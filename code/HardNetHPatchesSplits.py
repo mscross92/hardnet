@@ -662,7 +662,7 @@ def main(train_loader, test_loaders, model, logger, file_logger):
         # iterate over test loaders and test results
         #train_loader, test_loaders2 = create_loaders(load_random_triplets=triplet_flag)
         train(train_loader, model, optimizer1, epoch, logger, triplet_flag)
-        for test_loader in test_loaders:
+        # for test_loader in test_loaders:
             # test(test_loader['dataloader'], model, epoch, logger, test_loader['name'])
         if TEST_ON_W1BS:
             # print(weights_path)
