@@ -168,7 +168,7 @@ if os.path.isdir(args.w1bsroot):
 # order to prevent any memory allocation on unused GPUs
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
 
-args.cuda = not args.no_cuda and torch.cuda.is_available()
+args.cuda = True
 
 if args.cuda:
     cudnn.benchmark = True
