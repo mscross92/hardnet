@@ -77,7 +77,7 @@ parser.add_argument('--model-dir', default='data/models/',
                     help='folder to output model checkpoints')
 parser.add_argument('--experiment-name', default='/multiple_datasets_all/',
                     help='experiment path')
-parser.add_argument('--training-set', default='all',
+parser.add_argument('--training-set', default='turbid_milk',
                     help='Other options: notredame, yosemite')
 parser.add_argument('--loss', default='triplet_margin',
                     help='Other options: softmax, contrastive')
@@ -91,7 +91,7 @@ parser.add_argument('--decor', type=str2bool, default=False,
                     help='L2Net decorrelation penalty')
 parser.add_argument('--anchorave', type=str2bool, default=False,
                     help='anchorave')
-parser.add_argument('--imageSize', type=int, default=32,
+parser.add_argument('--imageSize', type=int, default=29,
                     help='the height / width of the input image to network')
 parser.add_argument('--mean-image', type=float, default=0.443728476019,
                     help='mean of train dataset for normalization')
@@ -105,11 +105,11 @@ parser.add_argument('--epochs', type=int, default=10, metavar='E',
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--anchorswap', type=bool, default=True,
                     help='turns on anchor swap')
-parser.add_argument('--batch-size', type=int, default=1024, metavar='BS',
+parser.add_argument('--batch-size', type=int, default=512, metavar='BS',
                     help='input batch size for training (default: 1024)')
-parser.add_argument('--test-batch-size', type=int, default=1024, metavar='BST',
+parser.add_argument('--test-batch-size', type=int, default=512, metavar='BST',
                     help='input batch size for testing (default: 1024)')
-parser.add_argument('--n-triplets', type=int, default=15000000, metavar='N',
+parser.add_argument('--n-triplets', type=int, default=11697, metavar='N',
                     help='how many triplets will generate from the dataset')
 parser.add_argument('--margin', type=float, default=1.0, metavar='MARGIN',
                     help='the margin value for the triplet loss function (default: 1.0')
@@ -121,7 +121,7 @@ parser.add_argument('--act-decay', type=float, default=0,
                     help='activity L2 decay, default 0')
 parser.add_argument('--lr', type=float, default=10.0, metavar='LR',
                     help='learning rate (default: 10.0)')
-parser.add_argument('--fliprot', type=str2bool, default=True,
+parser.add_argument('--fliprot', type=str2bool, default=False,
                     help='turns on flip and 90deg rotation augmentation')
 parser.add_argument('--augmentation', type=str2bool, default=False,
                     help='turns on shift and small scale rotation augmentation')
@@ -154,7 +154,7 @@ if args.anchorave:
 
 triplet_flag = (args.batch_reduce == 'random_global') or args.gor
 
-dataset_names = ['liberty', 'notredame', 'yosemite']
+dataset_names = ['turbid_milk', 'turbid_deepblue']
 
 TEST_ON_W1BS = False
 # check if path to w1bs dataset testing module exists
@@ -434,20 +434,20 @@ def weights_init(m):
 
 def create_loaders(load_random_triplets=False):
     test_dataset_names = copy.copy(dataset_names)
-    #test_dataset_names.remove(args.training_set)
+    test_dataset_names.remove(args.training_set)
     kwargs = {'num_workers': args.num_workers, 'pin_memory': args.pin_memory} if args.cuda else {}
-    np_reshape64 = lambda x: np.reshape(x, (64, 64, 1))
+    np_reshape29 = lambda x: np.reshape(x, (29, 29, 1))
     transform_test = transforms.Compose([
-            transforms.Lambda(np_reshape64),
+            transforms.Lambda(np_reshape29),
             transforms.ToPILImage(),
-            transforms.Resize(32),
+            transforms.Resize(29),
             transforms.ToTensor()])
     transform_train = transforms.Compose([
-            transforms.Lambda(np_reshape64),
+            transforms.Lambda(np_reshape29),
             transforms.ToPILImage(),
             transforms.RandomRotation(5,PIL.Image.BILINEAR),
-            transforms.RandomResizedCrop(32, scale = (0.9,1.0),ratio = (0.9,1.1)),
-            transforms.Resize(32),
+            transforms.RandomResizedCrop(29, scale = (0.9,1.0),ratio = (0.9,1.1)),
+            transforms.Resize(29),
             transforms.ToTensor()])
     transform = transforms.Compose([
             transforms.Lambda(cv2_scale),
