@@ -6,8 +6,12 @@ import cv2
 import sys
 import json
 
-types = ['e1','e2','e3','e4','e5','ref','h1','h2','h3','h4','h5', 't1', 't2', 't3', 't4', 't5']
-splits = ['a', 'b', 'c', 'view', 'illum']
+
+# types = ['0','1','2','3','4','5','6','7','8','9','10',\
+#        '11','12','13','14']
+
+types = ['0','1','2']
+splits = ['a']
 
 #images_to_exclude = ['v_adam', 'v_boat', 'v_graffiti', 'v_there','i_dome']
 
@@ -42,7 +46,7 @@ class HPatches(data.Dataset):
                 n_patches = int(h / w)
                 for i in range(n_patches):
                     patch = image[i * (w): (i + 1) * (w), 0:w]
-                    patch = cv2.resize(patch, (64, 64))
+                    patch = cv2.resize(patch, (29, 29))
                     patch = np.array(patch, dtype=np.uint8)
                     patches.append(patch)
                     labels.append(i+counter)
