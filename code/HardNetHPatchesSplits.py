@@ -481,7 +481,7 @@ def create_loaders(load_random_triplets=False):
                         download=True,
                         transform=transform_test),
         batch_size=args.test_batch_size,
-        shuffle=False, **kwargs)}
+        shuffle=False, **kwargs)
 
     return train_loader, test_loader
 
