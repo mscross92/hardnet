@@ -471,21 +471,19 @@ def create_loaders(load_random_triplets=False):
         batch_size=args.batch_size,
         shuffle=False, **kwargs)
 
-    test_loaders = [{'name': name,
-                     'dataloader': torch.utils.data.DataLoader(
-                         TotalDatasetsLoader(train=False,
-                                          batch_size=args.test_batch_size,
-                                          datasets_path=args.hpatches_split+"hpatches_split_a_test.pt",
-                                          fliprot=args.fliprot,
-                                          n_triplets = 936,
-                                          name=name,
-                                          download=True,
-                                          transform=transform_test),
-                         batch_size=args.test_batch_size,
-                         shuffle=False, **kwargs)}
-                    for name in test_dataset_names]
+    test_loader = torch.utils.data.DataLoader(
+        TotalDatasetsLoader(train=False,
+                        batch_size=args.test_batch_size,
+                        datasets_path=args.hpatches_split+"hpatches_split_a_test.pt",
+                        fliprot=args.fliprot,
+                        n_triplets = 936,
+                        name="turbid_deepblue",
+                        download=True,
+                        transform=transform_test),
+        batch_size=args.test_batch_size,
+        shuffle=False, **kwargs)}
 
-    return train_loader, test_loaders
+    return train_loader, test_loader
 
 
 def train(train_loader, model, optimizer, epoch, logger, load_triplets=False):
@@ -633,7 +631,7 @@ def create_optimizer(model, new_lr):
     return optimizer
 
 
-def main(train_loader, test_loaders, model, logger, file_logger):
+def main(train_loader, test_loader, model, logger, file_logger):
     # print the experiment configuration
     print('\nparsed options:\n{}\n'.format(vars(args)))
 
@@ -662,8 +660,7 @@ def main(train_loader, test_loaders, model, logger, file_logger):
         # iterate over test loaders and test results
         #train_loader, test_loaders2 = create_loaders(load_random_triplets=triplet_flag)
         train(train_loader, model, optimizer1, epoch, logger, triplet_flag)
-        for test_loader in test_loaders:
-            test(test_loader['dataloader'], model, epoch, logger, test_loader['name'])
+        test(test_loader, model, epoch, logger)
         if TEST_ON_W1BS:
             # print(weights_path)
             patch_images = w1bs.get_list_of_patch_images(
@@ -708,5 +705,5 @@ if __name__ == '__main__':
         from Loggers import Logger, FileLogger
         logger = Logger(LOG_DIR)
         # file_logger = FileLogger(./log/+suffix)
-    train_loader, test_loaders = create_loaders(load_random_triplets=triplet_flag)
-    main(train_loader, test_loaders, model, logger, file_logger)
+    train_loader, test_loader = create_loaders(load_random_triplets=triplet_flag)
+    main(train_loader, test_loader, model, logger, file_logger)
