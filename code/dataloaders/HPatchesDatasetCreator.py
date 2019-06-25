@@ -11,7 +11,7 @@ types = ['0','1','2','3','4','5','6','7','8','9','10',\
        '11','12','13','14']
 
 # types = ['0','1','2']
-splits = ['a']
+splits = ['a','b']
 
 #images_to_exclude = ['v_adam', 'v_boat', 'v_graffiti', 'v_there','i_dome']
 
