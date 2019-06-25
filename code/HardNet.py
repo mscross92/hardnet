@@ -542,41 +542,13 @@ def main(train_loader, test_loaders, model, logger, file_logger):
     start = args.start_epoch
     end = start + args.epochs
     for epoch in range(start, end):
-
+        
         # iterate over test loaders and test results
         train(train_loader, model, optimizer1, epoch, logger, triplet_flag)
         for test_loader in test_loaders:
             test(test_loader['dataloader'], model, epoch, logger, test_loader['name'])
         
-        if TEST_ON_W1BS :
-            # print(weights_path)
-            patch_images = w1bs.get_list_of_patch_images(
-                DATASET_DIR=args.w1bsroot.replace('/code', '/data/W1BS'))
-            desc_name = 'curr_desc'# + str(random.randint(0,100))
-            
-            DESCS_DIR = LOG_DIR + '/temp_descs/' #args.w1bsroot.replace('/code', "/data/out_descriptors")
-            OUT_DIR = DESCS_DIR.replace('/temp_descs/', "/out_graphs/")
-
-            for img_fname in patch_images:
-                w1bs_extract_descs_and_save(img_fname, model, desc_name, cuda = args.cuda,
-                                            mean_img=args.mean_image,
-                                            std_img=args.std_image, out_dir = DESCS_DIR)
-
-
-            force_rewrite_list = [desc_name]
-            w1bs.match_descriptors_and_save_results(DESC_DIR=DESCS_DIR, do_rewrite=True,
-                                                    dist_dict={},
-                                                    force_rewrite_list=force_rewrite_list)
-            if(args.enable_logging):
-                w1bs.draw_and_save_plots_with_loggers(DESC_DIR=DESCS_DIR, OUT_DIR=OUT_DIR,
-                                         methods=["SNN_ratio"],
-                                         descs_to_draw=[desc_name],
-                                         logger=file_logger,
-                                         tensor_logger = logger)
-            else:
-                w1bs.draw_and_save_plots(DESC_DIR=DESCS_DIR, OUT_DIR=OUT_DIR,
-                                         methods=["SNN_ratio"],
-                                         descs_to_draw=[desc_name])
+        
         #randomize train loader batches
         train_loader, test_loaders2 = create_loaders(load_random_triplets=triplet_flag)
 
