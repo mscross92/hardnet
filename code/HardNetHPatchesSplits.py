@@ -473,9 +473,10 @@ def create_loaders(load_random_triplets=False):
 
     test_loaders = [{'name': name,
                      'dataloader': torch.utils.data.DataLoader(
-                         TripletPhotoTour(train=False,
+                         TotalDatasetsLoader(train=False,
                                           batch_size=args.test_batch_size,
-                                          n_triplets = 1000,
+                                          datasets_path=args.hpatches_split,
+                                          n_triplets = 936,
                                           root=args.dataroot,
                                           name=name,
                                           download=True,
