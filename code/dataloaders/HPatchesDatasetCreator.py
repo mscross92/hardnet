@@ -51,7 +51,7 @@ class HPatches(data.Dataset):
                     patches.append(patch)
                     labels.append(i+counter)
             counter += n_patches
-        print counter
+        print(counter)
         return torch.ByteTensor(np.array(patches, dtype=np.uint8)), torch.LongTensor(labels)
 
 if __name__ == '__main__':
@@ -61,7 +61,7 @@ if __name__ == '__main__':
         path_to_splits_json = sys.argv[2]
         output_dir  = sys.argv[3]
     except:
-        print "Wrong input format. Try python HPatchesDatasetCreator.py path_to_hpatches path_to_splits_json output_dir"
+        print("Wrong input format. Try python HPatchesDatasetCreator.py path_to_hpatches path_to_splits_json output_dir")
         sys.exit(1)
     splits_json = json.load(open(path_to_splits_json, 'rb'))
     if not os.path.exists(output_dir):
