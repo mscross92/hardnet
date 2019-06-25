@@ -660,7 +660,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
         # iterate over test loaders and test results
         #train_loader, test_loaders2 = create_loaders(load_random_triplets=triplet_flag)
         train(train_loader, model, optimizer1, epoch, logger, triplet_flag)
-        test(test_loader, model, epoch, logger)
+        test(test_loader, model, epoch, logger,"a_test_log")
         if TEST_ON_W1BS:
             # print(weights_path)
             patch_images = w1bs.get_list_of_patch_images(
