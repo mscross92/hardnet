@@ -11,7 +11,7 @@ types = ['0','1','2','3','4','5','6','7','8','9','10',\
        '11','12','13','14']
 
 # types = ['0','1','2']
-splits = ['a','b']
+splits = ['a']
 
 #images_to_exclude = ['v_adam', 'v_boat', 'v_graffiti', 'v_there','i_dome']
 
@@ -72,6 +72,14 @@ if __name__ == '__main__':
         else:
             t = 'test'# view and illum are kind of train/test for each other
 
+        good_fnames = splits_json[split][t]
+        hPatches = HPatches(good_fnames = good_fnames)
+        images, labels = hPatches.read_image_file(path_to_hpatches_dir)
+        with open(os.path.join(output_dir, 'hpatches_split_' + split +  '_' + t + '.pt'), 'wb') as f:
+            torch.save((images, labels), f)
+        print(split, t, 'Saved')
+
+        t = 'test'
         good_fnames = splits_json[split][t]
         hPatches = HPatches(good_fnames = good_fnames)
         images, labels = hPatches.read_image_file(path_to_hpatches_dir)
