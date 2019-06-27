@@ -273,7 +273,7 @@ class TotalDatasetsLoader(data.Dataset):
                
         descriptors = []
         for d in data_a:
-            dx = torch.FloatTensor(np.array(d)).unsqueeze(0)
+            dx = torch.FloatTensor(np.array(d)).unsqueeze(-1)
             print(dx.shape)
             dx = dx.unsqueeze(-1)
             print(dx.shape)
@@ -282,8 +282,10 @@ class TotalDatasetsLoader(data.Dataset):
                 model.cuda()
                 dx = dx.cuda()
         
-            dx = Variable(dx),
+            dx = Variable(dx)
+
             out_a = model(dx)
+            
             descriptors.extend(out_a.data.cpu().numpy())
             
         return descriptors
