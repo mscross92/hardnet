@@ -713,7 +713,7 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     
     labels = np.ones(len(distances))
     # num_tests = test_loader.dataset.matches.size(0)
-    distances = np.vstack(distances).reshape(num_tests)
+    # distances = np.vstack(distances).reshape(num_tests)
     print(len(labels))
     print(len(distances))
     fpr95 = ErrorRateAt95Recall(labels, 1.0 / (distances + 1e-8))
