@@ -393,6 +393,9 @@ class TotalDatasetsLoader(data.Dataset):
                     img = self.transform(img.numpy())
                 return img
 
+            if not self.train:
+                print('No triplets!')
+                
             t = self.triplets[index]
             a, p, n = self.data[t[0]], self.data[t[1]], self.data[t[2]]
 
@@ -682,7 +685,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
 
 
 def test(test_loader, model, epoch, logger, logger_test_name):
-    print(test_loader)
+
     # switch to evaluate mode
     model.eval()
 
@@ -691,14 +694,12 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     pbar = tqdm(enumerate(test_loader))
     for batch_idx, data in pbar:
         data_a, data_p = data
-        print('DATA SHAPE',data.shape)
         if args.cuda:
             data_a, data_p = data_a.cuda(), data_p.cuda()
 
         data_a, data_p, label = Variable(data_a, volatile=True), \
                                 Variable(data_p, volatile=True), Variable(label)
 
-        print('LABEL SHAPE',label.shape)
         out_a = model(data_a)
         out_p = model(data_p)
         dists = torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
