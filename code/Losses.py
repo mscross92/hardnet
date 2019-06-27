@@ -102,9 +102,9 @@ def loss_HardNet(anchor, positive, visualise_idx, anchor_swap = False, anchor_av
     mask = mask.type_as(dist_without_min_on_diag)*10
     dist_without_min_on_diag = dist_without_min_on_diag+mask
     if batch_reduce == 'min':
-        min_neg,neg_ids = torch.min(dist_without_min_on_diag,1)[0]
+        min_neg,neg_ids = torch.min(dist_without_min_on_diag,1)
         if anchor_swap:
-            min_neg2,neg2_ids = torch.min(dist_without_min_on_diag,0)[0]
+            min_neg2,neg2_ids = torch.min(dist_without_min_on_diag,0)
             min_neg,min_types = torch.min(min_neg,min_neg2)
             n_type = min_types[visualise_idx]
             if n_type>0:
