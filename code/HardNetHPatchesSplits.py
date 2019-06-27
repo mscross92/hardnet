@@ -696,7 +696,7 @@ def test(test_loader, model, epoch, logger, logger_test_name):
         data_a, data_p, data_n = data
         del data_n
         if args.cuda:
-            data_a, data_p, = data_a.cuda(), data_p.cuda()
+            data_a, data_p = data_a.cuda(), data_p.cuda()
 
         data_a, data_p = Variable(data_a, volatile=True), \
                                 Variable(data_p, volatile=True)
@@ -705,8 +705,8 @@ def test(test_loader, model, epoch, logger, logger_test_name):
         out_p = model(data_p)
         dists = torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
         distances.append(dists.data.cpu().numpy().reshape(-1, 1))
-        print(len(out_a))
-        print(len(dists))
+        print(out_a.shape)
+        print(dists.shape)
 
         if batch_idx % args.log_interval == 0:
             pbar.set_description(logger_test_name + ' Test Epoch: {} [{}/{} ({:.0f}%)]'.format(
