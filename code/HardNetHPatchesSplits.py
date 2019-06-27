@@ -212,7 +212,7 @@ class TotalDatasetsLoader(data.Dataset):
         self.model = model
         self.fliprot = fliprot
         if self.train:
-                print('Generating {} triplets'.format(self.n_triplets))
+                # print('Generating {} triplets'.format(self.n_triplets))
                 if self.batch_hard == 0:
                     self.triplets = self.generate_triplets(self.labels, self.n_triplets, self.batch_size)
                 else:
@@ -534,7 +534,7 @@ def create_loaders(load_random_triplets=False):
     test_loader = torch.utils.data.DataLoader(
         TotalDatasetsLoader(train=False,
                          load_random_triplets = False,
-                         batch_size=args.test_batch_size,
+                         batch_size=128,
                          datasets_path=args.hpatches_split+"hpatches_split_a_test.pt",
                          fliprot=args.fliprot,
                          n_triplets=4680,
@@ -682,6 +682,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
 
 
 def test(test_loader, model, epoch, logger, logger_test_name):
+    print(test_loader)
     # switch to evaluate mode
     model.eval()
 
@@ -827,20 +828,6 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
         # # visualise 
         # test on deepblue set
-        test_x = TotalDatasetsLoader(train=False,
-                    load_random_triplets=False,
-                    batch_size=args.test_batch_size,
-                    datasets_path=args.hpatches_split+"hpatches_split_a_test.pt",
-                    fliprot=args.fliprot,
-                    n_triplets=4680,
-                    batch_hard=0,
-                    name="turbid_deepblue",
-                    download=True,
-                    transform=transform)
-
-        test_loader = torch.utils.data.DataLoader(test_x,
-                                                   batch_size=args.test_batch_size,
-                                                   shuffle=False, **kwargs)
         test(test_loader, model, epoch, logger,"a_test_log")
         # if TEST_ON_W1BS:
         #     # print(weights_path)
