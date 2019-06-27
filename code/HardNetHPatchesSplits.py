@@ -203,8 +203,6 @@ class TotalDatasetsLoader(data.Dataset):
 
         del datasets
 
-        if not self.train:
-            print(len(data))
         self.data, self.labels = data, labels
         self.transform = transform
         self.train = train
@@ -213,6 +211,8 @@ class TotalDatasetsLoader(data.Dataset):
         self.batch_hard = batch_hard
         self.model = model
         self.fliprot = fliprot
+        if not self.train:
+            print(len(data))
         if self.train:
                 # print('Generating {} triplets'.format(self.n_triplets))
                 if self.batch_hard == 0:
