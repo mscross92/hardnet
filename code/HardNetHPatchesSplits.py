@@ -216,7 +216,7 @@ class TotalDatasetsLoader(data.Dataset):
                 if self.batch_hard == 0:
                     self.triplets = self.generate_triplets(self.labels, self.n_triplets, self.batch_size)
                 else:
-                    self.descriptors = self.get_descriptors_for_dataset(self.data, self.model, self.transform)
+                    self.descriptors = self.get_descriptors_for_dataset(self.data, self.model)
                     # #
                     np.save('descriptors.npy', self.descriptors)
                     self.descriptors = np.load('descriptors.npy')
@@ -268,14 +268,25 @@ class TotalDatasetsLoader(data.Dataset):
 
 
     @staticmethod
-    def get_descriptors_for_dataset(data_a,model,trnsfrm):
+    def get_descriptors_for_dataset(data_a,model):
 
-        def transform_img(img):
+        def transform_img(img,trnsfrm):
             if trnsfrm is not None:
                 img = trnsfrm(img.numpy())
             return img
 
-        data_a = transform_img(data_a)
+        np_reshape29 = lambda x: np.reshape(x, (x.shape[0],29, 29, 1))
+        trnsfrm = transforms.Compose([
+            # transforms.Lambda(cv2_scale),
+            # transforms.Lambda(np_reshape),
+            # transforms.ToTensor(),
+            # transforms.Normalize((args.mean_image,), (args.std_image,))])
+            transforms.Lambda(np_reshape29),
+            transforms.ToPILImage(),
+            transforms.Resize(29),
+            transforms.ToTensor()])
+
+        data_a = transform_img(data_a,trnsfrm)
         if args.cuda:
             model.cuda()
             data_a = data_a.cuda()
