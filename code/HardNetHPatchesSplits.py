@@ -596,10 +596,28 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
             loss = loss_L2Net(out_a, out_p, anchor_swap=args.anchorswap,
                               margin=args.margin, loss_type=args.loss)
         elif args.batch_reduce == 'random_global':
+            vis_id = np.random.randint(0, data_a.shape[0])
             loss = loss_random_sampling(out_a, out_p, out_n,
                                         margin=args.margin,
                                         anchor_swap=args.anchorswap,
                                         loss_type=args.loss)
+            # visualise random hard sample
+            plt.figure()
+            plt.subplot(1, 3, 1)
+            plt.imshow((np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+            plt.gca().set_xticks([])
+            plt.gca().set_yticks([])
+            plt.subplot(1,3,2)
+            plt.imshow((np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+            plt.gca().set_xticks([])
+            plt.gca().set_yticks([])
+            plt.subplot(1,3,3)
+            plt.imshow((np.array(data_n[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+            plt.gca().set_xticks([])
+            plt.gca().set_yticks([])
+            savestr = 'hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '.png'
+            plt.savefig(savestr, bbox_inches='tight')
+            plt.close()
         else:
             vis_id = np.random.randint(0, data_a.shape[0])
             loss, n_idx,n_type = loss_HardNet(out_a, out_p,
