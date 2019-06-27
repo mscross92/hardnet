@@ -494,12 +494,29 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
     model.train()
     pbar = tqdm(enumerate(train_loader))
     for batch_idx, data in pbar:
-        print('DATA SHAPE',len(data))
         if load_triplets:
             data_a, data_p, data_n = data
-            # visualise the first triplet
-            print(data_a[0].shape)
             
+            # visualise random triplet for the first batch - TODO: randomly select batch
+            index = np.random.randint(0, data_a.shape[0])
+            if batch_idx == 0:
+                plt.figure(figsize=(3,2))
+                plt.subplot(131)
+                plt.imshow(np.array(data_a[index,:,:]).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+                plt.gca().set_xticks([])
+                plt.gca().set_yticks([])
+                plt.title('Anchor', fontsize=12)
+                plt.subplot(132)
+                plt.imshow(np.array(data_p[index,:,:]).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+                plt.title('Positive', fontsize=12)
+                plt.gca().set_xticks([])
+                plt.gca().set_yticks([])
+                plt.subplot(133)
+                plt.imshow(np.array(data_n[index,:,:]).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+                plt.title('Negative', fontsize=12)
+                plt.gca().set_xticks([])
+                plt.gca().set_yticks([])
+                plt.show()
         else:
             data_a, data_p = data
 
