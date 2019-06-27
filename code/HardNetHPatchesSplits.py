@@ -278,22 +278,19 @@ class TotalDatasetsLoader(data.Dataset):
             transforms.Resize(29),
             transforms.ToTensor()])
        
-        x = []
+        descriptors = []
         for d in data_a:
             dx = trnsfrm(d)
-            x.append(d)
 
-        data_a = x
-        del x
-
-        if args.cuda:
-            model.cuda()
-            data_a = data_a.cuda()
+            if args.cuda:
+                model.cuda()
+                dx = dx.cuda()
         
-        data_a = Variable(data_a)
-        out_a = model(data_a)
-        
-        return out_a
+            dx = Variable(dx),
+            out_a = model(dx)
+            descriptors.extend(out_a.data.cpu().numpy())
+            
+        return descriptors
     
 
     @staticmethod
