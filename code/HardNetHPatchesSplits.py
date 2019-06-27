@@ -473,26 +473,29 @@ def create_loaders(load_random_triplets=False):
 
     test_loader = torch.utils.data.DataLoader(
         TotalDatasetsLoader(train=False,
-                        batch_size=args.test_batch_size,
-                        datasets_path=args.hpatches_split+"hpatches_split_a_test.pt",
-                        fliprot=args.fliprot,
-                        n_triplets = 936,
-                        name="turbid_deepblue",
-                        download=True,
-                        transform=transform_test),
+                         batch_size=args.test_batch_size,
+                         datasets_path=args.hpatches_split+"hpatches_split_a_test.pt",
+                         fliprot=args.fliprot,
+                         n_triplets=936,
+                         name="turbid_deepblue",
+                         download=True,
+                         transform=transform_test),
         batch_size=args.test_batch_size,
         shuffle=False, **kwargs)
 
     return train_loader, test_loader
 
 
-def train(train_loader, model, optimizer, epoch, logger, load_triplets=False):
+def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
     # switch to train mode
     model.train()
     pbar = tqdm(enumerate(train_loader))
     for batch_idx, data in pbar:
         if load_triplets:
             data_a, data_p, data_n = data
+            # visualise the first triplet
+            print(data_a[0].shape)
+            
         else:
             data_a, data_p = data
 
@@ -557,8 +560,9 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     labels, distances = [], []
 
     pbar = tqdm(enumerate(test_loader))
-    for batch_idx, (data_a, data_p, label) in pbar:
-
+    for batch_idx, data in pbar:
+        data_a, data_p = data
+        
         if args.cuda:
             data_a, data_p = data_a.cuda(), data_p.cuda()
 
@@ -659,8 +663,11 @@ def main(train_loader, test_loader, model, logger, file_logger):
     for epoch in range(start, end):
         # iterate over test loaders and test results
         #train_loader, test_loaders2 = create_loaders(load_random_triplets=triplet_flag)
-        train(train_loader, model, optimizer1, epoch, logger, triplet_flag)
-        test(test_loader, model, epoch, logger,"a_test_log")
+        train(train_loader, model, optimizer1, epoch, logger, True)
+
+        # visualise 
+        # test on deepblue set
+        # test(test_loader, model, epoch, logger,"a_test_log")
         if TEST_ON_W1BS:
             # print(weights_path)
             patch_images = w1bs.get_list_of_patch_images(
