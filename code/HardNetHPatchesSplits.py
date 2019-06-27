@@ -245,7 +245,7 @@ class TotalDatasetsLoader(data.Dataset):
                         n2 = np.random.randint(0, len(indices[c1]))
                 n3 = np.random.randint(0, len(indices[c2]))
                 triplets.append([indices[c1][n1], indices[c1][n2], indices[c2][n3]])
-            print('TRIPLET SHAPE',np.array(triplets).shape)
+            # print('TRIPLET SHAPE',np.array(triplets).shape)
             return torch.LongTensor(np.array(triplets))
 
     def __getitem__(self, index):
@@ -493,6 +493,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
     model.train()
     pbar = tqdm(enumerate(train_loader))
     for batch_idx, data in pbar:
+        print('DATA SHAPE',data.shape)
         if load_triplets:
             data_a, data_p, data_n = data
             # visualise the first triplet
