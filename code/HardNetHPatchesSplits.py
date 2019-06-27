@@ -203,6 +203,8 @@ class TotalDatasetsLoader(data.Dataset):
 
         del datasets
 
+        if not self.train:
+            print(len(data))
         self.data, self.labels = data, labels
         self.transform = transform
         self.train = train
