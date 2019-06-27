@@ -152,7 +152,8 @@ if args.anchorswap:
 if args.anchorave:
     suffix = suffix + '_av'
 
-triplet_flag = (args.batch_reduce == 'random_global') or args.gor
+# triplet_flag = (args.batch_reduce == 'random_global') or args.gor
+triplet_flag = True
 
 dataset_names = ['turbid_milk', 'turbid_deepblue']
 
@@ -663,7 +664,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
     for epoch in range(start, end):
         # iterate over test loaders and test results
         #train_loader, test_loaders2 = create_loaders(load_random_triplets=triplet_flag)
-        train(train_loader, model, optimizer1, epoch, logger, True)
+        train(train_loader, model, optimizer1, epoch, logger, triplet_flag)
 
         # visualise 
         # test on deepblue set
@@ -712,5 +713,5 @@ if __name__ == '__main__':
         from Loggers import Logger, FileLogger
         logger = Logger(LOG_DIR)
         # file_logger = FileLogger(./log/+suffix)
-    train_loader, test_loader = create_loaders(load_random_triplets=True)
+    train_loader, test_loader = create_loaders(load_random_triplets=triplet_flag)
     main(train_loader, test_loader, model, logger, file_logger)
