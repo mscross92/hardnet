@@ -21,7 +21,6 @@ import torch
 import torch.nn.init
 import torch.nn as nn
 import torch.optim as optim
-# import torchvision.datasets as dset
 import torchvision.transforms as transforms
 from torch.autograd import Variable
 import torch.backends.cudnn as cudnn
