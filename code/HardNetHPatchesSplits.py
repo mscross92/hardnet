@@ -393,9 +393,6 @@ class TotalDatasetsLoader(data.Dataset):
                     img = self.transform(img.numpy())
                 return img
 
-            if not self.train:
-                print('No triplets!')
-                
             t = self.triplets[index]
             a, p, n = self.data[t[0]], self.data[t[1]], self.data[t[2]]
 
@@ -691,6 +688,8 @@ def test(test_loader, model, epoch, logger, logger_test_name):
 
     labels, distances = [], []
 
+    print(test_loader.data.shape)
+    
     pbar = tqdm(enumerate(test_loader))
     for batch_idx, data in pbar:
         data_a, data_p = data
