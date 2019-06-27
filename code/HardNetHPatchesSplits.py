@@ -221,7 +221,7 @@ class TotalDatasetsLoader(data.Dataset):
                     np.save('descriptors.npy', self.descriptors)
                     self.descriptors = np.load('descriptors.npy')
                     #
-                    self.negative_indices = self.get_hard_negatives(self.data, self.labels, self.descriptors)
+                    self.negative_indices = self.get_hard_negatives(self.labels, self.descriptors)
                     np.save('descriptors_min_dist.npy', self.negative_indices)
                     self.negative_indices = np.load('descriptors_min_dist.npy')
                     print(self.negative_indices[0])
@@ -268,10 +268,8 @@ class TotalDatasetsLoader(data.Dataset):
 
 
     @staticmethod
-    def get_descriptors_for_dataset(data,model):
-        
-        data_a, data_p, data_n = data
-        
+    def get_descriptors_for_dataset(data_a,model):
+                
         if args.cuda:
             model.cuda()
             data_a = data_a.cuda()
@@ -283,7 +281,7 @@ class TotalDatasetsLoader(data.Dataset):
     
 
     @staticmethod
-    def get_hard_negatives(data_in, labels, descriptors):
+    def get_hard_negatives(labels, descriptors):
         def BuildKNNGraphByFAISS_GPU(db,k):
             dbsize, dim = db.shape
             flat_config = faiss.GpuIndexFlatConfig()
