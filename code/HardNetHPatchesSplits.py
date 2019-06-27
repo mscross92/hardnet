@@ -693,9 +693,10 @@ def test(test_loader, model, epoch, logger, logger_test_name):
 
     pbar = tqdm(enumerate(test_loader))
     for batch_idx, data in pbar:
-        data_a, data_p = data
+        data_a, data_p, data_n = data
+        del data_n
         if args.cuda:
-            data_a, data_p = data_a.cuda(), data_p.cuda()
+            data_a, data_p, = data_a.cuda(), data_p.cuda()
 
         data_a, data_p, label = Variable(data_a, volatile=True), \
                                 Variable(data_p, volatile=True), Variable(label)
