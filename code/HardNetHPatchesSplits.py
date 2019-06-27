@@ -133,7 +133,7 @@ parser.add_argument('--wd', default=1e-4, type=float,
                     metavar='W', help='weight decay (default: 1e-4)')
 parser.add_argument('--optimizer', default='sgd', type=str,
                     metavar='OPT', help='The optimizer to use (default: SGD)')
-parser.add_argument('--batch-hard', type=int, default=0, metavar='HM',
+parser.add_argument('--batch_hard', type=int, default=0, metavar='HM',
                     help='triplet mining strategy')
 # Device options
 parser.add_argument('--no-cuda', action='store_true', default=False,
