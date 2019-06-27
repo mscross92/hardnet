@@ -810,7 +810,6 @@ def main(train_loader, test_loader, model, logger, file_logger):
                          fliprot=args.fliprot,
                          n_triplets=args.n_triplets,
                          batch_hard=args.batch_hard,
-                         model=model,
                          name=args.training_set,
                          download=True,
                          transform=transform)
@@ -828,6 +827,20 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
         # # visualise 
         # test on deepblue set
+        test_x = TotalDatasetsLoader(train=False,
+                    load_random_triplets=False,
+                    batch_size=args.test_batch_size,
+                    datasets_path=args.hpatches_split+"hpatches_split_a_test.pt",
+                    fliprot=args.fliprot,
+                    n_triplets=4680,
+                    batch_hard=0,
+                    name="turbid_deepblue",
+                    download=True,
+                    transform=transform)
+
+        test_loader = torch.utils.data.DataLoader(test_x,
+                                                   batch_size=args.test_batch_size,
+                                                   shuffle=False, **kwargs)
         test(test_loader, model, epoch, logger,"a_test_log")
         # if TEST_ON_W1BS:
         #     # print(weights_path)
