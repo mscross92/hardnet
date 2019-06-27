@@ -259,6 +259,7 @@ class TotalDatasetsLoader(data.Dataset):
 
             img_a = transform_img(a)
             img_p = transform_img(p)
+            img_n = transform_img(n)
 
             # transform images if required
             if self.fliprot:
@@ -272,7 +273,7 @@ class TotalDatasetsLoader(data.Dataset):
                 if do_flip:
                     img_a = torch.from_numpy(deepcopy(img_a.numpy()[:,:,::-1]))
                     img_p = torch.from_numpy(deepcopy(img_p.numpy()[:,:,::-1]))
-            return img_a, img_p
+            return img_a, img_p, img_n
 
     def __len__(self):
             if self.train:
