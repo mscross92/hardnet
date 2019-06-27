@@ -270,23 +270,21 @@ class TotalDatasetsLoader(data.Dataset):
     @staticmethod
     def get_descriptors_for_dataset(data_a,model):
 
-        def transform_img(img,trnsfrm):
-            if trnsfrm is not None:
-                img = trnsfrm(img.numpy())
-            return img
+        def get_transformed_data(x,batch_transform = None):
+            collated = torch.utils.data.dataloader.default_collate(x)
+            if batch_transform is not None:
+                collated = batch_transform(collated)
+            return collated
 
-        np_reshape29 = lambda x: np.reshape(x, (x.shape[0],29, 29, 1))
+        np_reshape29 = lambda x: np.reshape(x, (29, 29, 1))
         trnsfrm = transforms.Compose([
-            # transforms.Lambda(cv2_scale),
-            # transforms.Lambda(np_reshape),
-            # transforms.ToTensor(),
-            # transforms.Normalize((args.mean_image,), (args.std_image,))])
             transforms.Lambda(np_reshape29),
             transforms.ToPILImage(),
             transforms.Resize(29),
             transforms.ToTensor()])
 
-        data_a = transform_img(data_a,trnsfrm)
+        data_a = get_transformed_data(data_a,trnsfrm)
+
         if args.cuda:
             model.cuda()
             data_a = data_a.cuda()
