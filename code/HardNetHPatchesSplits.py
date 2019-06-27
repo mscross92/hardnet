@@ -638,7 +638,7 @@ def create_optimizer(model, new_lr):
     return optimizer
 
 
-def main(train_loader, train_data, train_labels, test_loader, model, logger, file_logger):
+def main(train_loader, test_loader, model, logger, file_logger):
 
     
     # print the experiment configuration
@@ -822,4 +822,4 @@ if __name__ == '__main__':
     # main(train_loader, test_loader, model, logger, file_logger)
 
     train_loader, test_loader = create_loaders(load_random_triplets=triplet_flag)
-    main(train_loader, train_data.data, train_data.labels, test_loader, model, logger, file_logger)
+    main(train_loader, test_loader, model, logger, file_logger)
