@@ -455,10 +455,14 @@ def create_loaders(load_random_triplets=False):
             transforms.Resize(29),
             transforms.ToTensor()])
     transform = transforms.Compose([
-            transforms.Lambda(cv2_scale),
-            transforms.Lambda(np_reshape),
-            transforms.ToTensor(),
-            transforms.Normalize((args.mean_image,), (args.std_image,))])
+            # transforms.Lambda(cv2_scale),
+            # transforms.Lambda(np_reshape),
+            # transforms.ToTensor(),
+            # transforms.Normalize((args.mean_image,), (args.std_image,))])
+            transforms.Lambda(np_reshape29),
+            transforms.ToPILImage(),
+            transforms.Resize(29),
+            transforms.ToTensor()])
     if not args.augmentation:
         transform_train = transform
         transform_test = transform
