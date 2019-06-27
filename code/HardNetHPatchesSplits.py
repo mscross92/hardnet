@@ -507,7 +507,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
             index = np.random.randint(0, data_a.shape[0])
             if batch_idx == 0:
                 print(data_a[index,0,28,28])
-                plt.figure(figsize=(3,2))
+                plt.figure()
                 plt.subplot(1, 3, 1)
                 plt.imshow((np.array(data_a[index,0,:,:])*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
                 plt.gca().set_xticks([])
