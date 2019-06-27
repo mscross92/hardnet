@@ -502,6 +502,9 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
             # visualise random triplet for the first batch - TODO: randomly select batch
             index = np.random.randint(0, data_a.shape[0])
             if batch_idx == 0:
+                print(data_a[index,:,:,0])
+                print(data_a[index,:,:])
+                
                 plt.figure(figsize=(3,2))
                 plt.subplot(131)
                 plt.imshow(data_a[index,:,:,0].numpy().astype('uint8'), cmap='gray',vmax=255,vmin=0) 
