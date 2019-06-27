@@ -187,7 +187,7 @@ if not os.path.exists(args.log_dir):
 
 class TotalDatasetsLoader(data.Dataset):
 
-    def __init__(self, datasets_path, train = True, transform = None, batch_size = None, n_triplets = 5000000, fliprot = False, *arg, **kw):
+    def __init__(self, datasets_path, train = True, transform = None, batch_size = None, n_triplets = 5000000, batch_hard = 0, negative_indices = None, fliprot = False, *arg, **kw):
         super(TotalDatasetsLoader, self).__init__()
         #datasets_path = [os.path.join(datasets_path, dataset) for dataset in os.listdir(datasets_path) if '.pt' in dataset]
         datasets_path = [datasets_path]
@@ -206,49 +206,105 @@ class TotalDatasetsLoader(data.Dataset):
         self.train = train
         self.n_triplets = n_triplets
         self.batch_size = batch_size
+        self.batch_hard = batch_hard
+        self.negative_indices = negative_indices
         self.fliprot = fliprot
         if self.train:
                 print('Generating {} triplets'.format(self.n_triplets))
-                self.triplets = self.generate_triplets(self.labels, self.n_triplets, self.batch_size)
+                if self.batch_hard == 0:
+                    self.triplets = self.generate_triplets(self.labels, self.n_triplets, self.batch_size)
+                else
+                    self.triplets = self.generate_hard_triplets(self.labels, self.n_triplets, self.batch_size, self.negative_indices)
 
     @staticmethod
     def generate_triplets(labels, num_triplets, batch_size):
-            def create_indices(_labels):
-                inds = dict()
-                for idx, ind in enumerate(_labels):
-                    if ind not in inds:
-                        inds[ind] = []
-                    inds[ind].append(idx)
-                return inds
+        def create_indices(_labels):
+            inds = dict()
+            for idx, ind in enumerate(_labels):
+                if ind not in inds:
+                    inds[ind] = []
+                inds[ind].append(idx)
+            return inds
 
-            triplets = []
-            indices = create_indices(labels.numpy())
-            unique_labels = np.unique(labels.numpy())
-            n_classes = unique_labels.shape[0]
-            # add only unique indices in batch
-            already_idxs = set()
+        triplets = []
+        indices = create_indices(labels.numpy())
+        unique_labels = np.unique(labels.numpy())
+        n_classes = unique_labels.shape[0]
+        # add only unique indices in batch
+        already_idxs = set()
 
-            for x in tqdm(range(num_triplets)):
-                if len(already_idxs) >= batch_size:
-                    already_idxs = set()
+        for x in tqdm(range(num_triplets)):
+            if len(already_idxs) >= batch_size:
+                already_idxs = set()
+            c1 = np.random.randint(0, n_classes)
+            while c1 in already_idxs:
                 c1 = np.random.randint(0, n_classes)
-                while c1 in already_idxs:
-                    c1 = np.random.randint(0, n_classes)
-                already_idxs.add(c1)
+            already_idxs.add(c1)
+            c2 = np.random.randint(0, n_classes)
+            while c1 == c2:
                 c2 = np.random.randint(0, n_classes)
-                while c1 == c2:
-                    c2 = np.random.randint(0, n_classes)
-                if len(indices[c1]) == 2:  # hack to speed up process
-                    n1, n2 = 0, 1
-                else:
-                    n1 = np.random.randint(0, len(indices[c1]))
+            if len(indices[c1]) == 2:  # hack to speed up process
+                n1, n2 = 0, 1
+            else:
+                n1 = np.random.randint(0, len(indices[c1]))
+                n2 = np.random.randint(0, len(indices[c1]))
+                while n1 == n2:
                     n2 = np.random.randint(0, len(indices[c1]))
-                    while n1 == n2:
-                        n2 = np.random.randint(0, len(indices[c1]))
-                n3 = np.random.randint(0, len(indices[c2]))
-                triplets.append([indices[c1][n1], indices[c1][n2], indices[c2][n3]])
-            # print('TRIPLET SHAPE',np.array(triplets).shape)
-            return torch.LongTensor(np.array(triplets))
+            n3 = np.random.randint(0, len(indices[c2]))
+            triplets.append([indices[c1][n1], indices[c1][n2], indices[c2][n3]])
+        # print('TRIPLET SHAPE',np.array(triplets).shape)
+        return torch.LongTensor(np.array(triplets))
+
+    @staticmethod
+    def generate_hard_triplets(labels, num_triplets, batch_size):
+        def create_indices(_labels):
+            inds = dict()
+            for idx, ind in enumerate(_labels):
+                if ind not in inds:
+                    inds[ind] = []
+                inds[ind].append(idx)
+            return inds
+
+        triplets = []
+        indices = create_indices(labels)
+        unique_labels = np.unique(labels.numpy())
+        n_classes = unique_labels.shape[0]
+
+        # add only unique indices in batch
+        already_idxs = set()
+        count  = 0
+        for x in tqdm(range(num_triplets)):
+            if len(already_idxs) >= args.batch_size:
+                already_idxs = set()
+            c1 = np.random.randint(0, n_classes - 1)
+            while c1 in already_idxs:
+                c1 = np.random.randint(0, n_classes - 1)
+            already_idxs.add(c1)
+            if len(indices[c1]) == 2:  # hack to speed up process
+                n1, n2 = 0, 1
+            else:
+                n1 = np.random.randint(0, len(indices[c1]) - 1)
+                n2 = np.random.randint(0, len(indices[c1]) - 1)
+                while n1 == n2:
+                    n2 = np.random.randint(0, len(indices[c1]) - 1)
+            indx = indices[c1][n1]
+            if(len(negative_indices[indx])>0):
+                negative_indx = random.choice(negative_indices[indx])
+            else:
+                count+=1
+                c2 = np.random.randint(0, n_classes - 1)
+                while c1 == c2:
+                    c2 = np.random.randint(0, n_classes - 1)
+                n3 = np.random.randint(0, len(indices[c2]) - 1)
+                negative_indx = indices[c2][n3]
+
+            already_idxs.add(c1)
+
+            triplets.append([indices[c1][n1], indices[c1][n2], negative_indx])
+
+        print(count)
+        print('triplets are generated. amount of triplets: {}'.format(len(triplets)))
+        return torch.LongTensor(np.array(triplets))
 
     def __getitem__(self, index):
             def transform_img(img):
@@ -280,106 +336,6 @@ class TotalDatasetsLoader(data.Dataset):
     def __len__(self):
             if self.train:
                 return self.triplets.size(0)
-
-class TripletPhotoTour(dset.PhotoTour):
-    """
-    From the PhotoTour Dataset it generates triplet samples
-    note: a triplet is composed by a pair of matching images and one of
-    different class.
-    """
-    def __init__(self, train=True, transform=None, n_triplets = 1000, batch_size=None, load_random_triplets=False, *arg, **kw):
-        super(TripletPhotoTour, self).__init__(*arg, **kw)
-        self.transform = transform
-        self.out_triplets = True
-        self.train = train
-        self.n_triplets = n_triplets
-        self.batch_size = batch_size
-        if self.train:
-            print('Generating {} triplets'.format(self.n_triplets))
-            self.triplets = self.generate_triplets(self.labels, self.n_triplets)
-
-    @staticmethod
-    def generate_triplets(labels, num_triplets):
-        def create_indices(_labels):
-            inds = dict()
-            for idx, ind in enumerate(_labels):
-                if ind not in inds:
-                    inds[ind] = []
-                inds[ind].append(idx)
-            return inds
-
-        triplets = []
-        indices = create_indices(labels.numpy())
-        unique_labels = np.unique(labels.numpy())
-        n_classes = unique_labels.shape[0]
-        # add only unique indices in batch
-        already_idxs = set()
-
-        for x in tqdm(range(num_triplets)):
-            if len(already_idxs) >= args.batch_size:
-                already_idxs = set()
-            c1 = np.random.randint(0, n_classes - 1)
-            while c1 in already_idxs:
-                c1 = np.random.randint(0, n_classes - 1)
-            already_idxs.add(c1)
-            c2 = np.random.randint(0, n_classes - 1)
-            while c1 == c2:
-                c2 = np.random.randint(0, n_classes - 1)
-            if len(indices[c1]) == 2:  # hack to speed up process
-                n1, n2 = 0, 1
-            else:
-                n1 = np.random.randint(0, len(indices[c1]) - 1)
-                n2 = np.random.randint(0, len(indices[c1]) - 1)
-                while n1 == n2:
-                    n2 = np.random.randint(0, len(indices[c1]) - 1)
-            n3 = np.random.randint(0, len(indices[c2]) - 1)
-            triplets.append([indices[c1][n1], indices[c1][n2], indices[c2][n3]])
-        return torch.LongTensor(np.array(triplets))
-
-    def __getitem__(self, index):
-        def transform_img(img):
-            if self.transform is not None:
-                img = self.transform(img.numpy())
-            return img
-
-        if not self.train:
-            m = self.matches[index]
-            img1 = transform_img(self.data[m[0]])
-            img2 = transform_img(self.data[m[1]])
-            return img1, img2, m[2]
-
-        t = self.triplets[index]
-        a, p, n = self.data[t[0]], self.data[t[1]], self.data[t[2]]
-
-        img_a = transform_img(a)
-        img_p = transform_img(p)
-        img_n = None
-        if self.out_triplets:
-            img_n = transform_img(n)
-        # transform images if required
-        if args.fliprot:
-            do_flip = random.random() > 0.5
-            do_rot = random.random() > 0.5
-            if do_rot:
-                img_a = img_a.permute(0, 2, 1)
-                img_p = img_p.permute(0, 2, 1)
-                if self.out_triplets:
-                    img_n = img_n.permute(0, 2, 1)
-            if do_flip:
-                img_a = torch.from_numpy(deepcopy(img_a.numpy()[:, :, ::-1]))
-                img_p = torch.from_numpy(deepcopy(img_p.numpy()[:, :, ::-1]))
-                if self.out_triplets:
-                    img_n = torch.from_numpy(deepcopy(img_n.numpy()[:, :, ::-1]))
-        if self.out_triplets:
-            return (img_a, img_p, img_n)
-        else:
-            return (img_a, img_p)
-
-    def __len__(self):
-        if self.train:
-            return self.triplets.size(0)
-        else:
-            return self.matches.size(0)
 
 
 class HardNet(nn.Module):
@@ -467,8 +423,20 @@ def create_loaders(load_random_triplets=False):
         transform_train = transform
         transform_test = transform
 
-    train_loader = torch.utils.data.DataLoader(
-        TotalDatasetsLoader(train=True,
+    # train_loader = torch.utils.data.DataLoader(
+    #     TotalDatasetsLoader(train=True,
+    #                      load_random_triplets=load_random_triplets,
+    #                      batch_size=args.batch_size,
+    #                      datasets_path=args.hpatches_split+"hpatches_split_a_train.pt",
+    #                      fliprot=args.fliprot,
+    #                      n_triplets=args.n_triplets,
+    #                      name=args.training_set,
+    #                      download=True,
+    #                      transform=transform_train),
+    #     batch_size=args.batch_size,
+    #     shuffle=False, **kwargs)
+
+    train_dx = TotalDatasetsLoader(train=True,
                          load_random_triplets=load_random_triplets,
                          batch_size=args.batch_size,
                          datasets_path=args.hpatches_split+"hpatches_split_a_train.pt",
@@ -476,9 +444,7 @@ def create_loaders(load_random_triplets=False):
                          n_triplets=args.n_triplets,
                          name=args.training_set,
                          download=True,
-                         transform=transform_train),
-        batch_size=args.batch_size,
-        shuffle=False, **kwargs)
+                         transform=transform_train)
 
     test_loader = torch.utils.data.DataLoader(
         TotalDatasetsLoader(train=False,
@@ -492,7 +458,7 @@ def create_loaders(load_random_triplets=False):
         batch_size=args.test_batch_size,
         shuffle=False, **kwargs)
 
-    return train_loader, test_loader
+    return train_dx, test_loader
 
 
 def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
@@ -506,7 +472,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
             # visualise random triplet for the first batch - TODO: randomly select batch
             index = np.random.randint(0, data_a.shape[0])
             if batch_idx == 0:
-                print(data_a[index,0,28,28])
+                print(data_n[index,0,28,28])
                 plt.figure()
                 plt.subplot(1, 3, 1)
                 plt.imshow((np.array(data_a[index,0,:,:])*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
@@ -665,7 +631,9 @@ def create_optimizer(model, new_lr):
     return optimizer
 
 
-def main(train_loader, test_loader, model, logger, file_logger):
+def main(train_data, train_labels, test_loader, model, logger, file_logger):
+
+    
     # print the experiment configuration
     print('\nparsed options:\n{}\n'.format(vars(args)))
 
@@ -691,41 +659,131 @@ def main(train_loader, test_loader, model, logger, file_logger):
     start = args.start_epoch
     end = start + args.epochs
     for epoch in range(start, end):
-        # iterate over test loaders and test results
-        #train_loader, test_loaders2 = create_loaders(load_random_triplets=triplet_flag)
-        train(train_loader, model, optimizer1, epoch, logger, triplet_flag)
 
-        # visualise 
-        # test on deepblue set
-        # test(test_loader, model, epoch, logger,"a_test_log")
-        if TEST_ON_W1BS:
-            # print(weights_path)
-            patch_images = w1bs.get_list_of_patch_images(
-                DATASET_DIR=args.w1bsroot.replace('/code', '/data/W1BS'))
-            desc_name = 'curr_desc'  # + str(random.randint(0,100))
+        model.eval()
+        # #
+        descriptors = get_descriptors_for_dataset(model, train_data)
+        # #
+        np.save('descriptors.npy', descriptors)
+        descriptors = np.load('descriptors.npy')
+        #
+        hard_negatives = get_hard_negatives(train_data, train_labels, descriptors)
+        np.save('descriptors_min_dist.npy', hard_negatives)
+        hard_negatives = np.load('descriptors_min_dist.npy')
+        print(hard_negatives[0])
 
-            DESCS_DIR = LOG_DIR + '/temp_descs/'  # args.w1bsroot.replace('/code', "/data/out_descriptors")
-            OUT_DIR = DESCS_DIR.replace('/temp_descs/', "/out_graphs/")
+        trainPhotoTourDatasetWithHardNegatives = TripletPhotoTourHardNegatives(train=True,
+                                                              negative_indices=hard_negatives,
+                                                              batch_size=args.batch_size,
+                                                              root=args.dataroot,
+                                                              name=args.training_set,
+                                                              download=True,
+                                                              transform=transform)
 
-            for img_fname in patch_images:
-                w1bs_extract_descs_and_save(img_fname, model, desc_name, cuda=args.cuda,
-                                            mean_img=args.mean_image,
-                                            std_img=args.std_image, out_dir=DESCS_DIR)
+        train_loader = torch.utils.data.DataLoader(trainPhotoTourDatasetWithHardNegatives,
+                                                   batch_size=args.batch_size,
+                                                   shuffle=False, **kwargs)
 
-            force_rewrite_list = [desc_name]
-            w1bs.match_descriptors_and_save_results(DESC_DIR=DESCS_DIR, do_rewrite=True,
-                                                    dist_dict={},
-                                                    force_rewrite_list=force_rewrite_list)
-            if (args.enable_logging):
-                w1bs.draw_and_save_plots_with_loggers(DESC_DIR=DESCS_DIR, OUT_DIR=OUT_DIR,
-                                                      methods=["SNN_ratio"],
-                                                      descs_to_draw=[desc_name],
-                                                      logger=file_logger,
-                                                      tensor_logger=logger)
-            else:
-                w1bs.draw_and_save_plots(DESC_DIR=DESCS_DIR, OUT_DIR=OUT_DIR,
-                                         methods=["SNN_ratio"],
-                                         descs_to_draw=[desc_name])
+        train(train_loader, model, optimizer1, epoch, logger)
+
+
+        # # iterate over test loaders and test results
+        # #train_loader, test_loaders2 = create_loaders(load_random_triplets=triplet_flag)
+        # train(train_loader, model, optimizer1, epoch, logger, triplet_flag)
+
+        # # visualise 
+        # # test on deepblue set
+        # # test(test_loader, model, epoch, logger,"a_test_log")
+        # if TEST_ON_W1BS:
+        #     # print(weights_path)
+        #     patch_images = w1bs.get_list_of_patch_images(
+        #         DATASET_DIR=args.w1bsroot.replace('/code', '/data/W1BS'))
+        #     desc_name = 'curr_desc'  # + str(random.randint(0,100))
+
+        #     DESCS_DIR = LOG_DIR + '/temp_descs/'  # args.w1bsroot.replace('/code', "/data/out_descriptors")
+        #     OUT_DIR = DESCS_DIR.replace('/temp_descs/', "/out_graphs/")
+
+        #     for img_fname in patch_images:
+        #         w1bs_extract_descs_and_save(img_fname, model, desc_name, cuda=args.cuda,
+        #                                     mean_img=args.mean_image,
+        #                                     std_img=args.std_image, out_dir=DESCS_DIR)
+
+        #     force_rewrite_list = [desc_name]
+        #     w1bs.match_descriptors_and_save_results(DESC_DIR=DESCS_DIR, do_rewrite=True,
+        #                                             dist_dict={},
+        #                                             force_rewrite_list=force_rewrite_list)
+        #     if (args.enable_logging):
+        #         w1bs.draw_and_save_plots_with_loggers(DESC_DIR=DESCS_DIR, OUT_DIR=OUT_DIR,
+        #                                               methods=["SNN_ratio"],
+        #                                               descs_to_draw=[desc_name],
+        #                                               logger=file_logger,
+        #                                               tensor_logger=logger)
+        #     else:
+        #         w1bs.draw_and_save_plots(DESC_DIR=DESCS_DIR, OUT_DIR=OUT_DIR,
+        #                                  methods=["SNN_ratio"],
+        #                                  descs_to_draw=[desc_name])
+
+def BuildKNNGraphByFAISS_GPU(db,k):
+    dbsize, dim = db.shape
+    flat_config = faiss.GpuIndexFlatConfig()
+    flat_config.device = 0
+    res = faiss.StandardGpuResources()
+    nn = faiss.GpuIndexFlatL2(res, dim, flat_config)
+    nn.add(db)
+    dists,idx = nn.search(db, k+1)
+    return idx[:,1:],dists[:,1:]
+
+
+def get_descriptors_for_dataset(model, data_in):
+    descriptors = []
+    for batch_idx, data_a in data_in:
+
+        if args.cuda:
+            model.cuda()
+            data_a = data_a.cuda()
+
+        data_a = Variable(data_a, volatile=True),
+        out_a = model(data_a[0])
+        descriptors.extend(out_a.data.cpu().numpy())
+
+    return descriptors
+
+
+def remove_descriptors_with_same_index(min_dist_indices, indices, labels, descriptors):
+
+    res_min_dist_indices = []
+
+    for current_index in range(0, len(min_dist_indices)):
+        # get indices of the same 3d points
+        point3d_indices = labels[indices[current_index]]
+        indices_to_remove = []
+        for indx in min_dist_indices[current_index]:
+            # add to removal list indices of the same 3d point and same images in other 3d point
+            if(indx in point3d_indices or (descriptors[indx] == descriptors[current_index]).all()):
+                indices_to_remove.append(indx)
+
+        curr_desc = [x for x in min_dist_indices[current_index] if x not in indices_to_remove]
+        res_min_dist_indices.append(curr_desc)
+
+
+    return res_min_dist_indices
+
+
+def get_hard_negatives(data_in, labels, descriptors):
+
+    indices = {}
+    for key, value in labels.iteritems():
+        for ind in value:
+            indices[ind] = key
+
+    print('getting closest indices .... ')
+    descriptors_min_dist, inidices = BuildKNNGraphByFAISS_GPU(descriptors, 12)
+
+    print('removing descriptors with same indices .... ')
+    descriptors_min_dist = remove_descriptors_with_same_index(descriptors_min_dist, indices, labels, descriptors)
+
+    return descriptors_min_dist
+
 
 if __name__ == '__main__':
     LOG_DIR = args.log_dir
@@ -742,5 +800,8 @@ if __name__ == '__main__':
         from Loggers import Logger, FileLogger
         logger = Logger(LOG_DIR)
         # file_logger = FileLogger(./log/+suffix)
-    train_loader, test_loader = create_loaders(load_random_triplets=triplet_flag)
-    main(train_loader, test_loader, model, logger, file_logger)
+    # train_loader, test_loader = create_loaders(load_random_triplets=triplet_flag)
+    # main(train_loader, test_loader, model, logger, file_logger)
+
+    train_data, test_loader = create_loaders(load_random_triplets=triplet_flag)
+    main(train_data.data, train_data.labels, test_loader, model, logger, file_logger)
