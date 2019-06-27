@@ -133,6 +133,8 @@ parser.add_argument('--wd', default=1e-4, type=float,
                     metavar='W', help='weight decay (default: 1e-4)')
 parser.add_argument('--optimizer', default='sgd', type=str,
                     metavar='OPT', help='The optimizer to use (default: SGD)')
+parser.add_argument('--batch-hard', type=int, default=0, metavar='HM',
+                    help='triplet mining strategy')
 # Device options
 parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='enables CUDA training')
@@ -442,6 +444,7 @@ def create_loaders(load_random_triplets=False):
                          datasets_path=args.hpatches_split+"hpatches_split_a_train.pt",
                          fliprot=args.fliprot,
                          n_triplets=args.n_triplets,
+                         batch_hard=0,
                          name=args.training_set,
                          download=True,
                          transform=transform_train)
@@ -452,6 +455,7 @@ def create_loaders(load_random_triplets=False):
                          datasets_path=args.hpatches_split+"hpatches_split_a_test.pt",
                          fliprot=args.fliprot,
                          n_triplets=936,
+                         batch_hard=0,
                          name="turbid_deepblue",
                          download=True,
                          transform=transform_test),
@@ -672,15 +676,19 @@ def main(train_data, train_labels, test_loader, model, logger, file_logger):
         hard_negatives = np.load('descriptors_min_dist.npy')
         print(hard_negatives[0])
 
-        trainPhotoTourDatasetWithHardNegatives = TripletPhotoTourHardNegatives(train=True,
-                                                              negative_indices=hard_negatives,
-                                                              batch_size=args.batch_size,
-                                                              root=args.dataroot,
-                                                              name=args.training_set,
-                                                              download=True,
-                                                              transform=transform)
+        trainDatasetWithHardNegatives = TotalDatasetsLoader(train=True,
+                         load_random_triplets=load_random_triplets,
+                         batch_size=args.batch_size,
+                         datasets_path=args.hpatches_split+"hpatches_split_a_train.pt",
+                         fliprot=args.fliprot,
+                         n_triplets=args.n_triplets,
+                         batch_hard=args.batch_hard,
+                         negative_indices=hard_negatives,
+                         name=args.training_set,
+                         download=True,
+                         transform=transform_train)
 
-        train_loader = torch.utils.data.DataLoader(trainPhotoTourDatasetWithHardNegatives,
+        train_loader = torch.utils.data.DataLoader(trainDatasetWithHardNegatives,
                                                    batch_size=args.batch_size,
                                                    shuffle=False, **kwargs)
 
