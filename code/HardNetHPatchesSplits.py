@@ -828,7 +828,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
         # # visualise 
         # test on deepblue set
         test_x = TotalDatasetsLoader(train=False,
-                    load_random_triplets=False,
+                    load_random_triplets=True,
                     batch_size=args.test_batch_size,
                     datasets_path=args.hpatches_split+"hpatches_split_a_test.pt",
                     fliprot=args.fliprot,
