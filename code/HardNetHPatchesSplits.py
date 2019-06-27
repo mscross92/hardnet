@@ -688,7 +688,7 @@ def test(test_loader, model, epoch, logger, logger_test_name):
 
     labels, distances = [], []
 
-    print(test_loader.dataset.shape)
+    print(len(test_loader.dataset))
 
     pbar = tqdm(enumerate(test_loader))
     for batch_idx, data in pbar:
