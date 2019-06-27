@@ -748,8 +748,8 @@ def BuildKNNGraphByFAISS_GPU(db,k):
 def get_descriptors_for_dataset(model, data_loader):
     descriptors = []
     pbar = tqdm(enumerate(train_loader))
-    x = train_loader.data
-    labels = train_loader.labels
+    x = pbar.data
+    labels = pbar.labels
 
     for batch_idx, data in pbar:
 
