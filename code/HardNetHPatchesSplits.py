@@ -280,6 +280,7 @@ class TotalDatasetsLoader(data.Dataset):
        
         descriptors = []
         for d in data_a:
+            print(dx.shape)
             dx = trnsfrm(d)
             print(dx.shape)
             dx.unsqueeze(0)
