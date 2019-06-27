@@ -213,8 +213,8 @@ class TotalDatasetsLoader(data.Dataset):
                 print('Generating {} triplets'.format(self.n_triplets))
                 if self.batch_hard == 0:
                     self.triplets = self.generate_triplets(self.labels, self.n_triplets, self.batch_size)
-                else
-                    self.triplets = self.generate_hard_triplets(self.labels, self.n_triplets, self.batch_size, self.negative_indices)
+                else:
+                    self.triplets = self.generate_hard_triplets(self.labels, self.n_triplets, self.negative_indices)
 
     @staticmethod
     def generate_triplets(labels, num_triplets, batch_size):
@@ -256,7 +256,7 @@ class TotalDatasetsLoader(data.Dataset):
         return torch.LongTensor(np.array(triplets))
 
     @staticmethod
-    def generate_hard_triplets(labels, num_triplets, batch_size):
+    def generate_hard_triplets(labels, num_triplets, negative_indices):
         def create_indices(_labels):
             inds = dict()
             for idx, ind in enumerate(_labels):
