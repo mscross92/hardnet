@@ -301,17 +301,17 @@ class TotalDatasetsLoader(data.Dataset):
             dists,idx = nn.search(db, k+1)
             return idx[:,1:],dists[:,1:]
             
-        def remove_descriptors_with_same_index(min_dist_indices, indices, labels, descriptors):
+        def remove_descriptors_with_same_index(min_dist_indices, labels, descriptors):
 
             res_min_dist_indices = []
 
             for current_index in range(0, len(min_dist_indices)):
                 # get indices of the same 3d points
-                point3d_indices = labels[indices[current_index]]
+                point3d_indices = labels[current_index]
                 indices_to_remove = []
                 for indx in min_dist_indices[current_index]:
                     # add to removal list indices of the same 3d point and same images in other 3d point
-                    if(indx in point3d_indices or (descriptors[indx] == descriptors[current_index]).all()):
+                    if(indx == point3d_indices or (descriptors[indx] == descriptors[current_index]).all()):
                         indices_to_remove.append(indx)
 
                 curr_desc = [x for x in min_dist_indices[current_index] if x not in indices_to_remove]
@@ -320,19 +320,19 @@ class TotalDatasetsLoader(data.Dataset):
 
             return res_min_dist_indices 
             
-        indices = {}
+        # indices = {}
 
-        print(len(labels))
-        print(labels[0])
-        for key, value in labels.iteritems():
-            for ind in value:
-                indices[ind] = key
+        # print(len(labels))
+        # print(labels[0])
+        # for key, value in labels.iteritems():
+        #     for ind in value:
+        #         indices[ind] = key
 
         print('getting closest indices .... ')
-        descriptors_min_dist, inidices = BuildKNNGraphByFAISS_GPU(descriptors, 12)
+        descriptors_min_dist, labels = BuildKNNGraphByFAISS_GPU(descriptors, 12)
 
         print('removing descriptors with same indices .... ')
-        descriptors_min_dist = remove_descriptors_with_same_index(descriptors_min_dist, indices, labels, descriptors)
+        descriptors_min_dist = remove_descriptors_with_same_index(descriptors_min_dist, labels, descriptors)
 
         return descriptors_min_dist
 
