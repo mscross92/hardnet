@@ -282,7 +282,7 @@ class TotalDatasetsLoader(data.Dataset):
                 dx = dx.cuda()
         
             dx = Variable(dx),
-            out_a = model([dx])
+            out_a = model(dx)
             descriptors.extend(out_a.data.cpu().numpy())
             
         return descriptors
