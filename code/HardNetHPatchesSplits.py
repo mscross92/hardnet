@@ -731,7 +731,12 @@ def main(train_loader, test_loader, model, logger, file_logger):
             model.load_state_dict(checkpoint['state_dict'])
         else:
             print('=> no checkpoint found at {}'.format(args.resume))
-
+    
+    transform = transforms.Compose([
+        transforms.Lambda(np_reshape29),
+        transforms.ToPILImage(),
+        transforms.Resize(29),
+        transforms.ToTensor()])
     start = args.start_epoch
     end = start + args.epochs
     for epoch in range(start, end):
@@ -748,7 +753,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
                          model=model,
                          name=args.training_set,
                          download=True,
-                         transform=transform_train)
+                         transform=transform)
 
         train_loader = torch.utils.data.DataLoader(trainDatasetWithHardNegatives,
                                                    batch_size=args.batch_size,
