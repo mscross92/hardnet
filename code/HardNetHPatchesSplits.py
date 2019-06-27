@@ -189,7 +189,7 @@ if not os.path.exists(args.log_dir):
 
 class TotalDatasetsLoader(data.Dataset):
 
-    def __init__(self, datasets_path, train = True, transform = None, batch_size = None, n_triplets = 5000000, batch_hard = 0, negative_indices = None, fliprot = False, *arg, **kw):
+    def __init__(self, datasets_path, train = True, transform = None, batch_size = None, n_triplets = 5000000, batch_hard = 0, model = None, fliprot = False, *arg, **kw):
         super(TotalDatasetsLoader, self).__init__()
         #datasets_path = [os.path.join(datasets_path, dataset) for dataset in os.listdir(datasets_path) if '.pt' in dataset]
         datasets_path = [datasets_path]
@@ -209,13 +209,22 @@ class TotalDatasetsLoader(data.Dataset):
         self.n_triplets = n_triplets
         self.batch_size = batch_size
         self.batch_hard = batch_hard
-        self.negative_indices = negative_indices
+        self.model = model
         self.fliprot = fliprot
         if self.train:
                 print('Generating {} triplets'.format(self.n_triplets))
                 if self.batch_hard == 0:
                     self.triplets = self.generate_triplets(self.labels, self.n_triplets, self.batch_size)
                 else:
+                    self.descriptors = self.get_descriptors_for_dataset(self.data, self.model)
+                    # #
+                    np.save('descriptors.npy', self.descriptors)
+                    self.descriptors = np.load('descriptors.npy')
+                    #
+                    self.negative_indices = self.get_hard_negatives(self.data, self.labels, self.descriptors)
+                    np.save('descriptors_min_dist.npy', self.negative_indices)
+                    self.negative_indices = np.load('descriptors_min_dist.npy')
+                    print(self.negative_indices[0])
                     self.triplets = self.generate_hard_triplets(self.labels, self.n_triplets, self.negative_indices)
 
     @staticmethod
@@ -256,6 +265,66 @@ class TotalDatasetsLoader(data.Dataset):
             triplets.append([indices[c1][n1], indices[c1][n2], indices[c2][n3]])
         # print('TRIPLET SHAPE',np.array(triplets).shape)
         return torch.LongTensor(np.array(triplets))
+
+
+    @staticmethod
+    def get_descriptors_for_dataset(data,model):
+        
+        data_a, data_p, data_n = data
+        
+        if args.cuda:
+            model.cuda()
+            data_a = data_a.cuda()
+        
+        data_a = Variable(data_a)
+        out_a = model(data_a)
+        
+        return out_a
+    
+
+    @staticmethod
+    def get_hard_negatives(data_in, labels, descriptors):
+        def BuildKNNGraphByFAISS_GPU(db,k):
+            dbsize, dim = db.shape
+            flat_config = faiss.GpuIndexFlatConfig()
+            flat_config.device = 0
+            res = faiss.StandardGpuResources()
+            nn = faiss.GpuIndexFlatL2(res, dim, flat_config)
+            nn.add(db)
+            dists,idx = nn.search(db, k+1)
+            return idx[:,1:],dists[:,1:]
+            
+        def remove_descriptors_with_same_index(min_dist_indices, indices, labels, descriptors):
+
+            res_min_dist_indices = []
+
+            for current_index in range(0, len(min_dist_indices)):
+                # get indices of the same 3d points
+                point3d_indices = labels[indices[current_index]]
+                indices_to_remove = []
+                for indx in min_dist_indices[current_index]:
+                    # add to removal list indices of the same 3d point and same images in other 3d point
+                    if(indx in point3d_indices or (descriptors[indx] == descriptors[current_index]).all()):
+                        indices_to_remove.append(indx)
+
+                curr_desc = [x for x in min_dist_indices[current_index] if x not in indices_to_remove]
+                res_min_dist_indices.append(curr_desc)
+
+
+            return res_min_dist_indices 
+            
+        indices = {}
+        for key, value in labels.iteritems():
+            for ind in value:
+                indices[ind] = key
+
+        print('getting closest indices .... ')
+        descriptors_min_dist, inidices = BuildKNNGraphByFAISS_GPU(descriptors, 12)
+
+        print('removing descriptors with same indices .... ')
+        descriptors_min_dist = remove_descriptors_with_same_index(descriptors_min_dist, indices, labels, descriptors)
+
+        return descriptors_min_dist
 
     @staticmethod
     def generate_hard_triplets(labels, num_triplets, negative_indices):
@@ -668,17 +737,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
     for epoch in range(start, end):
 
         model.eval()
-        # #
-        descriptors, train_data, train_labels = get_descriptors_for_dataset(model, train_loader)
-        # #
-        np.save('descriptors.npy', descriptors)
-        descriptors = np.load('descriptors.npy')
-        #
-        hard_negatives = get_hard_negatives(train_data, train_labels, descriptors)
-        np.save('descriptors_min_dist.npy', hard_negatives)
-        hard_negatives = np.load('descriptors_min_dist.npy')
-        print(hard_negatives[0])
-
+        
         trainDatasetWithHardNegatives = TotalDatasetsLoader(train=True,
                          load_random_triplets=load_random_triplets,
                          batch_size=args.batch_size,
@@ -686,7 +745,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
                          fliprot=args.fliprot,
                          n_triplets=args.n_triplets,
                          batch_hard=args.batch_hard,
-                         negative_indices=hard_negatives,
+                         model=model,
                          name=args.training_set,
                          download=True,
                          transform=transform_train)
@@ -733,74 +792,6 @@ def main(train_loader, test_loader, model, logger, file_logger):
         #         w1bs.draw_and_save_plots(DESC_DIR=DESCS_DIR, OUT_DIR=OUT_DIR,
         #                                  methods=["SNN_ratio"],
         #                                  descs_to_draw=[desc_name])
-
-def BuildKNNGraphByFAISS_GPU(db,k):
-    dbsize, dim = db.shape
-    flat_config = faiss.GpuIndexFlatConfig()
-    flat_config.device = 0
-    res = faiss.StandardGpuResources()
-    nn = faiss.GpuIndexFlatL2(res, dim, flat_config)
-    nn.add(db)
-    dists,idx = nn.search(db, k+1)
-    return idx[:,1:],dists[:,1:]
-
-
-def get_descriptors_for_dataset(model, data_loader):
-    descriptors = []
-    pbar = tqdm(enumerate(train_loader))
-    x = pbar.data
-    labels = pbar.labels
-
-    for batch_idx, data in pbar:
-
-        data_a, data_p, data_n = data
-        
-        if args.cuda:
-            model.cuda()
-            data_a = data_a.cuda()
-        
-        data_a = Variable(data_a)
-        out_a = model(data_a)
-        
-        descriptors.extend(out_a.data.cpu().numpy())
-
-    return descriptors, x, labels
-
-
-def remove_descriptors_with_same_index(min_dist_indices, indices, labels, descriptors):
-
-    res_min_dist_indices = []
-
-    for current_index in range(0, len(min_dist_indices)):
-        # get indices of the same 3d points
-        point3d_indices = labels[indices[current_index]]
-        indices_to_remove = []
-        for indx in min_dist_indices[current_index]:
-            # add to removal list indices of the same 3d point and same images in other 3d point
-            if(indx in point3d_indices or (descriptors[indx] == descriptors[current_index]).all()):
-                indices_to_remove.append(indx)
-
-        curr_desc = [x for x in min_dist_indices[current_index] if x not in indices_to_remove]
-        res_min_dist_indices.append(curr_desc)
-
-
-    return res_min_dist_indices
-
-
-def get_hard_negatives(data_in, labels, descriptors):
-
-    indices = {}
-    for key, value in labels.iteritems():
-        for ind in value:
-            indices[ind] = key
-
-    print('getting closest indices .... ')
-    descriptors_min_dist, inidices = BuildKNNGraphByFAISS_GPU(descriptors, 12)
-
-    print('removing descriptors with same indices .... ')
-    descriptors_min_dist = remove_descriptors_with_same_index(descriptors_min_dist, indices, labels, descriptors)
-
-    return descriptors_min_dist
 
 
 if __name__ == '__main__':
