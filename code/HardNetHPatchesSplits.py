@@ -506,9 +506,10 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
             # visualise random triplet for the first batch - TODO: randomly select batch
             index = np.random.randint(0, data_a.shape[0])
             if batch_idx == 0:
+                print(data_a[index,0,:,:].shape)
                 plt.figure(figsize=(3,2))
                 plt.subplot(131)
-                plt.imshow((data_a[index,0,:,:]).numpy().astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+                plt.imshow((np.array(data_a[index,0,:,:])*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
                 plt.gca().set_xticks([])
                 plt.gca().set_yticks([])
                 plt.title('Anchor', fontsize=12)
@@ -518,7 +519,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                 plt.gca().set_xticks([])
                 plt.gca().set_yticks([])
                 plt.subplot(133)
-                plt.imshow(np.array(data_n[index,0,:,:]), cmap='gray',vmax=1,vmin=0) 
+                plt.imshow((np.array(data_n[index,0,:,:])*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
                 plt.title('Negative', fontsize=12)
                 plt.gca().set_xticks([])
                 plt.gca().set_yticks([])
