@@ -216,7 +216,7 @@ class TotalDatasetsLoader(data.Dataset):
                 if self.batch_hard == 0:
                     self.triplets = self.generate_triplets(self.labels, self.n_triplets, self.batch_size)
                 else:
-                    self.descriptors = self.get_descriptors_for_dataset(self.data, self.model)
+                    self.descriptors = self.get_descriptors_for_dataset(self.data, self.model, self.transform)
                     # #
                     np.save('descriptors.npy', self.descriptors)
                     self.descriptors = np.load('descriptors.npy')
@@ -268,8 +268,14 @@ class TotalDatasetsLoader(data.Dataset):
 
 
     @staticmethod
-    def get_descriptors_for_dataset(data_a,model):
-                
+    def get_descriptors_for_dataset(data_a,model,trnsfrm):
+
+        def transform_img(img):
+            if trnsfrm is not None:
+                img = trnsfrm(img.numpy())
+            return img
+
+        data_a = transform_img(data_a)
         if args.cuda:
             model.cuda()
             data_a = data_a.cuda()
