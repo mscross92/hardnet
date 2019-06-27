@@ -41,7 +41,7 @@ import torch.nn as nn
 import torch.utils.data as data
 
 import matplotlib.pyplot as plt
-import faiss
+# import faiss
 
 
 class CorrelationPenaltyLoss(nn.Module):
