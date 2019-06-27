@@ -615,7 +615,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
             plt.imshow((np.array(data_n[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
             plt.gca().set_xticks([])
             plt.gca().set_yticks([])
-            savestr = 'hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '.png'
+            savestr = 'randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '.png'
             plt.savefig(savestr, bbox_inches='tight')
             plt.close()
         else:
