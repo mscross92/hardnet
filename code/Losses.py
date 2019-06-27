@@ -125,10 +125,10 @@ def loss_HardNet(anchor, positive, visualise_idx, anchor_swap = False, anchor_av
             min_neg_p = torch.t(torch.min(dist_without_min_on_diag_p,0)[0])
             min_neg_3 = torch.min(min_neg_p,min_neg_a)
             min_neg = torch.min(min_neg,min_neg_3)
-            print (min_neg_a)
-            print (min_neg_p)
-            print (min_neg_3)
-            print (min_neg)
+            # print (min_neg_a)
+            # print (min_neg_p)
+            # print (min_neg_3)
+            # print (min_neg)
         min_neg = min_neg
         pos = pos1
     elif batch_reduce == 'average':
