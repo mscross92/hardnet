@@ -712,5 +712,5 @@ if __name__ == '__main__':
         from Loggers import Logger, FileLogger
         logger = Logger(LOG_DIR)
         # file_logger = FileLogger(./log/+suffix)
-    train_loader, test_loader = create_loaders(load_random_triplets=triplet_flag)
+    train_loader, test_loader = create_loaders(load_random_triplets=True)
     main(train_loader, test_loader, model, logger, file_logger)
