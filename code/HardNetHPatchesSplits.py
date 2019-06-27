@@ -275,7 +275,7 @@ class TotalDatasetsLoader(data.Dataset):
         for d in data_a:
             dx = torch.FloatTensor(np.array(d)).unsqueeze(0)
             print(dx.shape)
-            dx.unsqueeze(0)
+            dx = dx.unsqueeze(0)
             print(dx.shape)
 
             if args.cuda:
