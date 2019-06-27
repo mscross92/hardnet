@@ -270,28 +270,19 @@ class TotalDatasetsLoader(data.Dataset):
     @staticmethod
     def get_descriptors_for_dataset(data_a,model):
         # data_a = torch.FloatTensor(np.array(data_a)).unsqueeze_(-1)
-        
-        np_reshape29 = lambda x: np.reshape(x, (29, 29, 1))
-        trnsfrm = transforms.Compose([
-            transforms.Lambda(np_reshape29),
-            transforms.ToPILImage(),
-            transforms.Resize(29),
-            transforms.ToTensor()])
-       
+               
         descriptors = []
         for d in data_a:
-            print(d.shape)
-            dx = trnsfrm(d)
-            print(dx.shape)
+            dx = d
             dx.unsqueeze(0)
-            print(dx.shape)
+            dx.unsqueeze(-1)
 
             if args.cuda:
                 model.cuda()
                 dx = dx.cuda()
         
             dx = Variable(dx),
-            out_a = model(dx)
+            out_a = model([dx])
             descriptors.extend(out_a.data.cpu().numpy())
             
         return descriptors
