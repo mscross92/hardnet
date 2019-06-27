@@ -518,7 +518,9 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                 plt.title('Negative', fontsize=12)
                 plt.gca().set_xticks([])
                 plt.gca().set_yticks([])
-                plt.show()
+                savestr = 'epch' + str(epoch) + '_idx' + str(index) + '.png'
+                plt.savefig(savestr, bbox_inches='tight')
+                plt.close()
         else:
             data_a, data_p = data
 
