@@ -44,6 +44,7 @@ import torch.utils.data as data
 import matplotlib.pyplot as plt
 import faiss
 
+torch.backends.cudnn.benchmark = False
 
 class CorrelationPenaltyLoss(nn.Module):
     def __init__(self):
