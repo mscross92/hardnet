@@ -705,7 +705,7 @@ def test(test_loader, model, epoch, logger, logger_test_name):
         out_p = model(data_p)
         dists = torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
         distances.append(dists.data.cpu().numpy().reshape(-1, 1))
-        print(len(distances))
+        print(distances[batch_idx].shape)
 
         if batch_idx % args.log_interval == 0:
             pbar.set_description(logger_test_name + ' Test Epoch: {} [{}/{} ({:.0f}%)]'.format(
