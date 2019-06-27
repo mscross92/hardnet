@@ -245,6 +245,7 @@ class TotalDatasetsLoader(data.Dataset):
                         n2 = np.random.randint(0, len(indices[c1]))
                 n3 = np.random.randint(0, len(indices[c2]))
                 triplets.append([indices[c1][n1], indices[c1][n2], indices[c2][n3]])
+            print('TRIPLET SHAPE',np.array(triplets).shape)
             return torch.LongTensor(np.array(triplets))
 
     def __getitem__(self, index):
