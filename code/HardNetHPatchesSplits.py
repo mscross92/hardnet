@@ -438,7 +438,7 @@ def create_loaders(load_random_triplets=False):
     #     batch_size=args.batch_size,
     #     shuffle=False, **kwargs)
 
-    train_loader = orch.utils.data.DataLoader(
+    train_loader = torch.utils.data.DataLoader(
         TotalDatasetsLoader(train=True,
                          load_random_triplets=load_random_triplets,
                          batch_size=args.batch_size,
