@@ -438,7 +438,8 @@ def create_loaders(load_random_triplets=False):
     #     batch_size=args.batch_size,
     #     shuffle=False, **kwargs)
 
-    train_dx = TotalDatasetsLoader(train=True,
+    train_loader = orch.utils.data.DataLoader(
+        TotalDatasetsLoader(train=True,
                          load_random_triplets=load_random_triplets,
                          batch_size=args.batch_size,
                          datasets_path=args.hpatches_split+"hpatches_split_a_train.pt",
@@ -447,7 +448,9 @@ def create_loaders(load_random_triplets=False):
                          batch_hard=0,
                          name=args.training_set,
                          download=True,
-                         transform=transform_train)
+                         transform=transform_train),
+        batch_size=args.batch_size,
+        shuffle=False, **kwargs)
 
     test_loader = torch.utils.data.DataLoader(
         TotalDatasetsLoader(train=False,
@@ -462,7 +465,7 @@ def create_loaders(load_random_triplets=False):
         batch_size=args.test_batch_size,
         shuffle=False, **kwargs)
 
-    return train_dx, test_loader
+    return train_loader, test_loader
 
 
 def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
@@ -635,7 +638,7 @@ def create_optimizer(model, new_lr):
     return optimizer
 
 
-def main(train_data, train_labels, test_loader, model, logger, file_logger):
+def main(train_loader, train_data, train_labels, test_loader, model, logger, file_logger):
 
     
     # print the experiment configuration
@@ -666,7 +669,7 @@ def main(train_data, train_labels, test_loader, model, logger, file_logger):
 
         model.eval()
         # #
-        descriptors = get_descriptors_for_dataset(model, train_data)
+        descriptors, train_data, train_labels = get_descriptors_for_dataset(model, train_loader)
         # #
         np.save('descriptors.npy', descriptors)
         descriptors = np.load('descriptors.npy')
@@ -742,19 +745,26 @@ def BuildKNNGraphByFAISS_GPU(db,k):
     return idx[:,1:],dists[:,1:]
 
 
-def get_descriptors_for_dataset(model, data_in):
+def get_descriptors_for_dataset(model, data_loader):
     descriptors = []
-    for batch_idx, data_a in data_in:
+    pbar = tqdm(enumerate(train_loader))
+    x = train_loader.data
+    labels = train_loader.labels
 
+    for batch_idx, data in pbar:
+
+        data_a, data_p, data_n = data
+        
         if args.cuda:
             model.cuda()
             data_a = data_a.cuda()
-
-        data_a = Variable(data_a, volatile=True),
-        out_a = model(data_a[0])
+        
+        data_a = Variable(data_a)
+        out_a = model(data_a)
+        
         descriptors.extend(out_a.data.cpu().numpy())
 
-    return descriptors
+    return descriptors, x, labels
 
 
 def remove_descriptors_with_same_index(min_dist_indices, indices, labels, descriptors):
@@ -811,5 +821,5 @@ if __name__ == '__main__':
     # train_loader, test_loader = create_loaders(load_random_triplets=triplet_flag)
     # main(train_loader, test_loader, model, logger, file_logger)
 
-    train_data, test_loader = create_loaders(load_random_triplets=triplet_flag)
-    main(train_data.data, train_data.labels, test_loader, model, logger, file_logger)
+    train_loader, test_loader = create_loaders(load_random_triplets=triplet_flag)
+    main(train_loader, train_data.data, train_data.labels, test_loader, model, logger, file_logger)
