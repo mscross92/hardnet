@@ -211,23 +211,22 @@ class TotalDatasetsLoader(data.Dataset):
         self.batch_hard = batch_hard
         self.model = model
         self.fliprot = fliprot
-        if not self.train:
-            print(len(data))
-        if self.train:
+
+        # if self.train:
                 # print('Generating {} triplets'.format(self.n_triplets))
-                if self.batch_hard == 0:
-                    self.triplets = self.generate_triplets(self.labels, self.n_triplets, self.batch_size)
-                else:
-                    self.descriptors = self.get_descriptors_for_dataset(self.data, self.model)
-                    # #
-                    np.save('descriptors.npy', self.descriptors)
-                    self.descriptors = np.load('descriptors.npy')
-                    #
-                    self.negative_indices = self.get_hard_negatives(self.labels, self.descriptors)
-                    np.save('descriptors_min_dist.npy', self.negative_indices)
-                    self.negative_indices = np.load('descriptors_min_dist.npy')
-                    # print(self.negative_indices[0])
-                    self.triplets = self.generate_hard_triplets(self.labels, self.n_triplets, self.negative_indices)
+        if self.batch_hard == 0:
+            self.triplets = self.generate_triplets(self.labels, self.n_triplets, self.batch_size)
+        else:
+            self.descriptors = self.get_descriptors_for_dataset(self.data, self.model)
+            # #
+            np.save('descriptors.npy', self.descriptors)
+            self.descriptors = np.load('descriptors.npy')
+            #
+            self.negative_indices = self.get_hard_negatives(self.labels, self.descriptors)
+            np.save('descriptors_min_dist.npy', self.negative_indices)
+            self.negative_indices = np.load('descriptors_min_dist.npy')
+            # print(self.negative_indices[0])
+            self.triplets = self.generate_hard_triplets(self.labels, self.n_triplets, self.negative_indices)
 
     @staticmethod
     def generate_triplets(labels, num_triplets, batch_size):
@@ -417,8 +416,8 @@ class TotalDatasetsLoader(data.Dataset):
             return img_a, img_p, img_n
 
     def __len__(self):
-            if self.train:
-                return self.triplets.size(0)
+            # if self.train:
+            return self.triplets.size(0)
 
 
 class HardNet(nn.Module):
