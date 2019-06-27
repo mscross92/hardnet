@@ -208,7 +208,6 @@ class TotalDatasetsLoader(data.Dataset):
         if self.train:
                 print('Generating {} triplets'.format(self.n_triplets))
                 self.triplets = self.generate_triplets(self.labels, self.n_triplets, self.batch_size)
-                print(len(self.triplets))
 
     @staticmethod
     def generate_triplets(labels, num_triplets, batch_size):
@@ -288,7 +287,7 @@ class TripletPhotoTour(dset.PhotoTour):
     def __init__(self, train=True, transform=None, n_triplets = 1000, batch_size=None, load_random_triplets=False, *arg, **kw):
         super(TripletPhotoTour, self).__init__(*arg, **kw)
         self.transform = transform
-        self.out_triplets = load_random_triplets
+        self.out_triplets = True
         self.train = train
         self.n_triplets = n_triplets
         self.batch_size = batch_size
