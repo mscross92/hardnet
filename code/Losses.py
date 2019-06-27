@@ -84,7 +84,7 @@ def loss_L2Net(anchor, positive, anchor_swap = False,  margin = 1.0, loss_type =
     loss = torch.mean(loss)
     return loss
 
-def loss_HardNet(anchor, positive, anchor_swap = False, anchor_ave = False,\
+def loss_HardNet(anchor, positive, visualise_idx, anchor_swap = False, anchor_ave = False,\
         margin = 1.0, batch_reduce = 'min', loss_type = "triplet_margin"):
     """HardNet margin loss - calculates loss based on distance matrix based on positive distance and closest negative distance.
     """
@@ -102,10 +102,15 @@ def loss_HardNet(anchor, positive, anchor_swap = False, anchor_ave = False,\
     mask = mask.type_as(dist_without_min_on_diag)*10
     dist_without_min_on_diag = dist_without_min_on_diag+mask
     if batch_reduce == 'min':
-        min_neg = torch.min(dist_without_min_on_diag,1)[0]
+        min_neg,neg_ids = torch.min(dist_without_min_on_diag,1)[0]
         if anchor_swap:
-            min_neg2 = torch.min(dist_without_min_on_diag,0)[0]
-            min_neg = torch.min(min_neg,min_neg2)
+            min_neg2,neg2_ids = torch.min(dist_without_min_on_diag,0)[0]
+            min_neg,min_types = torch.min(min_neg,min_neg2)
+            n_type = min_types[visualise_idx]
+            if n_type>0:
+                n_idx = neg2_ids[visualise_idx]
+            else:
+                n_idx = neg_ids[visualise_idx]
         if False:
             dist_matrix_a = distance_matrix_vector(anchor, anchor)+ eps
             dist_matrix_p = distance_matrix_vector(positive,positive)+eps
@@ -151,6 +156,10 @@ def loss_HardNet(anchor, positive, anchor_swap = False, anchor_ave = False,\
         print ('Unknown loss type. Try triplet_margin, softmax or contrastive')
         sys.exit(1)
     loss = torch.mean(loss)
+
+    if batch_reduce == 'min' and anchor_swap:
+        return loss, n_idx, n_type
+    
     return loss
 
 def global_orthogonal_regularization(anchor, negative):

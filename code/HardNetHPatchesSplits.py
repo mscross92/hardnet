@@ -43,7 +43,6 @@ import torch.utils.data as data
 import matplotlib.pyplot as plt
 import faiss
 
-cudnn.benchmark = False
 
 class CorrelationPenaltyLoss(nn.Module):
     def __init__(self):
@@ -157,8 +156,8 @@ if args.anchorswap:
 if args.anchorave:
     suffix = suffix + '_av'
 
-# triplet_flag = (args.batch_reduce == 'random_global') or args.gor
-triplet_flag = True
+triplet_flag = (args.batch_reduce == 'random_global') or args.gor
+# triplet_flag = True
 
 dataset_names = ['turbid_milk', 'turbid_deepblue']
 
@@ -602,12 +601,37 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                                         anchor_swap=args.anchorswap,
                                         loss_type=args.loss)
         else:
-            loss = loss_HardNet(out_a, out_p,
+            vis_id = np.random.randint(0, data_a.shape[0])
+            loss, n_idx,n_type = loss_HardNet(out_a, out_p,
                                 margin=args.margin,
                                 anchor_swap=args.anchorswap,
                                 anchor_ave=args.anchorave,
                                 batch_reduce=args.batch_reduce,
-                                loss_type=args.loss)
+                                loss_type=args.loss,
+                                visualise_idx=vis_id)
+            
+            if n_type>0:
+                d_n = data_p[n_idx,0,:,:]
+            else:
+                d_n = data_a[n_idx,0,:,:]
+
+            # visualise random hard sample
+            plt.figure()
+            plt.subplot(1, 3, 1)
+            plt.imshow((np.array(data_a[vis_id,0,:,:])*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+            plt.gca().set_xticks([])
+            plt.gca().set_yticks([])
+            plt.subplot(1,3,2)
+            plt.imshow((np.array(data_p[vis_id,0,:,:])*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+            plt.gca().set_xticks([])
+            plt.gca().set_yticks([])
+            plt.subplot(1,3,3)
+            plt.imshow((np.array(d_n)*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+            plt.gca().set_xticks([])
+            plt.gca().set_yticks([])
+            savestr = 'hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '.png'
+            plt.savefig(savestr, bbox_inches='tight')
+            plt.close()
 
         if args.decor:
             loss += CorrelationPenaltyLoss()(out_a)
