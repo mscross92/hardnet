@@ -208,6 +208,7 @@ class TotalDatasetsLoader(data.Dataset):
         if self.train:
                 print('Generating {} triplets'.format(self.n_triplets))
                 self.triplets = self.generate_triplets(self.labels, self.n_triplets, self.batch_size)
+                print(len(self.triplets))
 
     @staticmethod
     def generate_triplets(labels, num_triplets, batch_size):
