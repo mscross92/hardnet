@@ -175,15 +175,15 @@ args.cuda = not args.no_cuda and torch.cuda.is_available()
 
 if args.cuda:
     cudnn.benchmark = True
-    torch.cuda.manual_seed_all(args.seed)
+    # torch.cuda.manual_seed_all(args.seed)
 
 # create loggin directory
 if not os.path.exists(args.log_dir):
     os.makedirs(args.log_dir)
 
 # set random seeds
-torch.manual_seed(args.seed)
-np.random.seed(args.seed)
+# torch.manual_seed(args.seed)
+# np.random.seed(args.seed)
 
 class TotalDatasetsLoader(data.Dataset):
 
