@@ -274,9 +274,7 @@ class TotalDatasetsLoader(data.Dataset):
         descriptors = []
         for d in data_a:
             dx = torch.FloatTensor(np.array(d)).unsqueeze(0)
-            print(dx.shape)
             dx = dx.unsqueeze(0)
-            print(dx.shape)
 
             if args.cuda:
                 model.cuda()
@@ -323,6 +321,9 @@ class TotalDatasetsLoader(data.Dataset):
             return res_min_dist_indices 
             
         indices = {}
+
+        print(len(labels))
+        print(labels[0])
         for key, value in labels.iteritems():
             for ind in value:
                 indices[ind] = key
