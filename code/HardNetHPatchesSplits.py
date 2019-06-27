@@ -611,18 +611,18 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                                 visualise_idx=vis_id)
             
             if n_type>0:
-                d_n = data_p[n_idx,0,:,:]
+                d_n = data_p[n_idx,0,:,:].cpu()
             else:
-                d_n = data_a[n_idx,0,:,:]
+                d_n = data_a[n_idx,0,:,:].cpu()
 
             # visualise random hard sample
             plt.figure()
             plt.subplot(1, 3, 1)
-            plt.imshow((np.array(data_a[vis_id,0,:,:])*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+            plt.imshow((np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
             plt.gca().set_xticks([])
             plt.gca().set_yticks([])
             plt.subplot(1,3,2)
-            plt.imshow((np.array(data_p[vis_id,0,:,:])*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+            plt.imshow((np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
             plt.gca().set_xticks([])
             plt.gca().set_yticks([])
             plt.subplot(1,3,3)
@@ -768,7 +768,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
             print('=> no checkpoint found at {}'.format(args.resume))
     
     kwargs = {'num_workers': args.num_workers, 'pin_memory': args.pin_memory} if args.cuda else {}
-    
+
     np_reshape29 = lambda x: np.reshape(x, (29, 29, 1))
     transform = transforms.Compose([
         transforms.Lambda(np_reshape29),
