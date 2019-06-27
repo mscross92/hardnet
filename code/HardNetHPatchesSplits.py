@@ -459,9 +459,9 @@ def create_loaders(load_random_triplets=False):
             # transforms.Lambda(np_reshape),
             # transforms.ToTensor(),
             # transforms.Normalize((args.mean_image,), (args.std_image,))])
-            # transforms.Lambda(np_reshape29),
+            transforms.Lambda(np_reshape29),
             transforms.ToPILImage(),
-            # transforms.Resize(29),
+            transforms.Resize(29),
             transforms.ToTensor()])
     if not args.augmentation:
         transform_train = transform
@@ -506,7 +506,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
             # visualise random triplet for the first batch - TODO: randomly select batch
             index = np.random.randint(0, data_a.shape[0])
             if batch_idx == 0:
-                print(data_a[index,0,:,:].shape)
+                print(data_a[index,0,28,28])
                 plt.figure(figsize=(3,2))
                 plt.subplot(131)
                 plt.imshow((np.array(data_a[index,0,:,:])*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
