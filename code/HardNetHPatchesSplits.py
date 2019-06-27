@@ -493,7 +493,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
     model.train()
     pbar = tqdm(enumerate(train_loader))
     for batch_idx, data in pbar:
-        print('DATA SHAPE',data.shape)
+        print('DATA SHAPE',len(data))
         if load_triplets:
             data_a, data_p, data_n = data
             # visualise the first triplet
