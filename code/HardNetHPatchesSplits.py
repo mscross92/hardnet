@@ -270,8 +270,6 @@ class TotalDatasetsLoader(data.Dataset):
     @staticmethod
     def get_descriptors_for_dataset(data_a,model):
         print(type(data_a))
-        data_a = float(data_a)
-        print(type(data_a))
         
         # np_reshape29 = lambda x: np.reshape(x, (29, 29, 1))
         # trnsfrm = transforms.Compose([
