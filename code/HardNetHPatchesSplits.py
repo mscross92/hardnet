@@ -732,6 +732,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
         else:
             print('=> no checkpoint found at {}'.format(args.resume))
     
+    np_reshape29 = lambda x: np.reshape(x, (29, 29, 1))
     transform = transforms.Compose([
         transforms.Lambda(np_reshape29),
         transforms.ToPILImage(),
