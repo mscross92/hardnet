@@ -687,7 +687,7 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     # switch to evaluate mode
     model.eval()
 
-    labels, distances = [], []
+    distances = []
 
     print(len(test_loader.dataset))
 
@@ -698,21 +698,22 @@ def test(test_loader, model, epoch, logger, logger_test_name):
         if args.cuda:
             data_a, data_p, = data_a.cuda(), data_p.cuda()
 
-        data_a, data_p, label = Variable(data_a, volatile=True), \
-                                Variable(data_p, volatile=True), Variable(label)
+        data_a, data_p = Variable(data_a, volatile=True), \
+                                Variable(data_p, volatile=True)
 
         out_a = model(data_a)
         out_p = model(data_p)
         dists = torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
         distances.append(dists.data.cpu().numpy().reshape(-1, 1))
-        ll = label.data.cpu().numpy().reshape(-1, 1)
-        labels.append(ll)
+        print(len(out_a))
+        print(len(dists))
 
         if batch_idx % args.log_interval == 0:
             pbar.set_description(logger_test_name + ' Test Epoch: {} [{}/{} ({:.0f}%)]'.format(
                 epoch, batch_idx * len(data_a), len(test_loader.dataset),
                        100. * batch_idx / len(test_loader)))
-
+    
+    labels = np.ones(len(distances))
     num_tests = test_loader.dataset.matches.size(0)
     labels = np.vstack(labels).reshape(num_tests)
     distances = np.vstack(distances).reshape(num_tests)
