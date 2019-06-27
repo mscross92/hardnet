@@ -41,6 +41,8 @@ from Utils import str2bool
 import torch.nn as nn
 import torch.utils.data as data
 
+import matplotlib.pyplot as plt
+
 
 class CorrelationPenaltyLoss(nn.Module):
     def __init__(self):
