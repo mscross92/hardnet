@@ -281,6 +281,9 @@ class TotalDatasetsLoader(data.Dataset):
         descriptors = []
         for d in data_a:
             dx = trnsfrm(d)
+            print(dx.shape)
+            dx.unsqueeze(0)
+            print(dx.shape)
 
             if args.cuda:
                 model.cuda()
