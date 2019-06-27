@@ -107,12 +107,15 @@ def loss_HardNet(anchor, positive, visualise_idx, anchor_swap = False, anchor_av
         if anchor_swap:
             min_neg2 = torch.min(dist_without_min_on_diag,0)[0]
             neg2_ids = torch.min(dist_without_min_on_diag,0)[1]
-            min_neg,min_types = torch.min(min_neg,min_neg2)
-            n_type = min_types[visualise_idx]
-            if n_type>0:
+            min_neg = torch.min(min_neg,min_neg2)
+            min_n = min_neg[visualise_idx]
+            if min_n==min_neg2[visualise_idx]:
                 n_idx = neg2_ids[visualise_idx]
+                n_type = 1
             else:
                 n_idx = neg_ids[visualise_idx]
+                n_type = 0
+
         if False:
             dist_matrix_a = distance_matrix_vector(anchor, anchor)+ eps
             dist_matrix_p = distance_matrix_vector(positive,positive)+eps
