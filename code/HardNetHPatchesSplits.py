@@ -704,8 +704,7 @@ def test(test_loader, model, epoch, logger, logger_test_name):
         out_a = model(data_a)
         out_p = model(data_p)
         dists = torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
-        distances.append(dists.data.cpu().numpy().reshape(-1, 1))
-        print(distances[batch_idx].shape)
+        distances.extend(dists.data.cpu().numpy().reshape(-1, 1))
 
         if batch_idx % args.log_interval == 0:
             pbar.set_description(logger_test_name + ' Test Epoch: {} [{}/{} ({:.0f}%)]'.format(
@@ -713,10 +712,10 @@ def test(test_loader, model, epoch, logger, logger_test_name):
                        100. * batch_idx / len(test_loader)))
     
     labels = np.ones(len(distances))
-    num_tests = test_loader.dataset.matches.size(0)
-    labels = np.vstack(labels).reshape(num_tests)
+    # num_tests = test_loader.dataset.matches.size(0)
     distances = np.vstack(distances).reshape(num_tests)
-
+    print(len(labels))
+    print(len(distances))
     fpr95 = ErrorRateAt95Recall(labels, 1.0 / (distances + 1e-8))
     #fdr95 = ErrorRateFDRAt95Recall(labels, 1.0 / (distances + 1e-8))
 
