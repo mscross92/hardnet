@@ -194,7 +194,7 @@ class TotalDatasetsLoader(data.Dataset):
         #datasets_path = [os.path.join(datasets_path, dataset) for dataset in os.listdir(datasets_path) if '.pt' in dataset]
         datasets_path = [datasets_path]
         datasets = [torch.load(dataset) for dataset in datasets_path]
-        print (datasets_path)
+        # print (datasets_path)
         data, labels = datasets[0][0], datasets[0][1]
 
         for i in range(1,len(datasets)):
@@ -224,7 +224,7 @@ class TotalDatasetsLoader(data.Dataset):
                     self.negative_indices = self.get_hard_negatives(self.labels, self.descriptors)
                     np.save('descriptors_min_dist.npy', self.negative_indices)
                     self.negative_indices = np.load('descriptors_min_dist.npy')
-                    print(self.negative_indices[0])
+                    # print(self.negative_indices[0])
                     self.triplets = self.generate_hard_triplets(self.labels, self.n_triplets, self.negative_indices)
 
     @staticmethod
@@ -558,7 +558,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
             # visualise random triplet for the first batch - TODO: randomly select batch
             index = np.random.randint(0, data_a.shape[0])
             if batch_idx == 0:
-                print(data_n[index,0,28,28])
+                # print(data_n[index,0,28,28])
                 plt.figure()
                 plt.subplot(1, 3, 1)
                 plt.imshow((np.array(data_a[index,0,:,:])*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
