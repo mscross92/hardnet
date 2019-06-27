@@ -533,10 +533,11 @@ def create_loaders(load_random_triplets=False):
 
     test_loader = torch.utils.data.DataLoader(
         TotalDatasetsLoader(train=False,
+                         load_random_triplets = False,
                          batch_size=args.test_batch_size,
                          datasets_path=args.hpatches_split+"hpatches_split_a_test.pt",
                          fliprot=args.fliprot,
-                         n_triplets=936,
+                         n_triplets=4680,
                          batch_hard=0,
                          name="turbid_deepblue",
                          download=True,
@@ -689,13 +690,14 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     pbar = tqdm(enumerate(test_loader))
     for batch_idx, data in pbar:
         data_a, data_p = data
-        
+        print('DATA SHAPE',data.shape)
         if args.cuda:
             data_a, data_p = data_a.cuda(), data_p.cuda()
 
         data_a, data_p, label = Variable(data_a, volatile=True), \
                                 Variable(data_p, volatile=True), Variable(label)
 
+        print('LABEL SHAPE',label.shape)
         out_a = model(data_a)
         out_p = model(data_p)
         dists = torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
@@ -802,7 +804,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
         model.eval()
         
         trainDatasetWithHardNegatives = TotalDatasetsLoader(train=True,
-                         load_random_triplets=True,
+                         load_random_triplets=False,
                          batch_size=args.batch_size,
                          datasets_path=args.hpatches_split+"hpatches_split_a_train.pt",
                          fliprot=args.fliprot,
