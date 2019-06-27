@@ -602,7 +602,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                                         anchor_swap=args.anchorswap,
                                         loss_type=args.loss)
             # visualise random hard sample
-            plt.figure(figsize=(1,1))
+            plt.figure()
             plt.subplot(1, 3, 1)
             plt.imshow((np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
             plt.gca().set_xticks([])
@@ -634,7 +634,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                 d_n = data_a[n_idx,0,:,:].cpu()
 
             # visualise random hard sample
-            plt.figure(figsize=(1,1))
+            plt.figure()
             plt.subplot(1, 3, 1)
             plt.imshow((np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
             plt.gca().set_xticks([])
