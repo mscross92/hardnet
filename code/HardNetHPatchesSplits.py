@@ -270,20 +270,20 @@ class TotalDatasetsLoader(data.Dataset):
     @staticmethod
     def get_descriptors_for_dataset(data_a,model):
 
-        def get_transformed_data(x,batch_transform = None):
-            collated = torch.utils.data.dataloader.default_collate(x)
-            if batch_transform is not None:
-                collated = batch_transform(collated)
-            return collated
-
         np_reshape29 = lambda x: np.reshape(x, (29, 29, 1))
         trnsfrm = transforms.Compose([
             transforms.Lambda(np_reshape29),
             transforms.ToPILImage(),
             transforms.Resize(29),
             transforms.ToTensor()])
+       
+        x = []
+        for d in data_a:
+            dx = trnsfrm(d)
+            x.extend(d)
 
-        data_a = get_transformed_data(data_a,trnsfrm)
+        data_a = x
+        del x
 
         if args.cuda:
             model.cuda()
