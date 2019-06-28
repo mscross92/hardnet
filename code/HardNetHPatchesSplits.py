@@ -875,7 +875,8 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         return distances
 
     def visualise_distance_matrix(dist_m,epoch,max_d=3.0):
-        # normalise matrix values
+        # normalise matrix values using specified maximum
+        dist_m = np.array(dist_m)
         dist_m /= max_d
         dist_m *= 255
         dist_m = np.array(dist_m).astype('uint8')
