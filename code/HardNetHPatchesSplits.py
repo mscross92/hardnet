@@ -711,7 +711,7 @@ def test(test_loader, model, epoch, logger, logger_test_name):
         y_norm = (out_p**2).sum(1).view(1, -1)
         dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
         d_p = torch.diag(dists) # 1D tensor of distances for positive samples
-        distances.append(d_p.data.cpu().numpy())        
+        distances.extend(d_p.data.cpu().numpy())        
         labels.extend(np.ones(len(d_p)))
 
         y_t = torch.transpose(out_n, 0, 1)
@@ -719,7 +719,7 @@ def test(test_loader, model, epoch, logger, logger_test_name):
         dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
         d_n = torch.diag(dists) # 1D tensor of distances for positive samples
         print(d_n.shape)
-        distances.append(d_n.data.cpu().numpy())        
+        distances.extend(d_n.data.cpu().numpy())        
         labels.extend(np.zeros(len(d_n)))
 
         # labels.append(np.eye(len(out_a)).reshape(-1, 1))
@@ -741,7 +741,7 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     
     # labels = np.ones(len(distances))
     # num_tests = test_loader.dataset.matches.size(0)
-    distances = np.vstack(distances)
+    distances = np.asarray(distances)
     # labels = np.vstack(labels).reshape(num_tests)
     # distances = np.array(distances) + 1e-8
     fpr95 = ErrorRateAt95Recall(labels, 1.0 / (distances + 1e-8))
