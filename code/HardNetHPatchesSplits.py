@@ -766,50 +766,50 @@ def test(test_loader, model, epoch, logger, logger_test_name):
         # del data_n
         if args.cuda:
             data_a, data_p, data_n = data_a.cuda(), data_p.cuda(), data_n.cuda()
+        with torch.no_grad():
+            data_a, data_p, data_n = Variable(data_a), \
+                                    Variable(data_p), \
+                                    Variable(data_n)
 
-        data_a, data_p, data_n = Variable(data_a, volatile=True), \
-                                Variable(data_p, volatile=True), \
-                                Variable(data_n, volatile=True)
+            # descriptors
+            out_a = model(data_a)
+            out_p = model(data_p)
+            out_n = model(data_n)
 
-        # descriptors
-        out_a = model(data_a)
-        out_p = model(data_p)
-        out_n = model(data_n)
+            # euclidean distance
+            x_norm = (out_a**2).sum(1).view(-1, 1)
+            y_t = torch.transpose(out_p, 0, 1)
+            y_norm = (out_p**2).sum(1).view(1, -1)
+            dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
+            d_p = torch.diag(dists) # 1D tensor of distances for positive samples
+            distances.extend(d_p.data.cpu().numpy())        
+            labels.extend(np.ones(len(d_p)))
+            tp.extend(d_p.data.cpu().numpy()) 
 
-        # euclidean distance
-        x_norm = (out_a**2).sum(1).view(-1, 1)
-        y_t = torch.transpose(out_p, 0, 1)
-        y_norm = (out_p**2).sum(1).view(1, -1)
-        dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
-        d_p = torch.diag(dists) # 1D tensor of distances for positive samples
-        distances.extend(d_p.data.cpu().numpy())        
-        labels.extend(np.ones(len(d_p)))
-        tp.extend(d_p.data.cpu().numpy()) 
+            y_t = torch.transpose(out_n, 0, 1)
+            y_norm = (out_n**2).sum(1).view(1, -1)
+            dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
+            d_n = torch.diag(dists) # 1D tensor of distances for positive samples
+            distances.extend(d_n.data.cpu().numpy())        
+            labels.extend(np.zeros(len(d_n)))
+            tn.extend(d_n.data.cpu().numpy()) 
 
-        y_t = torch.transpose(out_n, 0, 1)
-        y_norm = (out_n**2).sum(1).view(1, -1)
-        dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
-        d_n = torch.diag(dists) # 1D tensor of distances for positive samples
-        distances.extend(d_n.data.cpu().numpy())        
-        labels.extend(np.zeros(len(d_n)))
-        tn.extend(d_n.data.cpu().numpy()) 
+            # labels.append(np.eye(len(out_a)).reshape(-1, 1))
+            # dists = torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
+            # distances.append(dists.data.cpu().numpy().reshape(-1, 1))
+            # labels.append(np.eye(len(out_a)).reshape(-1, 1))
+            
+            num_tests += (len(out_p) + len(out_n))
 
-        # labels.append(np.eye(len(out_a)).reshape(-1, 1))
-        # dists = torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
-        # distances.append(dists.data.cpu().numpy().reshape(-1, 1))
-        # labels.append(np.eye(len(out_a)).reshape(-1, 1))
-        
-        num_tests += (len(out_p) + len(out_n))
+            test_loss = loss_random_sampling(out_a, out_p, out_n,
+                                            margin=args.margin,
+                                            anchor_swap=args.anchorswap,
+                                            loss_type=args.loss)
 
-        test_loss = loss_random_sampling(out_a, out_p, out_n,
-                                        margin=args.margin,
-                                        anchor_swap=args.anchorswap,
-                                        loss_type=args.loss)
-
-        if batch_idx % args.log_interval == 0:
-            pbar.set_description('Test Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(data_a), len(test_loader.dataset),
-                       100. * batch_idx / len(test_loader),test_loss.item()))
+            if batch_idx % args.log_interval == 0:
+                pbar.set_description('Test Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                    epoch, batch_idx * len(data_a), len(test_loader.dataset),
+                        100. * batch_idx / len(test_loader),test_loss.item()))
     
     # labels = np.ones(len(distances))
     # num_tests = test_loader.dataset.matches.size(0)
