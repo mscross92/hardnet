@@ -954,7 +954,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
                         f = os.path.join(subdir, file)
                         ptch = cv2.imread(f, cv2.IMREAD_GRAYSCALE)
                         ptch = cv2.resize(ptch, (29, 29))
-                        ptch = np.array(patch, dtype=np.uint8)
+                        ptch = np.array(ptch, dtype=np.uint8)
                         X.append(ptch)
                         if not int(yyy) in cl:
                             cl.append(int(yyy))     
