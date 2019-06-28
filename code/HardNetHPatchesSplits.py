@@ -687,10 +687,8 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     # switch to evaluate mode
     model.eval()
 
-    distances = []
-
-    print(len(test_loader.dataset))
-
+    distances, labels = [], []
+    num_tests = 0
     pbar = tqdm(enumerate(test_loader))
     for batch_idx, data in pbar:
         data_a, data_p, data_n = data
@@ -701,23 +699,34 @@ def test(test_loader, model, epoch, logger, logger_test_name):
         data_a, data_p = Variable(data_a, volatile=True), \
                                 Variable(data_p, volatile=True)
 
+        # descriptors
         out_a = model(data_a)
         out_p = model(data_p)
-        dists = torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
-        distances.extend(dists.data.cpu().numpy().reshape(-1, 1))
 
+        # euclidean distance
+        x_norm = (out_a**2).sum(1).view(-1, 1)
+        y_t = torch.transpose(out_p, 0, 1)
+        y_norm = (out_p**2).sum(1).view(1, -1)
+        dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
+        print(dists.shape)
+
+        # dists = torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
+        distances.append(dists.data.cpu().numpy().reshape(-1, 1))
+        print(distances[0].shape)
+        labels.append(np.eye(len(out_a)))
+        num_tests += (len(out_a) * len(out_p))
         if batch_idx % args.log_interval == 0:
             pbar.set_description(logger_test_name + ' Test Epoch: {} [{}/{} ({:.0f}%)]'.format(
                 epoch, batch_idx * len(data_a), len(test_loader.dataset),
                        100. * batch_idx / len(test_loader)))
     
-    labels = np.ones(len(distances))
+    # labels = np.ones(len(distances))
     # num_tests = test_loader.dataset.matches.size(0)
-    # distances = np.vstack(distances).reshape(num_tests)
-
-    distances = np.array(distances) + 1e-8
-    fpr95 = ErrorRateAt95Recall(labels, 1.0 / (distances))
-    #fdr95 = ErrorRateFDRAt95Recall(labels, 1.0 / (distances + 1e-8))
+    distances = np.vstack(distances).reshape(num_tests)
+    labels = np.vstack(labels).reshape(num_tests)
+    # distances = np.array(distances) + 1e-8
+    # fpr95 = ErrorRateAt95Recall(labels, 1.0 / (distances))
+    fdr95 = ErrorRateFDRAt95Recall(labels, 1.0 / (distances + 1e-8))
 
     #fpr2 = convertFDR2FPR(fdr95, 0.95, 50000, 50000)
     #fpr2fdr = convertFPR2FDR(fpr2, 0.95, 50000, 50000)
