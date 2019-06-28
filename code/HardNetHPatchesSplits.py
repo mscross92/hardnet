@@ -742,6 +742,7 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     # labels = np.ones(len(distances))
     # num_tests = test_loader.dataset.matches.size(0)
     distances = np.asarray(distances)
+    labels = np.asarray(labels)
     print(labels.shape)
     print(distances.shape)
     # labels = np.vstack(labels).reshape(num_tests)
