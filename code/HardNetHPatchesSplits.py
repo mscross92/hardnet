@@ -953,14 +953,14 @@ def main(train_loader, test_loader, model, logger, file_logger):
                         y.append(int(yyy))
                         f = os.path.join(subdir, file)
                         ptch = cv2.imread(f, cv2.IMREAD_GRAYSCALE)
-                        dx = torch.FloatTensor(np.array(ptch)).unsqueeze(0)
-                        dx = dx.unsqueeze(0)
-                        X.append(dx)
+                        ptch = cv2.resize(ptch, (29, 29))
+                        ptch = np.array(patch, dtype=np.uint8)
+                        X.append(ptch)
                         if not int(yyy) in cl:
-                            cl.append(int(yyy))        
+                            cl.append(int(yyy))     
         nC = len(cl)
         print(len(y),'patches loaded from',nC,'classes')
-        return X,y
+        return torch.ByteTensor(np.array(X, dtype=np.uint8)), y
 
     # print the experiment configuration
     print('\nparsed options:\n{}\n'.format(vars(args)))
@@ -998,7 +998,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
     patch_fldr = '/content/hardnet/data/sets/turbid/test_data/patches'
     inc_list = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]
     xt, yt = load_patchDataset_test(patch_fldr,inc_list)
-
+    xt = torch.FloatTensor(np.array(xt)).unsqueeze(0).unsqueeze(0)
  
     start = args.start_epoch
     end = start + args.epochs
