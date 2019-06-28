@@ -769,13 +769,13 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     # # true positives
     tp = np.asarray(tp)
     plt.figure(figsize=(8, 5))
-    sns.distplot(tp, hist=True, 
+    sns.distplot(tp, hist=False, 
                 bins=int(30), color = 'green', 
                 hist_kws={'edgecolor':'black'},
                 kde_kws={'linewidth': 2})
     # # true positives
     tn = np.asarray(tn)
-    sns.distplot(tn, hist=True, kde=True, 
+    sns.distplot(tn, hist=False, kde=True, 
                 bins=int(30), color = 'darkred', 
                 hist_kws={'edgecolor':'black'},
                 kde_kws={'linewidth': 2})
