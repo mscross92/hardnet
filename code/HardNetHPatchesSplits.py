@@ -708,13 +708,13 @@ def test(test_loader, model, epoch, logger, logger_test_name):
         y_t = torch.transpose(out_p, 0, 1)
         y_norm = (out_p**2).sum(1).view(1, -1)
         dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
-        print(dists.shape)
 
         # dists = torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
         distances.append(dists.data.cpu().numpy().reshape(-1, 1))
-        print(distances[0].shape)
-        labels.append(np.eye(len(out_a)))
+        labels.append(np.eye(len(out_a)).reshape(-1, 1))
+        
         num_tests += (len(out_a) * len(out_p))
+
         if batch_idx % args.log_interval == 0:
             pbar.set_description(logger_test_name + ' Test Epoch: {} [{}/{} ({:.0f}%)]'.format(
                 epoch, batch_idx * len(data_a), len(test_loader.dataset),
