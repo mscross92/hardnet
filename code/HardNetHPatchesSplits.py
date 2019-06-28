@@ -868,7 +868,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         distances.extend(dists.data.cpu().numpy())        
         return distances
 
-    def visualise_distance_matrix(dist_m,epoch,max_d=5):
+    def visualise_distance_matrix(dist_m,epoch,max_d=3.0):
         plt.figure(figsize=(5, 5))
         plt.imshow(dist_m,cmap='gray',vmin=0,vmax=max_d)
         plt.axis('off')
@@ -882,7 +882,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         test_sample_x = Variable(test_sample_x)
         des_eg_test = model(test_sample_x)
         dist_m_test = pairwise_dstncs(des_eg_test)
-        visualise_distance_matrix(dist_m_test,epoch,5)
+        visualise_distance_matrix(dist_m_test,epoch)
 
     return test_loss.item(), fpr95
 
