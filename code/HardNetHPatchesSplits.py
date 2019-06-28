@@ -41,6 +41,8 @@ import torch.nn as nn
 import torch.utils.data as data
 
 import matplotlib.pyplot as plt
+import seaborn as sns
+
 # import faiss
 
 
@@ -687,7 +689,7 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     # switch to evaluate mode
     model.eval()
 
-    distances, labels = [], []
+    distances, labels, tp, tn = [], [], [], []
     num_tests = 0
     pbar = tqdm(enumerate(test_loader))
     for batch_idx, data in pbar:
@@ -713,14 +715,15 @@ def test(test_loader, model, epoch, logger, logger_test_name):
         d_p = torch.diag(dists) # 1D tensor of distances for positive samples
         distances.extend(d_p.data.cpu().numpy())        
         labels.extend(np.ones(len(d_p)))
+        tp.extend(d_p.data.cpu().numpy()) 
 
         y_t = torch.transpose(out_n, 0, 1)
         y_norm = (out_n**2).sum(1).view(1, -1)
         dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
         d_n = torch.diag(dists) # 1D tensor of distances for positive samples
-
         distances.extend(d_n.data.cpu().numpy())        
         labels.extend(np.zeros(len(d_n)))
+        tn.extend(d_n.data.cpu().numpy()) 
 
         # labels.append(np.eye(len(out_a)).reshape(-1, 1))
         # dists = torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
@@ -761,6 +764,24 @@ def test(test_loader, model, epoch, logger, logger_test_name):
 
     #print('\33[91mTest set: Accuracy(FDR2FPR): {:.8f}\n\33[0m'.format(fpr2))
     #print('\33[91mTest set: Accuracy(FPR2FDR): {:.8f}\n\33[0m'.format(fpr2fdr))
+
+    # visualise distance distributions
+    # # true positives
+    tp = np.asarray(tp)
+    plt.figure(figsize=(8, 5))
+    sns.distplot(tp, hist=True, 
+                bins=int(30), color = 'green', 
+                hist_kws={'edgecolor':'black'},
+                kde_kws={'linewidth': 2})
+    # # true positives
+    tn = np.asarray(tn)
+    sns.distplot(tn, hist=True, kde=True, 
+                bins=int(30), color = 'darkred', 
+                hist_kws={'edgecolor':'black'},
+                kde_kws={'linewidth': 2})
+    savestr = 'testdistances_epoch' + str(epoch) + '.png'
+    plt.savefig(savestr, bbox_inches='tight')
+    plt.close()
 
     if (args.enable_logging):
         logger.log_value(logger_test_name + ' fpr95', fpr95)
