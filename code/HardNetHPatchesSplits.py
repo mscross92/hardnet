@@ -936,7 +936,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.show()
 
     # determine optimal threshold from validation set
-    roc_difs = np.array(tr_tpr) - np.array(tr_fpr)
+    roc_difs = np.array(te_tpr) - np.array(te_fpr)
     max_dif = np.amax(roc_difs)
     idx = np.where(roc_difs == max_dif)
     thresh = int(np.mean(idx[0])) * inc
