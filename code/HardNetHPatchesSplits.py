@@ -605,58 +605,61 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                                         margin=args.margin,
                                         anchor_swap=args.anchorswap,
                                         loss_type=args.loss)
-            if batch_idx==0 or batch_idx==100 or batch_idx==50:
+            if batch_idx==0:
                 # visualise random sample
-                plt.figure()
-                plt.subplot(1, 3, 1)
-                plt.imshow((np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
-                plt.gca().set_xticks([])
-                plt.gca().set_yticks([])
-                plt.subplot(1,3,2)
-                plt.imshow((np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
-                plt.gca().set_xticks([])
-                plt.gca().set_yticks([])
-                plt.subplot(1,3,3)
-                plt.imshow((np.array(data_n[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
-                plt.gca().set_xticks([])
-                plt.gca().set_yticks([])
-                savestr = 'batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '.png'
+                # plt.figure()
+                # plt.subplot(1, 3, 1)
+                # plt.imshow((np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+                # plt.gca().set_xticks([])
+                # plt.gca().set_yticks([])
+                # plt.subplot(1,3,2)
+                # plt.imshow((np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+                # plt.gca().set_xticks([])
+                # plt.gca().set_yticks([])
+                # plt.subplot(1,3,3)
+                # plt.imshow((np.array(data_n[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+                # plt.gca().set_xticks([])
+                # plt.gca().set_yticks([])
+                # savestr = 'batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '.png'
+                # plt.savefig(savestr, bbox_inches='tight')
+                # plt.close()
+                cv2.imwrite('batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
+                cv2.imwrite('batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
+                cv2.imwrite('batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(data_n[vis_id,0,:,:].cpu())*255).astype('uint8'))
+
+            if batch_idx==100:
+                # visualise distribution of batch
+                tp, tn = [], []
+                # # get pairwise distances
+                x_norm = (out_a**2).sum(1).view(-1, 1)
+                y_t = torch.transpose(out_p, 0, 1)
+                y_norm = (out_p**2).sum(1).view(1, -1)
+                dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
+                d_p = torch.diag(dists) # 1D tensor of distances for positive samples
+                tp.extend(d_p.data.cpu().numpy()) 
+                y_t = torch.transpose(out_n, 0, 1)
+                y_norm = (out_n**2).sum(1).view(1, -1)
+                dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
+                d_n = torch.diag(dists) # 1D tensor of distances for positive samples
+                tn.extend(d_n.data.cpu().numpy()) 
+                # # plot positives
+                tp = np.asarray(tp)
+                plt.figure(figsize=(8, 5))
+                sns.distplot(tp, hist=False, 
+                            bins=int(30), color = 'green', 
+                            hist_kws={'edgecolor':'black'},
+                            kde_kws={'linewidth': 2})
+                # # plot negatives
+                tn = np.asarray(tn)
+                sns.distplot(tn, hist=False, kde=True, 
+                            bins=int(30), color = 'darkred', 
+                            hist_kws={'edgecolor':'black'},
+                            kde_kws={'linewidth': 2})
+                savestr = 'traindistances_epoch' + str(epoch) + '_batch100.png'
                 plt.savefig(savestr, bbox_inches='tight')
                 plt.close()
-
-                if batch_idx==100:
-                    # visualise distribution of batch
-                    tp, tn = [], []
-                    # # get pairwise distances
-                    x_norm = (out_a**2).sum(1).view(-1, 1)
-                    y_t = torch.transpose(out_p, 0, 1)
-                    y_norm = (out_p**2).sum(1).view(1, -1)
-                    dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
-                    d_p = torch.diag(dists) # 1D tensor of distances for positive samples
-                    tp.extend(d_p.data.cpu().numpy()) 
-                    y_t = torch.transpose(out_n, 0, 1)
-                    y_norm = (out_n**2).sum(1).view(1, -1)
-                    dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
-                    d_n = torch.diag(dists) # 1D tensor of distances for positive samples
-                    tn.extend(d_n.data.cpu().numpy()) 
-                    # # plot positives
-                    tp = np.asarray(tp)
-                    plt.figure(figsize=(8, 5))
-                    sns.distplot(tp, hist=False, 
-                                bins=int(30), color = 'green', 
-                                hist_kws={'edgecolor':'black'},
-                                kde_kws={'linewidth': 2})
-                    # # plot negatives
-                    tn = np.asarray(tn)
-                    sns.distplot(tn, hist=False, kde=True, 
-                                bins=int(30), color = 'darkred', 
-                                hist_kws={'edgecolor':'black'},
-                                kde_kws={'linewidth': 2})
-                    savestr = 'traindistances_epoch' + str(epoch) + '_batch100.png'
-                    plt.savefig(savestr, bbox_inches='tight')
-                    plt.close()
-                    del tp, x_norm, y_t, y_norm, dists, d_p
-                    del tn, d_n
+                del tp, x_norm, y_t, y_norm, dists, d_p
+                del tn, d_n
 
         else:
             vis_id = np.random.randint(0, data_a.shape[0])
@@ -674,57 +677,60 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                 d_n = data_a[n_idx,0,:,:].cpu()
 
             # visualise random hard sample
-            if batch_idx==0 or batch_idx==100 or batch_idx==50:
-                plt.figure()
-                plt.subplot(1, 3, 1)
-                plt.imshow((np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
-                plt.gca().set_xticks([])
-                plt.gca().set_yticks([])
-                plt.subplot(1,3,2)
-                plt.imshow((np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
-                plt.gca().set_xticks([])
-                plt.gca().set_yticks([])
-                plt.subplot(1,3,3)
-                plt.imshow((np.array(d_n)*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
-                plt.gca().set_xticks([])
-                plt.gca().set_yticks([])
-                savestr = 'batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '.png'
+            if batch_idx==0:
+                # plt.figure()
+                # plt.subplot(1, 3, 1)
+                # plt.imshow((np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+                # plt.gca().set_xticks([])
+                # plt.gca().set_yticks([])
+                # plt.subplot(1,3,2)
+                # plt.imshow((np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+                # plt.gca().set_xticks([])
+                # plt.gca().set_yticks([])
+                # plt.subplot(1,3,3)
+                # plt.imshow((np.array(d_n)*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+                # plt.gca().set_xticks([])
+                # plt.gca().set_yticks([])
+                # savestr = 'batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '.png'
+                # plt.savefig(savestr, bbox_inches='tight')
+                # plt.close()
+                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
+                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
+                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(d_n)*255).astype('uint8'))
+
+            if batch_idx==100:
+                # visualise distribution of batch
+                tp, tn = [], []
+                # # get pairwise distances
+                x_norm = (out_a**2).sum(1).view(-1, 1)
+                y_t = torch.transpose(out_p, 0, 1)
+                y_norm = (out_p**2).sum(1).view(1, -1)
+                dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
+                d_p = torch.diag(dists) # 1D tensor of distances for positive samples
+                tp.extend(d_p.data.cpu().numpy()) 
+                y_t = torch.transpose(out_n, 0, 1)
+                y_norm = (out_n**2).sum(1).view(1, -1)
+                dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
+                d_n = torch.diag(dists) # 1D tensor of distances for positive samples
+                tn.extend(d_n.data.cpu().numpy()) 
+                # # plot positives
+                tp = np.asarray(tp)
+                plt.figure(figsize=(8, 5))
+                sns.distplot(tp, hist=False, 
+                            bins=int(30), color = 'green', 
+                            hist_kws={'edgecolor':'black'},
+                            kde_kws={'linewidth': 2})
+                # # plot negatives
+                tn = np.asarray(tn)
+                sns.distplot(tn, hist=False, kde=True, 
+                            bins=int(30), color = 'darkred', 
+                            hist_kws={'edgecolor':'black'},
+                            kde_kws={'linewidth': 2})
+                savestr = 'traindistances_epoch' + str(epoch) + '_batch100.png'
                 plt.savefig(savestr, bbox_inches='tight')
                 plt.close()
-
-                if batch_idx==100:
-                    # visualise distribution of batch
-                    tp, tn = [], []
-                    # # get pairwise distances
-                    x_norm = (out_a**2).sum(1).view(-1, 1)
-                    y_t = torch.transpose(out_p, 0, 1)
-                    y_norm = (out_p**2).sum(1).view(1, -1)
-                    dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
-                    d_p = torch.diag(dists) # 1D tensor of distances for positive samples
-                    tp.extend(d_p.data.cpu().numpy()) 
-                    y_t = torch.transpose(out_n, 0, 1)
-                    y_norm = (out_n**2).sum(1).view(1, -1)
-                    dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
-                    d_n = torch.diag(dists) # 1D tensor of distances for positive samples
-                    tn.extend(d_n.data.cpu().numpy()) 
-                    # # plot positives
-                    tp = np.asarray(tp)
-                    plt.figure(figsize=(8, 5))
-                    sns.distplot(tp, hist=False, 
-                                bins=int(30), color = 'green', 
-                                hist_kws={'edgecolor':'black'},
-                                kde_kws={'linewidth': 2})
-                    # # plot negatives
-                    tn = np.asarray(tn)
-                    sns.distplot(tn, hist=False, kde=True, 
-                                bins=int(30), color = 'darkred', 
-                                hist_kws={'edgecolor':'black'},
-                                kde_kws={'linewidth': 2})
-                    savestr = 'traindistances_epoch' + str(epoch) + '_batch100.png'
-                    plt.savefig(savestr, bbox_inches='tight')
-                    plt.close()
-                    del tp, x_norm, y_t, y_norm, dists, d_p
-                    del tn, d_n
+                del tp, x_norm, y_t, y_norm, dists, d_p
+                del tn, d_n
 
         if args.decor:
             loss += CorrelationPenaltyLoss()(out_a)
@@ -869,12 +875,17 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         return distances
 
     def visualise_distance_matrix(dist_m,epoch,max_d=3.0):
-        plt.figure(figsize=(5, 5))
-        plt.imshow(dist_m,cmap='gray',vmin=0,vmax=max_d)
-        plt.axis('off')
+        # normalise matrix values
+        max_v = np.max(dist_m)
+        dist_m /= max_v
+        dist_m *= max_d
         savestr = 'distancematrix_epoch' + str(epoch) + '.png'
-        plt.savefig(savestr, bbox_inches='tight')
-        plt.close()
+        cv2.imwrite(savestr,dist_m)
+        # plt.figure(figsize=(5, 5))
+        # plt.imshow(dist_m,cmap='gray',vmin=0,vmax=max_d)
+        # plt.axis('off')
+        # plt.savefig(savestr, bbox_inches='tight')
+        # plt.close()
 
     if args.cuda:
             test_sample_x = test_sample_x.cuda()
