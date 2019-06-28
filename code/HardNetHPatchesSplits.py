@@ -651,7 +651,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                                 bins=int(30), color = 'darkred', 
                                 hist_kws={'edgecolor':'black'},
                                 kde_kws={'linewidth': 2})
-                    savestr = 'testdistances_epoch' + str(epoch) + '.png'
+                    savestr = 'traindistances_epoch' + str(epoch) + '_batch100.png'
                     plt.savefig(savestr, bbox_inches='tight')
                     plt.close()
                     del tp, x_norm, y_t, y_norm, dists, d_p
