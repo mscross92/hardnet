@@ -1071,7 +1071,6 @@ def main(train_loader, test_loader, model, logger, file_logger):
     plt.plot(epchs, test_fpr95_arr)
     plt.xlabel('Epochs')
     plt.ylabel('FPR(95)')
-    plt.legend()
     savestr = 'frp95_plot.png'
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
