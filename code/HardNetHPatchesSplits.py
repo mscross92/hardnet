@@ -626,6 +626,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
 
                 if batch_idx==100:
                     # visualise distribution of batch
+                    tp, tn = [], []
                     # # get pairwise distances
                     x_norm = (out_a**2).sum(1).view(-1, 1)
                     y_t = torch.transpose(out_p, 0, 1)
@@ -693,6 +694,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
 
                 if batch_idx==100:
                     # visualise distribution of batch
+                    tp, tn = [], []
                     # # get pairwise distances
                     x_norm = (out_a**2).sum(1).view(-1, 1)
                     y_t = torch.transpose(out_p, 0, 1)
@@ -723,7 +725,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                     plt.close()
                     del tp, x_norm, y_t, y_norm, dists, d_p
                     del tn, d_n
-                    
+
         if args.decor:
             loss += CorrelationPenaltyLoss()(out_a)
 
