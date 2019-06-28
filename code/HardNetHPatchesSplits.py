@@ -743,7 +743,7 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     # distances = np.vstack(distances).reshape(num_tests)
     # labels = np.vstack(labels).reshape(num_tests)
     # distances = np.array(distances) + 1e-8
-    fpr95 = ErrorRateAt95Recall(labels, 1.0 / (distances.numpy() + 1e-8))
+    fpr95 = ErrorRateAt95Recall(labels, 1.0 / (np.asarray(distances) + 1e-8))
     # fdr95 = ErrorRateFDRAt95Recall(labels, 1.0 / (distances + 1e-8))
 
     #fpr2 = convertFDR2FPR(fdr95, 0.95, 50000, 50000)
