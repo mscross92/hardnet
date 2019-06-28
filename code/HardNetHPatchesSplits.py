@@ -946,6 +946,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     val_acc = compute_accuracy(y_true_te, y_pred_te,thresh)
     print('When using selected threshold from validation set: ',thresh)
     print('* Accuracy on validation set: %0.2f%%' % (100 * val_acc))
+    print("\n")
 
     plt.figure(figsize=(8, 5))
     sns.distplot(tp, hist=False, 
