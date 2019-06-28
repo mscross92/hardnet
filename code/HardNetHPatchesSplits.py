@@ -845,20 +845,8 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     # visualise distance distributions
     # # true positives
     tp = np.asarray(tp)
-    plt.figure(figsize=(8, 5))
-    sns.distplot(tp, hist=False, 
-                bins=int(30), color = 'green', 
-                hist_kws={'edgecolor':'black'},
-                kde_kws={'linewidth': 2})
     # # true positives
     tn = np.asarray(tn)
-    sns.distplot(tn, hist=False, kde=True, 
-                bins=int(30), color = 'darkred', 
-                hist_kws={'edgecolor':'black'},
-                kde_kws={'linewidth': 2})
-    savestr = 'testdistances_epoch' + str(epoch) + '.png'
-    plt.savefig(savestr, bbox_inches='tight')
-    plt.close()
 
     if (args.enable_logging):
         logger.log_value(logger_test_name + ' fpr95', fpr95)
@@ -888,6 +876,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         # plt.savefig(savestr, bbox_inches='tight')
         # plt.close()
 
+
     if args.cuda:
             test_sample_x = test_sample_x.cuda()
     with torch.no_grad():
@@ -896,6 +885,82 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         dist_m_test = pairwise_dstncs(des_eg_test)
         visualise_distance_matrix(dist_m_test,epoch)
 
+    # plot ROC curve
+    y_pred_te = np.concatenate((tp,tn))
+    y1 = np.ones(len(tp))
+    y2 = np.zeros(len(tn))
+    y_true_te = np.concatenate((y1,y2))
+    max_distance = np.max(y_pred_te)
+
+    def compute_accuracy(y_true, y_pred, t):
+        pred = y_pred.ravel() < t
+        return np.mean(pred == y_true)
+
+    def compute_ROC(thresh, y_true, y_pred):        
+        tp = 0
+        fp = 0
+        tn = 0
+        fn = 0
+        counter = 0;    
+        for y in y_pred:
+            if y < thresh:
+                if y_true[counter]==1:
+                    tp += 1
+                else:
+                    fp += 1
+            else:
+                if y_true[counter]==0:
+                    tn += 1
+                else:
+                    fn += 1
+            counter += 1
+        tpr = tp / (tp + fn)
+        fpr = fp / (fp + tn)
+        roc = [tpr, fpr]
+        return roc
+
+    te_tpr = []
+    te_fpr = []
+    inc = 0.05
+    r = np.arange(0.0, max_distance+inc, inc)
+    for t in r:
+        roc = compute_ROC(t,y_true_te,y_pred_te)
+        te_tpr.append(roc[0])
+        te_fpr.append(roc[1])
+    plt.figure(figsize=(6, 6))
+    # plt.plot(tr_fpr,tr_tpr, label='train set')
+    plt.plot(te_fpr,te_tpr, label='validation set')
+    plt.xlabel('False positive rate')
+    plt.ylabel('True positive rate')
+    plt.legend()
+    plt.show()
+
+    # determine optimal threshold from validation set
+    roc_difs = np.array(tr_tpr) - np.array(tr_fpr)
+    max_dif = np.amax(roc_difs)
+    idx = np.where(roc_difs == max_dif)
+    thresh = int(np.mean(idx[0])) * inc
+    # # compute final accuracy on training and test sets
+    val_acc = compute_accuracy(y_true_te, y_pred_te,thresh)
+    print('When using selected threshold from validation set: ',thresh)
+    print('* Accuracy on validation set: %0.2f%%' % (100 * val_acc))
+
+    plt.figure(figsize=(8, 5))
+    sns.distplot(tp, hist=False, 
+                bins=int(30), color = 'green', 
+                hist_kws={'edgecolor':'black'},
+                kde_kws={'linewidth': 2})
+    # # true positives
+    tn = np.asarray(tn)
+    sns.distplot(tn, hist=False, kde=True, 
+                bins=int(30), color = 'darkred', 
+                hist_kws={'edgecolor':'black'},
+                kde_kws={'linewidth': 2})
+    plt.axvline(thresh,linewidth=1, color='k',linestyle='--')
+    savestr = 'testdistances_epoch' + str(epoch) + '.png'
+    plt.savefig(savestr, bbox_inches='tight')
+    plt.close()
+    
     return test_loss.item(), fpr95
 
 
