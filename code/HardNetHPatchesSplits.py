@@ -933,7 +933,9 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.xlabel('False positive rate')
     plt.ylabel('True positive rate')
     plt.legend()
-    plt.show()
+    savestr = 'test_roc_epoch' + str(epoch) + '.png'
+    plt.savefig(savestr, bbox_inches='tight')
+    plt.close()
 
     # determine optimal threshold from validation set
     roc_difs = np.array(te_tpr) - np.array(te_fpr)
