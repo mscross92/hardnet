@@ -876,9 +876,9 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
 
     def visualise_distance_matrix(dist_m,epoch,max_d=3.0):
         # normalise matrix values
-        max_v = np.max(dist_m)
-        dist_m /= max_v
-        dist_m *= max_d
+        dist_m /= max_d
+        dist_m *= 255
+        dist_m = np.array(dist_m).astype('uint8')
         savestr = 'distancematrix_epoch' + str(epoch) + '.png'
         cv2.imwrite(savestr,dist_m)
         # plt.figure(figsize=(5, 5))
