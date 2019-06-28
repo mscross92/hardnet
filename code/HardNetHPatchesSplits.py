@@ -560,28 +560,28 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
             data_a, data_p, data_n = data
             
             # visualise random triplet for the first batch - TODO: randomly select batch
-            index = np.random.randint(0, data_a.shape[0])
-            if batch_idx == 0:
+            # index = np.random.randint(0, data_a.shape[0])
+            # if batch_idx == 0:
                 # print(data_n[index,0,28,28])
-                plt.figure()
-                plt.subplot(1, 3, 1)
-                plt.imshow((np.array(data_a[index,0,:,:])*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
-                plt.gca().set_xticks([])
-                plt.gca().set_yticks([])
-                plt.title('Anchor', fontsize=12)
-                plt.subplot(1,3,2)
-                plt.imshow((np.array(data_p[index,0,:,:])*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
-                plt.title('Positive', fontsize=12)
-                plt.gca().set_xticks([])
-                plt.gca().set_yticks([])
-                plt.subplot(1,3,3)
-                plt.imshow((np.array(data_n[index,0,:,:])*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
-                plt.title('Negative', fontsize=12)
-                plt.gca().set_xticks([])
-                plt.gca().set_yticks([])
-                savestr = 'epch' + str(epoch) + '_idx' + str(index) + '.png'
-                plt.savefig(savestr, bbox_inches='tight')
-                plt.close()
+                # plt.figure()
+                # plt.subplot(1, 3, 1)
+                # plt.imshow((np.array(data_a[index,0,:,:])*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+                # plt.gca().set_xticks([])
+                # plt.gca().set_yticks([])
+                # plt.title('Anchor', fontsize=12)
+                # plt.subplot(1,3,2)
+                # plt.imshow((np.array(data_p[index,0,:,:])*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+                # plt.title('Positive', fontsize=12)
+                # plt.gca().set_xticks([])
+                # plt.gca().set_yticks([])
+                # plt.subplot(1,3,3)
+                # plt.imshow((np.array(data_n[index,0,:,:])*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
+                # plt.title('Negative', fontsize=12)
+                # plt.gca().set_xticks([])
+                # plt.gca().set_yticks([])
+                # savestr = 'epch' + str(epoch) + '_idx' + str(index) + '.png'
+                # plt.savefig(savestr, bbox_inches='tight')
+                # plt.close()
         else:
             data_a, data_p = data
 
@@ -606,7 +606,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                                         anchor_swap=args.anchorswap,
                                         loss_type=args.loss)
             if batch_idx==0 or batch_idx==100 or batch_idx==50:
-                # visualise random hard sample
+                # visualise random sample
                 plt.figure()
                 plt.subplot(1, 3, 1)
                 plt.imshow((np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
@@ -623,6 +623,40 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                 savestr = 'batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '.png'
                 plt.savefig(savestr, bbox_inches='tight')
                 plt.close()
+
+                if batch_idx==100:
+                    # visualise distribution of batch
+                    # # get pairwise distances
+                    x_norm = (out_a**2).sum(1).view(-1, 1)
+                    y_t = torch.transpose(out_p, 0, 1)
+                    y_norm = (out_p**2).sum(1).view(1, -1)
+                    dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
+                    d_p = torch.diag(dists) # 1D tensor of distances for positive samples
+                    tp.extend(d_p.data.cpu().numpy()) 
+                    y_t = torch.transpose(out_n, 0, 1)
+                    y_norm = (out_n**2).sum(1).view(1, -1)
+                    dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
+                    d_n = torch.diag(dists) # 1D tensor of distances for positive samples
+                    tn.extend(d_n.data.cpu().numpy()) 
+                    # # plot positives
+                    tp = np.asarray(tp)
+                    plt.figure(figsize=(8, 5))
+                    sns.distplot(tp, hist=False, 
+                                bins=int(30), color = 'green', 
+                                hist_kws={'edgecolor':'black'},
+                                kde_kws={'linewidth': 2})
+                    # # plot negatives
+                    tn = np.asarray(tn)
+                    sns.distplot(tn, hist=False, kde=True, 
+                                bins=int(30), color = 'darkred', 
+                                hist_kws={'edgecolor':'black'},
+                                kde_kws={'linewidth': 2})
+                    savestr = 'testdistances_epoch' + str(epoch) + '.png'
+                    plt.savefig(savestr, bbox_inches='tight')
+                    plt.close()
+                    del tp, x_norm, y_t, y_norm, dists, d_p
+                    del tn, d_n
+
         else:
             vis_id = np.random.randint(0, data_a.shape[0])
             loss, n_idx,n_type = loss_HardNet(out_a, out_p,
