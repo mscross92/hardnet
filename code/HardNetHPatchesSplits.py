@@ -1064,7 +1064,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
         #                                  descs_to_draw=[desc_name])
 
     # plot losses
-    epchs = len(test_losses_arr)
+    epchs = range(1, len(test_losses_arr) + 1)
     plt.figure(figsize=(7,4))
     plt.plot(epchs, test_fpr95_arr)
     plt.xlabel('Epochs')
