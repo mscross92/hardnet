@@ -751,6 +751,8 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
 
     torch.save({'epoch': epoch + 1, 'state_dict': model.state_dict()},
                '{}{}/checkpoint_{}.pth'.format(args.model_dir, suffix, epoch))
+    
+    return loss.item()
 
 
 def test(test_loader, model, epoch, logger, logger_test_name):
@@ -854,7 +856,8 @@ def test(test_loader, model, epoch, logger, logger_test_name):
 
     if (args.enable_logging):
         logger.log_value(logger_test_name + ' fpr95', fpr95)
-    return
+    
+    return test_loss.item(), fpr95
 
 
 def adjust_learning_rate(optimizer):
@@ -912,6 +915,8 @@ def main(train_loader, test_loader, model, logger, file_logger):
     
     kwargs = {'num_workers': args.num_workers, 'pin_memory': args.pin_memory} if args.cuda else {}
 
+    test_losses_arr, test_fpr95_arr, train_losses_arr = [], [], []
+
     np_reshape29 = lambda x: np.reshape(x, (29, 29, 1))
     transform = transforms.Compose([
         transforms.Lambda(np_reshape29),
@@ -939,8 +944,8 @@ def main(train_loader, test_loader, model, logger, file_logger):
                                                    batch_size=args.batch_size,
                                                    shuffle=False, **kwargs)
 
-        train(train_loader, model, optimizer1, epoch, logger)
-
+        train_loss_epch = train(train_loader, model, optimizer1, epoch, logger)
+        train_losses_arr.append(train_loss_epch)
 
         # # iterate over test loaders and test results
         # #train_loader, test_loaders2 = create_loaders(load_random_triplets=triplet_flag)
@@ -948,7 +953,10 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
         # # visualise 
         # test on deepblue set
-        test(test_loader, model, epoch, logger,"a_test_log")
+        test_loss_epch, fpr95_epch = test(test_loader, model, epoch, logger,"a_test_log")
+        test_losses_arr.append(test_loss_epch)
+        test_fpr95_arr.append(fpr95_epch)
+
         # if TEST_ON_W1BS:
         #     # print(weights_path)
         #     patch_images = w1bs.get_list_of_patch_images(
@@ -978,6 +986,17 @@ def main(train_loader, test_loader, model, logger, file_logger):
         #                                  methods=["SNN_ratio"],
         #                                  descs_to_draw=[desc_name])
 
+    # plot losses
+    epchs = end - start
+    plt.figure(figsize=(7,4))
+    plt.plot(epchs, train_losses_arr, label='Milk subset (train)')
+    plt.plot(epchs, test_losses_arr, label='DeepBlue subset (validation)')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+    savestr = 'losses_plot.png'
+    plt.savefig(savestr, bbox_inches='tight')
+    plt.close()
 
 if __name__ == '__main__':
     LOG_DIR = args.log_dir
