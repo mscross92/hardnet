@@ -755,7 +755,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
     return loss.item()
 
 
-def test(test_loader, model, epoch, logger, logger_test_name):
+def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, test_sample_y):
 
     # switch to evaluate mode
     model.eval()
@@ -857,6 +857,33 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     if (args.enable_logging):
         logger.log_value(logger_test_name + ' fpr95', fpr95)
     
+    # plot example distance matrix for samples from training set
+    def pairwise_dstncs(descA):
+        distances = []
+        # euclidean distance
+        x_norm = (descA**2).sum(1).view(-1, 1)
+        y_t = torch.transpose(descA, 0, 1)
+        y_norm = (descA**2).sum(1).view(1, -1)
+        dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(descA, y_t),0.0,np.inf))
+        distances.extend(dists.data.cpu().numpy())        
+        return distances
+
+    def visualise_distance_matrix(dist_m,epoch,max_d=5):
+        plt.figure(figsize=(5, 5))
+        plt.imshow(dist_m,cmap='gray',vmin=0,vmax=max_d)
+        plt.axis('off')
+        savestr = 'distancematrix_epoch' + str(epoch) + '.png'
+        plt.savefig(savestr, bbox_inches='tight')
+        plt.close()
+
+    if args.cuda:
+            test_sample_x = test_sample_x.cuda()
+    with torch.no_grad():
+        test_sample_x = Variable(test_sample_x)
+        des_eg_test = model(test_sample_x)
+        dist_m_test = pairwise_dstncs(des_eg_test)
+        visualise_distance_matrix(dist_m_test,epoch,5)
+
     return test_loss.item(), fpr95
 
 
@@ -889,8 +916,52 @@ def create_optimizer(model, new_lr):
 
 
 def main(train_loader, test_loader, model, logger, file_logger):
+    # load test patch trajectories
+    def sortedWalk(top, topdown=True, onerror=None):
+        from os.path import join, isdir, islink
+        names = os.listdir(top)
+        names.sort()
+        dirs, nondirs = [], []
+        for name in names:
+            if isdir(os.path.join(top, name)):
+                dirs.append(name)
+            else:
+                nondirs.append(name)
+        if topdown:
+            yield top, dirs, nondirs
+        for name in dirs:
+            path = join(top, name)
+            if not os.path.islink(path):
+                for x in sortedWalk(path, topdown, onerror):
+                    yield x
+        if not topdown:
+            yield top, dirs, nondirs
 
-    
+    def load_patchDataset_test(patch_dir,incld):
+        X = []
+        y = []
+        cl = []
+        for subdir, dirs, files in sortedWalk(patch_dir):
+            yy = subdir.replace(patch_dir+'/','')
+            print(yy)            
+            files = sorted(files)
+            for file in files:
+                if yy != patch_dir:
+                    s = file.replace('.jpg','')
+                    if int(s) in incld:
+                        yyy = yy[1:]
+                        y.append(int(yyy))
+                        f = os.path.join(subdir, file)
+                        ptch = cv2.imread(f, cv2.IMREAD_GRAYSCALE)
+                        dx = torch.FloatTensor(np.array(ptch)).unsqueeze(0)
+                        dx = dx.unsqueeze(0)
+                        X.append(dx)
+                        if not int(yyy) in cl:
+                            cl.append(int(yyy))        
+        nC = len(cl)
+        print(len(y),'patches loaded from',nC,'classes')
+        return X,y
+
     # print the experiment configuration
     print('\nparsed options:\n{}\n'.format(vars(args)))
 
@@ -923,6 +994,12 @@ def main(train_loader, test_loader, model, logger, file_logger):
         transforms.ToPILImage(),
         transforms.Resize(29),
         transforms.ToTensor()])
+    
+    patch_fldr = 'test_data/patches'
+    inc_list = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]
+    xt, yt = load_patchDataset_test(patch_fldr,inc_list)
+
+ 
     start = args.start_epoch
     end = start + args.epochs
     for epoch in range(start, end):
@@ -953,7 +1030,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
         # # visualise 
         # test on deepblue set
-        test_loss_epch, fpr95_epch = test(test_loader, model, epoch, logger,"a_test_log")
+        test_loss_epch, fpr95_epch = test(test_loader, model, epoch, logger,"a_test_log",xt, yt)
         test_losses_arr.append(test_loss_epch)
         test_fpr95_arr.append(fpr95_epch)
 
@@ -987,7 +1064,16 @@ def main(train_loader, test_loader, model, logger, file_logger):
         #                                  descs_to_draw=[desc_name])
 
     # plot losses
-    epchs = end - start
+    epchs = len(test_losses_arr)
+    plt.figure(figsize=(7,4))
+    plt.plot(epchs, test_fpr95_arr)
+    plt.xlabel('Epochs')
+    plt.ylabel('FPR(95)')
+    plt.legend()
+    savestr = 'frp95_plot.png'
+    plt.savefig(savestr, bbox_inches='tight')
+    plt.close()
+
     plt.figure(figsize=(7,4))
     plt.plot(epchs, train_losses_arr, label='Milk subset (train)')
     plt.plot(epchs, test_losses_arr, label='DeepBlue subset (validation)')
