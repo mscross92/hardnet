@@ -691,6 +691,39 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                 plt.savefig(savestr, bbox_inches='tight')
                 plt.close()
 
+                if batch_idx==100:
+                    # visualise distribution of batch
+                    # # get pairwise distances
+                    x_norm = (out_a**2).sum(1).view(-1, 1)
+                    y_t = torch.transpose(out_p, 0, 1)
+                    y_norm = (out_p**2).sum(1).view(1, -1)
+                    dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
+                    d_p = torch.diag(dists) # 1D tensor of distances for positive samples
+                    tp.extend(d_p.data.cpu().numpy()) 
+                    y_t = torch.transpose(out_n, 0, 1)
+                    y_norm = (out_n**2).sum(1).view(1, -1)
+                    dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
+                    d_n = torch.diag(dists) # 1D tensor of distances for positive samples
+                    tn.extend(d_n.data.cpu().numpy()) 
+                    # # plot positives
+                    tp = np.asarray(tp)
+                    plt.figure(figsize=(8, 5))
+                    sns.distplot(tp, hist=False, 
+                                bins=int(30), color = 'green', 
+                                hist_kws={'edgecolor':'black'},
+                                kde_kws={'linewidth': 2})
+                    # # plot negatives
+                    tn = np.asarray(tn)
+                    sns.distplot(tn, hist=False, kde=True, 
+                                bins=int(30), color = 'darkred', 
+                                hist_kws={'edgecolor':'black'},
+                                kde_kws={'linewidth': 2})
+                    savestr = 'traindistances_epoch' + str(epoch) + '_batch100.png'
+                    plt.savefig(savestr, bbox_inches='tight')
+                    plt.close()
+                    del tp, x_norm, y_t, y_norm, dists, d_p
+                    del tn, d_n
+                    
         if args.decor:
             loss += CorrelationPenaltyLoss()(out_a)
 
