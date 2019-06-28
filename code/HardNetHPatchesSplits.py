@@ -743,8 +743,6 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     # num_tests = test_loader.dataset.matches.size(0)
     distances = np.asarray(distances)
     labels = np.asarray(labels)
-    print(labels.shape)
-    print(distances.shape)
     # labels = np.vstack(labels).reshape(num_tests)
     # distances = np.array(distances) + 1e-8
     fpr95 = ErrorRateAt95Recall(labels, 1.0 / (distances + 1e-8))
