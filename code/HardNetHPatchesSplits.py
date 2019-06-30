@@ -982,6 +982,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
             splts = torch.chunk(all_dsc, 14)
             del all_dsc
             for s in splts:
+                print(s.shape)
                  # euclidean distance
                 y_t = torch.transpose(s, 0, 1)
                 y_norm = (s**2).sum(1).view(1, -1)
@@ -1181,8 +1182,6 @@ def main(train_loader, test_loader, model, logger, file_logger):
     xv, xv_ref, yv_p, yv_i = load_patchDataset_allval(patch_fldr,inc_list)
     xv = torch.FloatTensor(np.array(xv)).unsqueeze(1)
     xv_ref = torch.FloatTensor(np.array(xv_ref)).unsqueeze(1)
-    print(xv_ref.shape)
-    print(xv.shape)
     
     start = args.start_epoch
     end = start + args.epochs
