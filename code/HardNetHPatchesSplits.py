@@ -1115,7 +1115,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
                     s = file.replace('.jpg','')
                     if int(s) in incld:
                         y.append(int(yy))
-                        y2.append(int(x))
+                        y2.append(int(s))
                         f = os.path.join(subdir, file)
                         ptch = cv2.imread(f, cv2.IMREAD_GRAYSCALE)
                         ptch = cv2.resize(ptch, (29, 29))
