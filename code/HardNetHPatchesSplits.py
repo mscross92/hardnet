@@ -967,7 +967,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.close()
     
     del tn, tp
-    del y_pred_te, te_tpr, te_tnr, roc_difs
+    del y_pred_te, te_tpr, te_fpr, roc_difs
 
 
     # # visualise distance against image id / patch id
