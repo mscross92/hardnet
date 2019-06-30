@@ -1139,6 +1139,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
                             if counter == 0:
                                 X[int(s)] = ptch
                             else:
+                                print(int(s))
                                 X[int(s)].append(ptch)
                             y.append(int(yy))
                             y2.append(int(s))
