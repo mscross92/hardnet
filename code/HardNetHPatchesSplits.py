@@ -983,7 +983,6 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
             splts = torch.chunk(all_dsc, 14)
             del all_dsc
             for s in splts:
-                print(s.shape)
                  # euclidean distance
                 y_t = torch.transpose(s, 0, 1)
                 y_norm = (s**2).sum(1).view(1, -1)
@@ -1018,7 +1017,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     # plt.plot(average_scores,'o',label='mean distance for image')
     plt.xlabel('Patch index')
     plt.ylabel('distance')
-    plt.legend()
+    # plt.legend()
     savestr = 'patchid-v-dist_epoch' + str(epoch) + '.png'
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
@@ -1029,7 +1028,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     # plt.plot(average_scores,'o',label='mean distance for image')
     plt.xlabel('Image index')
     plt.ylabel('distance')
-    plt.legend()
+    # plt.legend()
     savestr = 'imageid-v-dist_epoch' + str(epoch) + '.png'
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
