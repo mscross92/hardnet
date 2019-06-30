@@ -1118,7 +1118,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
         cl = []
         for subdir, dirs, files in sortedWalk(patch_dir):
             yy = subdir.replace(patch_dir+'/','')
-            print(yy)
+            # print(yy)
             files = sorted(files)
             for file in files:
                 if yy != patch_dir:
