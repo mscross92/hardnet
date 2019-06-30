@@ -761,7 +761,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
     return loss.item()
 
 
-def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, test_sample_y):
+def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, test_sample_y, all_val_set_x, all_val_set_y, all_val_set_images):
 
     # switch to evaluate mode
     model.eval()
@@ -878,7 +878,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
 
 
     if args.cuda:
-            test_sample_x = test_sample_x.cuda()
+        test_sample_x = test_sample_x.cuda()
     with torch.no_grad():
         test_sample_x = Variable(test_sample_x)
         des_eg_test = model(test_sample_x)
@@ -964,6 +964,65 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
     
+
+    # # visualise distance against image id / patch id
+    # all_val_set_x, all_val_set_y, all_val_set_images
+    if args.cuda:
+        all_val_set_x = all_val_set_x.cuda()
+    
+    # predict descriptors
+    def pairwise_dstncs_2vec(descA,descB):
+        # euclidean distance
+        x_norm = (descA**2).sum(1).view(-1, 1)
+        y_t = torch.transpose(descB, 0, 1)
+        y_norm = (descB**2).sum(1).view(1, -1)
+        dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(descA, y_t),0.0,np.inf))
+        dists = torch.diag(dists) # get diagonal only
+        return dists.data.cpu().numpy()
+
+    with torch.no_grad():
+        all_val_set_x = Variable(all_val_set_x)
+        desc_all_val = model(all_val_set_x)
+        ref_desc = all_val_set_x[:312]
+        ref_desc = torch.cat((ref_desc, ref_desc, ref_desc, ref_desc, ref_desc, ref_desc, ref_desc, ref_desc, ref_desc, ref_desc, ref_desc, ref_desc, ref_desc, ref_desc), 0)
+
+        dist_m_all_val = pairwise_dstncs_2vec(ref_desc,desc_all_val)
+
+
+    # compute distances
+    # all_counts = []
+    # all_scores = []
+    # average_scores = []
+    # for d in ref_desc:
+        # pairwise distance matrix
+
+        # get diagonal distances only
+
+        # add distances to array for plotting
+        # average_scores.append(np.average(dists))
+
+    # plot against patch label
+    fig, ax = plt.subplots(figsize=(6,6))
+    plt.plot(all_val_set_y,dist_m_all_val,'.')
+    # plt.plot(average_scores,'o',label='mean distance for image')
+    plt.xlabel('Patch index')
+    plt.ylabel('distance')
+    plt.legend()
+    savestr = 'patchid-v-dist_epoch' + str(epoch) + '.png'
+    plt.savefig(savestr, bbox_inches='tight')
+    plt.close()
+
+    # plot against patch label
+    fig, ax = plt.subplots(figsize=(6,6))
+    plt.plot(all_val_set_images,dist_m_all_val,'.')
+    # plt.plot(average_scores,'o',label='mean distance for image')
+    plt.xlabel('Image index')
+    plt.ylabel('distance')
+    plt.legend()
+    savestr = 'imageid-v-dist_epoch' + str(epoch) + '.png'
+    plt.savefig(savestr, bbox_inches='tight')
+    plt.close()
+
     return test_loss.item(), fpr95
 
 
@@ -1042,6 +1101,31 @@ def main(train_loader, test_loader, model, logger, file_logger):
         print(len(y),'patches loaded from',nC,'classes')
         return torch.ByteTensor(np.array(X, dtype=np.uint8)), y
 
+    def load_patchDataset_allval(patch_dir,incld):
+        X = []
+        y = []
+        cl = []
+        for subdir, dirs, files in sortedWalk(patch_dir):
+            yy = subdir.replace(patch_dir+'/','')
+            print(yy)            
+            files = sorted(files)
+            for file in files:
+                if yy != patch_dir:
+                    s = file.replace('.jpg','')
+                    if int(s) in incld:
+                        y.append(int(yy))
+                        y2.append(int(x))
+                        f = os.path.join(subdir, file)
+                        ptch = cv2.imread(f, cv2.IMREAD_GRAYSCALE)
+                        ptch = cv2.resize(ptch, (29, 29))
+                        ptch = np.array(ptch, dtype=np.uint8)
+                        X.append(ptch)
+                        if not int(yy) in cl:
+                            cl.append(int(yy))     
+        nC = len(cl)
+        print(len(y),'patches loaded from',nC,'classes')
+        return torch.ByteTensor(np.array(X, dtype=np.uint8)), y, y2
+
     # print the experiment configuration
     print('\nparsed options:\n{}\n'.format(vars(args)))
 
@@ -1080,6 +1164,10 @@ def main(train_loader, test_loader, model, logger, file_logger):
     xt, yt = load_patchDataset_test(patch_fldr,inc_list)
     xt = torch.FloatTensor(np.array(xt)).unsqueeze(1)
  
+    patch_fldr = '/content/hardnet/data/sets/turbid/validation_all'
+    xv, yv_p, yv_i = load_patchDataset_test(patch_fldr,inc_list)
+    xv = torch.FloatTensor(np.array(xv)).unsqueeze(1)
+ 
     start = args.start_epoch
     end = start + args.epochs
     for epoch in range(start, end):
@@ -1110,7 +1198,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
         # # visualise 
         # test on deepblue set
-        test_loss_epch, fpr95_epch = test(test_loader, model, epoch, logger,"a_test_log",xt, yt)
+        test_loss_epch, fpr95_epch = test(test_loader, model, epoch, logger,"a_test_log", xt, yt, xv, yv_p, yv_i)
         test_losses_arr.append(test_loss_epch)
         test_fpr95_arr.append(fpr95_epch)
 
