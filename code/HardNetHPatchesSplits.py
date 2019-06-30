@@ -1127,30 +1127,22 @@ def main(train_loader, test_loader, model, logger, file_logger):
             for file in files:
                 if yy != patch_dir:
                     s = file.replace('.jpg','')
-                    if int(s) in incld:
+                    if int(yy) in incld:
                         f = os.path.join(subdir, file)
                         ptch = cv2.imread(f, cv2.IMREAD_GRAYSCALE)
                         ptch = cv2.resize(ptch, (29, 29))
                         ptch = np.array(ptch, dtype=np.uint8)
-                        if int(s)==0:
+                        if int(yy)==0:
                             X_ref.append(ptch)
-                            counter = counter + 1
                         else:
-                            if counter == 0:
-                                X[int(s)] = ptch
-                            else:
-                                print(int(s))
-                                X[int(s)].append(ptch)
-                            y.append(int(yy))
-                            y2.append(int(s))
-                        if not int(yy) in cl:
-                            cl.append(int(yy))     
+                            X.append(ptch)
+                            y.append(int(s))
+                            y2.append(int(yy))
+                        if not int(s) in cl:
+                            cl.append(int(s))     
         nC = len(cl)
         print(len(y),'patches loaded from',nC,'classes')
-        X2 = []
-        for x in X:
-            X2.append(x)
-        print(X2.shape)
+
         return torch.ByteTensor(np.array(X, dtype=np.uint8)), torch.ByteTensor(np.array(X_ref, dtype=np.uint8)), y, y2
 
     # print the experiment configuration
