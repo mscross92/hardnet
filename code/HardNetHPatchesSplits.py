@@ -1117,6 +1117,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
         y = []
         y2 = []
         cl = []
+        counter = 0
         for subdir, dirs, files in sortedWalk(patch_dir):
             yy = subdir.replace(patch_dir+'/','')
             # print(yy)
@@ -1131,14 +1132,22 @@ def main(train_loader, test_loader, model, logger, file_logger):
                         ptch = np.array(ptch, dtype=np.uint8)
                         if int(s)==0:
                             X_ref.append(ptch)
+                            counter = counter + 1
                         else:
-                            X.append(ptch)
+                            if counter == 0:
+                                X[int(s)] = ptch
+                            else:
+                                X[int(s)].append(ptch)
                             y.append(int(yy))
                             y2.append(int(s))
                         if not int(yy) in cl:
                             cl.append(int(yy))     
         nC = len(cl)
         print(len(y),'patches loaded from',nC,'classes')
+        X2 = []
+        for x in X:
+            X2.append(x)
+        print(X2.shape)
         return torch.ByteTensor(np.array(X, dtype=np.uint8)), torch.ByteTensor(np.array(X_ref, dtype=np.uint8)), y, y2
 
     # print the experiment configuration
