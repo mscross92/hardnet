@@ -1104,6 +1104,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
     def load_patchDataset_allval(patch_dir,incld):
         X = []
         y = []
+        y2 = []
         cl = []
         for subdir, dirs, files in sortedWalk(patch_dir):
             yy = subdir.replace(patch_dir+'/','')
