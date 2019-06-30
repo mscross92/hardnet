@@ -974,6 +974,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     # all_val_set_x, all_val_set_y, all_val_set_images
     if args.cuda:
         all_val_set_x = all_val_set_x.cuda()
+        desc_all_val = desc_all_val.cuda()
     
     with torch.no_grad():
         def pairwise_dstncs_2vec(ref_dsc,all_dsc):
@@ -993,6 +994,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
 
         # predict descriptors
         all_val_set_x = Variable(all_val_set_x)
+        all_val_set_x = Variable(desc_all_val)
         desc_all_val = model(all_val_set_x)
         ref_desc = model(all_val_set_x_ref)
         dist_m_all_val = pairwise_dstncs_2vec(ref_desc,desc_all_val)
