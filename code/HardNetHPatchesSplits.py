@@ -1030,7 +1030,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.axhline(thresh,linewidth=1, color='k',linestyle='--',label='Threshold')
     plt.xlabel('Image index')
     plt.ylabel('distance')
-    # plt.legend()
+    plt.legend()
     savestr = 'imageid-v-dist_epoch' + str(epoch) + '.png'
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
