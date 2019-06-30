@@ -1137,7 +1137,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
                             cl.append(int(yy))     
         nC = len(cl)
         print(len(y),'patches loaded from',nC,'classes')
-        return torch.ByteTensor(np.array(X, dtype=np.uint8)),torch.ByteTensor(np.array(X_ref, dtype=np.uint8)), y, y2
+        return torch.ByteTensor(np.array(X, dtype=np.uint8)), torch.ByteTensor(np.array(X_ref, dtype=np.uint8)), y, y2
 
     # print the experiment configuration
     print('\nparsed options:\n{}\n'.format(vars(args)))
@@ -1181,7 +1181,9 @@ def main(train_loader, test_loader, model, logger, file_logger):
     xv, xv_ref, yv_p, yv_i = load_patchDataset_allval(patch_fldr,inc_list)
     xv = torch.FloatTensor(np.array(xv)).unsqueeze(1)
     xv_ref = torch.FloatTensor(np.array(xv_ref)).unsqueeze(1)
- 
+    print(xv_ref.shape)
+    print(xv.shape)
+    
     start = args.start_epoch
     end = start + args.epochs
     for epoch in range(start, end):
