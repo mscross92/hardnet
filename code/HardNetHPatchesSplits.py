@@ -438,9 +438,12 @@ class HardNet(nn.Module):
             nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, bias=False),
             nn.BatchNorm2d(64, affine=False),
             nn.ReLU(),
-            #64 input features, 10 output features for our 10 defined classes
+            nn.Conv2d(64, 128, kernel_size=3, bias=False),
+            nn.BatchNorm2d(128, affine=False),
+            nn.ReLU(),
             nn.Dropout(0.3),
-            nn.Linear(753664*23, 128),
+            nn.Conv2d(128, 128, kernel_size=8, bias=False),
+            nn.BatchNorm2d(128, affine=False),
 
             # nn.Conv2d(1, 32, kernel_size=3, padding=1, bias=False),
             # nn.BatchNorm2d(32, affine=False),
@@ -476,7 +479,7 @@ class HardNet(nn.Module):
 
     def forward(self, input):
         x_features = self.features(self.input_norm(input))
-        # x = x_features.view(x_features.size(0), -1)
+        x = x_features.view(x_features.size(0), -1)
         return L2Norm()(x)
 
 
