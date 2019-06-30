@@ -429,18 +429,18 @@ class HardNet(nn.Module):
     def __init__(self):
         super(HardNet, self).__init__()
         self.features = nn.Sequential(
-            nn.Conv2d(in_channels=1, out_channels=32, kernel_size=3, bias=False),
+            nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, bias=False),
+            nn.BatchNorm2d(16,affine=False),
+            nn.ReLU(),
+            nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, bias=False),
             nn.BatchNorm2d(32,affine=False),
             nn.ReLU(),
             nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, bias=False),
-            nn.BatchNorm2d(64,affine=False),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, bias=False),
-            nn.BatchNorm2d(128, affine=False),
+            nn.BatchNorm2d(64, affine=False),
             nn.ReLU(),
             #64 input features, 10 output features for our 10 defined classes
             nn.Dropout(0.3),
-            nn.Linear(128, 128),
+            nn.Linear(35*35*64, 128),
 
             # nn.Conv2d(1, 32, kernel_size=3, padding=1, bias=False),
             # nn.BatchNorm2d(32, affine=False),
