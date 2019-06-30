@@ -440,7 +440,7 @@ class HardNet(nn.Module):
             nn.ReLU(),
             #64 input features, 10 output features for our 10 defined classes
             nn.Dropout(0.3),
-            nn.Linear(25*25*64, 128),
+            nn.Linear(135424, 128),
 
             # nn.Conv2d(1, 32, kernel_size=3, padding=1, bias=False),
             # nn.BatchNorm2d(32, affine=False),
