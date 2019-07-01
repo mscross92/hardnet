@@ -218,7 +218,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                     ret.append(min_neg[ii])
             min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
             
-            print(counter,'anchors with 1 negative index within range out of',len(anchor))
+            # print(counter,'anchors with 1 negative index within range out of',len(anchor))
 
             # min_n = min_neg[visualise_idx]
             # if min_n==min_neg2[visualise_idx]:
