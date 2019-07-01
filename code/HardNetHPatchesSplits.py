@@ -692,10 +692,10 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                     loss_type=args.loss,
                     visualise_idx=vis_id)
             
-            if n_type>0:
-                d_n = data_p[n_idx,0,:,:].cpu()
-            else:
-                d_n = data_a[n_idx,0,:,:].cpu()
+            # if n_type>0:
+            #     d_n = data_p[n_idx,0,:,:].cpu()
+            # else:
+            #     d_n = data_a[n_idx,0,:,:].cpu()
 
             # visualise random semi-hard sample
             # if batch_idx==0:
