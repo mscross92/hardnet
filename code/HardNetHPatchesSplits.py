@@ -435,7 +435,6 @@ class HardNet(nn.Module):
         super(HardNet, self).__init__()
 
         self.features = nn.Sequential(
-            nn.InstanceNorm2d(1, affine=False),
             nn.Conv2d(1, 32, kernel_size=7),
             nn.Tanh(),
             nn.MaxPool2d(kernel_size=2, stride=2),
