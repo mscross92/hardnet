@@ -43,7 +43,7 @@ import torch.utils.data as data
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# import faiss
+import faiss
 
 
 class CorrelationPenaltyLoss(nn.Module):
@@ -191,7 +191,7 @@ np.random.seed(args.seed)
 
 class TotalDatasetsLoader(data.Dataset):
 
-    def __init__(self, datasets_path, train = True, transform = None, batch_size = None, n_triplets = 5000000, batch_hard = 0, model = None, fliprot = False, *arg, **kw):
+    def __init__(self, datasets_path, train = True, transform = None, batch_size = None, n_triplets = 5000000, batch_hard = 0, alpha_margin=1.0,model = None, fliprot = False, *arg, **kw):
         super(TotalDatasetsLoader, self).__init__()
         #datasets_path = [os.path.join(datasets_path, dataset) for dataset in os.listdir(datasets_path) if '.pt' in dataset]
         datasets_path = [datasets_path]
@@ -211,6 +211,7 @@ class TotalDatasetsLoader(data.Dataset):
         self.n_triplets = n_triplets
         self.batch_size = batch_size
         self.batch_hard = batch_hard
+        self.alpha_margin = alpha_margin
         self.model = model
         self.fliprot = fliprot
 
@@ -228,7 +229,7 @@ class TotalDatasetsLoader(data.Dataset):
             np.save('descriptors_min_dist.npy', self.negative_indices)
             self.negative_indices = np.load('descriptors_min_dist.npy')
             # print(self.negative_indices[0])
-            self.triplets = self.generate_hard_triplets(self.labels, self.n_triplets, self.negative_indices)
+            self.triplets = self.generate_hard_triplets(self.labels, self.n_triplets, self.negative_indices,self.descriptors,self.alpha_margin)
 
     @staticmethod
     def generate_triplets(labels, num_triplets, batch_size):
@@ -273,7 +274,6 @@ class TotalDatasetsLoader(data.Dataset):
     @staticmethod
     def get_descriptors_for_dataset(data_a,model):
         # data_a = torch.FloatTensor(np.array(data_a)).unsqueeze_(-1)
-               
         descriptors = []
         for d in data_a:
             dx = torch.FloatTensor(np.array(d)).unsqueeze(0)
@@ -284,11 +284,8 @@ class TotalDatasetsLoader(data.Dataset):
                 dx = dx.cuda()
         
             dx = Variable(dx)
-
             out_a = model(dx)
-            
             descriptors.extend(out_a.data.cpu().numpy())
-            
         return descriptors
     
 
@@ -305,9 +302,7 @@ class TotalDatasetsLoader(data.Dataset):
             return idx[:,1:],dists[:,1:]
             
         def remove_descriptors_with_same_index(min_dist_indices, labels, descriptors):
-
             res_min_dist_indices = []
-
             for current_index in range(0, len(min_dist_indices)):
                 # get indices of the same 3d points
                 point3d_indices = labels[current_index]
@@ -316,11 +311,8 @@ class TotalDatasetsLoader(data.Dataset):
                     # add to removal list indices of the same 3d point and same images in other 3d point
                     if(indx == point3d_indices or (descriptors[indx] == descriptors[current_index]).all()):
                         indices_to_remove.append(indx)
-
                 curr_desc = [x for x in min_dist_indices[current_index] if x not in indices_to_remove]
                 res_min_dist_indices.append(curr_desc)
-
-
             return res_min_dist_indices 
             
         # indices = {}
@@ -332,7 +324,7 @@ class TotalDatasetsLoader(data.Dataset):
         #         indices[ind] = key
 
         print('getting closest indices .... ')
-        descriptors_min_dist, labels = BuildKNNGraphByFAISS_GPU(descriptors, 12)
+        descriptors_min_dist, labels = BuildKNNGraphByFAISS_GPU(descriptors, 200)
 
         print('removing descriptors with same indices .... ')
         descriptors_min_dist = remove_descriptors_with_same_index(descriptors_min_dist, labels, descriptors)
@@ -340,7 +332,7 @@ class TotalDatasetsLoader(data.Dataset):
         return descriptors_min_dist
 
     @staticmethod
-    def generate_hard_triplets(labels, num_triplets, negative_indices):
+    def generate_hard_triplets(labels, num_triplets, descrptrs, negative_indices, alpha_margin=1.0):
         def create_indices(_labels):
             inds = dict()
             for idx, ind in enumerate(_labels):
@@ -371,9 +363,20 @@ class TotalDatasetsLoader(data.Dataset):
                 n2 = np.random.randint(0, len(indices[c1]) - 1)
                 while n1 == n2:
                     n2 = np.random.randint(0, len(indices[c1]) - 1)
+            
+            min_dist = torch.dist(descrptrs[indices[c1][n1]],descrptrs[indices[c1][nn]],p=2)
+            print(min_dist)
+
             indx = indices[c1][n1]
             if(len(negative_indices[indx])>0):
+                counter=0
                 negative_indx = random.choice(negative_indices[indx])
+                # get distance between anchor and randomly selected index
+                d = torch.dist(descrptrs[indices[c1][n1]],descrptrs[negative_indx],p=2)
+                while (d<min_dist or d>(min_dist + alpha_margin)) and counter<50:
+                    negative_indx = random.choice(negative_indices[indx])
+                    d = torch.dist(descrptrs[indices[c1][n1]],descrptrs[negative_indx],p=2)
+                    counter = counter + 1
             else:
                 count+=1
                 c2 = np.random.randint(0, n_classes - 1)
