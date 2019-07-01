@@ -43,7 +43,7 @@ import torch.utils.data as data
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-import faiss
+# import faiss
 
 
 class CorrelationPenaltyLoss(nn.Module):
@@ -697,45 +697,46 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
             else:
                 d_n = data_a[n_idx,0,:,:].cpu()
 
-            # visualise random hard sample
-            if batch_idx==0:
-                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
-                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
-                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(d_n)*255).astype('uint8'))
+            # visualise random semi-hard sample
+            # if batch_idx==0:
+            #     cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
+            #     cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
+            #     cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(d_n)*255).astype('uint8'))
 
-            if batch_idx==100:
-                # visualise distribution of batch
-                tp, tn = [], []
-                # # get pairwise distances
-                x_norm = (out_a**2).sum(1).view(-1, 1)
-                y_t = torch.transpose(out_p, 0, 1)
-                y_norm = (out_p**2).sum(1).view(1, -1)
-                dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
-                d_p = torch.diag(dists) # 1D tensor of distances for positive samples
-                tp.extend(d_p.data.cpu().numpy()) 
-                y_t = torch.transpose(out_n, 0, 1)
-                y_norm = (out_n**2).sum(1).view(1, -1)
-                dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
-                d_n = torch.diag(dists) # 1D tensor of distances for positive samples
-                tn.extend(d_n.data.cpu().numpy()) 
-                # # plot positives
-                tp = np.asarray(tp)
-                plt.figure(figsize=(8, 5))
-                sns.distplot(tp, hist=False, 
-                            bins=int(30), color = 'green', 
-                            hist_kws={'edgecolor':'black'},
-                            kde_kws={'linewidth': 2})
-                # # plot negatives
-                tn = np.asarray(tn)
-                sns.distplot(tn, hist=False, kde=True, 
-                            bins=int(30), color = 'darkred', 
-                            hist_kws={'edgecolor':'black'},
-                            kde_kws={'linewidth': 2})
-                savestr = 'traindistances_epoch' + str(epoch) + '_batch100.png'
-                plt.savefig(savestr, bbox_inches='tight')
-                plt.close()
-                del tp, x_norm, y_t, y_norm, dists, d_p
-                del tn, d_n
+            # if batch_idx==100:
+            #     # visualise distribution of batch
+            #     tp, tn = [], []
+            #     # # get pairwise distances
+            #     x_norm = (out_a**2).sum(1).view(-1, 1)
+            #     y_t = torch.transpose(out_p, 0, 1)
+            #     y_norm = (out_p**2).sum(1).view(1, -1)
+            #     dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
+            #     d_p = torch.diag(dists) # 1D tensor of distances for positive samples
+            #     tp.extend(d_p.data.cpu().numpy()) 
+            #     y_t = torch.transpose(out_n, 0, 1)
+            #     y_norm = (out_n**2).sum(1).view(1, -1)
+            #     dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
+            #     d_n = torch.diag(dists) # 1D tensor of distances for positive samples
+            #     tn.extend(d_n.data.cpu().numpy()) 
+            #     # # plot positives
+            #     tp = np.asarray(tp)
+            #     plt.figure(figsize=(8, 5))
+            #     sns.distplot(tp, hist=False, 
+            #                 bins=int(30), color = 'green', 
+            #                 hist_kws={'edgecolor':'black'},
+            #                 kde_kws={'linewidth': 2})
+            #     # # plot negatives
+            #     tn = np.asarray(tn)
+            #     sns.distplot(tn, hist=False, kde=True, 
+            #                 bins=int(30), color = 'darkred', 
+            #                 hist_kws={'edgecolor':'black'},
+            #                 kde_kws={'linewidth': 2})
+            #     savestr = 'traindistances_epoch' + str(epoch) + '_batch100.png'
+            #     plt.savefig(savestr, bbox_inches='tight')
+            #     plt.close()
+            #     del tp, x_norm, y_t, y_norm, dists, d_p
+            #     del tn, d_n
+
         else:
             vis_id = np.random.randint(0, data_a.shape[0])
             loss, n_idx,n_type = loss_HardNet(out_a, out_p,

@@ -187,15 +187,14 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
     dist_without_min_on_diag = dist_without_min_on_diag+mask
     if batch_reduce == 'random_sh':
         min_neg = torch.min(dist_without_min_on_diag,1)[0]
-        neg_ids = torch.min(dist_without_min_on_diag,1)[1]
+        # neg_ids = torch.min(dist_without_min_on_diag,1)[1]
         if anchor_swap:
             min_neg2 = torch.min(dist_without_min_on_diag,0)[0]
-            neg2_ids = torch.min(dist_without_min_on_diag,0)[1]
+            # neg2_ids = torch.min(dist_without_min_on_diag,0)[1]
             min_neg = torch.min(min_neg,min_neg2)
-            mn = min_neg
             # concat d(a,a) and d(a,p)
             cat_d = torch.cat((dist_matrix_a,dist_matrix_p),1)
-            cat_mins = mn.expand(-1,(len(anchor) + len(positive)))
+            cat_mins = torch.cat([min_neg]*(len(anchor) + len(positive)))
             inc_negs = torch.le((torch.gt(cat_d,cat_mins)),margin)
 
             valid_idx = inc_negs.nonzero()
