@@ -465,7 +465,7 @@ class HardNet(nn.Module):
         )
 
         self.descr = nn.Sequential(
-            nn.Linear(64 * 8 * 8, 128),
+            nn.Linear(64 * 25 * 25, 128),
             nn.Tanh()
         )
 
@@ -483,6 +483,7 @@ class HardNet(nn.Module):
     def forward(self, input):
         x_features = self.features(self.input_norm(input))
         x = x_features.view(x_features.size(0), -1)
+        print(x.shape)
         x = self.descr(x)
         return L2Norm()(x)
 
