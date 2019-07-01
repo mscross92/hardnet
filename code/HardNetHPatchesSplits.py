@@ -224,11 +224,13 @@ class TotalDatasetsLoader(data.Dataset):
             # #
             np.save('descriptors.npy', self.descriptors)
             self.descriptors = np.load('descriptors.npy')
+            print(self.descriptors[0])
             #
             self.negative_indices = self.get_hard_negatives(self.labels, self.descriptors)
             np.save('descriptors_min_dist.npy', self.negative_indices)
             self.negative_indices = np.load('descriptors_min_dist.npy')
-            # print(self.negative_indices[0])
+            print(self.negative_indices[0])
+
             self.triplets = self.generate_hard_triplets(self.labels, self.n_triplets, self.negative_indices,self.descriptors,self.alpha_margin)
 
     @staticmethod
