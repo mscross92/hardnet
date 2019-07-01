@@ -195,10 +195,8 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             mn = min_neg
             # concat d(a,a) and d(a,p)
             cat_d = torch.cat((dist_matrix_a,dist_matrix_p),1)
-            print(cat_d.shape)
             cat_mins = torch.cat([mn.unsqueeze(-1)]*(len(anchor) + len(positive)),1)
             del mn
-            print(cat_mins.shape)
             inc_negs = torch.le((torch.gt(cat_d,cat_mins)),margin)
 
             # randomly select a negative distance for each row
@@ -209,8 +207,8 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             for v in valid_row_idx:
                 choice = torch.multinomial(torch.arange(v.size(0)).float(), 1)
                 ret.append(inc_negs[v[choice].squeeze().chunk(2)])
-            min_neg = torch.stack(ret)
-
+            min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
+            
 
             # min_n = min_neg[visualise_idx]
             # if min_n==min_neg2[visualise_idx]:
