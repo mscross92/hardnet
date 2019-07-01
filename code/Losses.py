@@ -197,9 +197,9 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             cat_d = torch.cat((dist_matrix_a,dist_matrix_p),1)
             cat_mins = torch.cat([mn.unsqueeze(-1)]*(len(anchor) + len(positive)),1)
             del mn
-            inc_negs = torch.le((torch.gt(cat_d,cat_mins)),0.5)
+            inc_negs = torch.le((torch.gt(cat_d,cat_mins)),torch.add(min_neg, 0.3))
 
-            # randomly select a negative distance for each row: TODO: what if no sample within range?
+            # randomly select a negative distance for each row
             valid_idx = inc_negs.nonzero()
             unique_rows = valid_idx[:, 0].unique()
             valid_row_idx = [valid_idx[valid_idx[:, 0] == u] for u in unique_rows]
