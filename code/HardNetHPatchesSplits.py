@@ -435,6 +435,7 @@ class HardNet(nn.Module):
         super(HardNet, self).__init__()
 
         self.features = nn.Sequential(
+            nn.InstanceNorm2d(1, affine=False),
             nn.Conv2d(1, 32, kernel_size=7),
             nn.Tanh(),
             nn.MaxPool2d(kernel_size=2, stride=2),
@@ -445,6 +446,12 @@ class HardNet(nn.Module):
             nn.Linear(64 * 8 * 8, 128),
             nn.Tanh()
         )
+
+    def forward(self, x):
+        x = self.features(x)
+        x = x.view(x.size(0), -1)
+        x = self.descr(x)
+        return L2Norm()(x)
 
         # self.features = nn.Sequential(
         #     nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, bias=False),
@@ -494,12 +501,6 @@ class HardNet(nn.Module):
         sp = torch.std(flat, dim=1) + 1e-7
         return (x - mp.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1).expand_as(x)) / sp.unsqueeze(-1).unsqueeze(
             -1).unsqueeze(1).expand_as(x)
-
-    def forward(self, x):
-        x = self.features(self.input_norm(x))
-        x = x.view(x.size(0), -1)
-        x = self.descr(x)
-        return L2Norm()(x)
 
     # def forward(self, input):
     #     x_features = self.features(self.input_norm(input))
