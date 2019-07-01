@@ -167,6 +167,107 @@ def loss_HardNet(anchor, positive, visualise_idx, anchor_swap = False, anchor_av
     
     return loss
 
+def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_ave = False,\
+        margin = 1.0, batch_reduce = 'min', loss_type = "triplet_margin"):
+    """HardNet margin loss - calculates loss based on distance matrix based on positive distance and closest negative distance.
+    """
+
+    assert anchor.size() == positive.size(), "Input sizes between positive and negative must be equal."
+    assert anchor.dim() == 2, "Inputd must be a 2D matrix."
+    eps = 1e-8
+    dist_matrix_p = distance_matrix_vector(anchor, positive) +eps
+    dist_matrix_a = distance_matrix_vector(anchor, anchor) +eps
+    eye = torch.autograd.Variable(torch.eye(dist_matrix_p.size(1))).cuda()
+
+    # steps to filter out same patches that occur in distance matrix as negatives
+    pos1 = torch.diag(dist_matrix_p)
+    dist_without_min_on_diag = dist_matrix_p+eye*10
+    mask = (dist_without_min_on_diag.ge(0.008).float()-1.0)*(-1)
+    mask = mask.type_as(dist_without_min_on_diag)*10
+    dist_without_min_on_diag = dist_without_min_on_diag+mask
+    if batch_reduce == 'random_sh':
+        min_neg = torch.min(dist_without_min_on_diag,1)[0]
+        neg_ids = torch.min(dist_without_min_on_diag,1)[1]
+        if anchor_swap:
+            min_neg2 = torch.min(dist_without_min_on_diag,0)[0]
+            neg2_ids = torch.min(dist_without_min_on_diag,0)[1]
+            min_neg = torch.min(min_neg,min_neg2)
+            mn = min_neg
+            # concat d(a,a) and d(a,p)
+            cat_d = torch.cat((dist_matrix_a,dist_matrix_p),1)
+            cat_mins = mn.expand(-1,(len(anchor) + len(positive)))
+            inc_negs = torch.le((torch.gt(cat_d,cat_mins)),margin)
+
+            valid_idx = inc_negs.nonzero()
+            unique_rows = valid_idx[:, 0].unique()
+            valid_row_idx = [valid_idx[valid_idx[:, 0] == u] for u in unique_rows]
+
+            ret = []
+            for v in valid_row_idx:
+                choice = torch.multinomial(torch.arange(v.size(0)).float(), 1)
+                ret.append(inc_negs[v[choice].squeeze().chunk(2)])
+            min_neg = torch.stack(ret)
+
+
+            # min_n = min_neg[visualise_idx]
+            # if min_n==min_neg2[visualise_idx]:
+            #     n_idx = neg2_ids[visualise_idx]
+            #     n_type = 1
+            # else:
+            #     n_idx = neg_ids[visualise_idx]
+            #     n_type = 0
+
+        if False:
+            dist_matrix_a = distance_matrix_vector(anchor, anchor)+ eps
+            dist_matrix_p = distance_matrix_vector(positive,positive)+eps
+            dist_without_min_on_diag_a = dist_matrix_a+eye*10
+            dist_without_min_on_diag_p = dist_matrix_p+eye*10
+            min_neg_a = torch.min(dist_without_min_on_diag_a,1)[0]
+            min_neg_p = torch.t(torch.min(dist_without_min_on_diag_p,0)[0])
+            min_neg_3 = torch.min(min_neg_p,min_neg_a)
+            min_neg = torch.min(min_neg,min_neg_3)
+            # print (min_neg_a)
+            # print (min_neg_p)
+            # print (min_neg_3)
+            # print (min_neg)
+        min_neg = min_neg
+        pos = pos1
+    elif batch_reduce == 'average':
+        pos = pos1.repeat(anchor.size(0)).view(-1,1).squeeze(0)
+        min_neg = dist_without_min_on_diag.view(-1,1)
+        if anchor_swap:
+            min_neg2 = torch.t(dist_without_min_on_diag).contiguous().view(-1,1)
+            min_neg = torch.min(min_neg,min_neg2)
+        min_neg = min_neg.squeeze(0)
+    elif batch_reduce == 'random':
+        idxs = torch.autograd.Variable(torch.randperm(anchor.size()[0]).long()).cuda()
+        min_neg = dist_without_min_on_diag.gather(1,idxs.view(-1,1))
+        if anchor_swap:
+            min_neg2 = torch.t(dist_without_min_on_diag).gather(1,idxs.view(-1,1)) 
+            min_neg = torch.min(min_neg,min_neg2)
+        min_neg = torch.t(min_neg).squeeze(0)
+        pos = pos1
+    else: 
+        print ('Unknown batch reduce mode. Try min, average or random')
+        sys.exit(1)
+    if loss_type == "triplet_margin":
+        loss = torch.clamp(margin + pos - min_neg, min=0.0)
+    elif loss_type == 'softmax':
+        exp_pos = torch.exp(2.0 - pos)
+        exp_den = exp_pos + torch.exp(2.0 - min_neg) + eps
+        loss = - torch.log( exp_pos / exp_den )
+    elif loss_type == 'contrastive':
+        loss = torch.clamp(margin - min_neg, min=0.0) + pos
+    else: 
+        print ('Unknown loss type. Try triplet_margin, softmax or contrastive')
+        sys.exit(1)
+    loss = torch.mean(loss)
+
+    # if batch_reduce == 'random_sh' and anchor_swap:
+    #     return loss, n_idx, n_type
+    
+    return loss
+
 def global_orthogonal_regularization(anchor, negative):
 
     neg_dis = torch.sum(torch.mul(anchor,negative),1)
