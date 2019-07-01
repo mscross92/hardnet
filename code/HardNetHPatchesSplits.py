@@ -1213,23 +1213,23 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
         model.eval()
         
-        trainDatasetWithHardNegatives = TotalDatasetsLoader(train=True,
-                         load_random_triplets=False,
-                         batch_size=args.batch_size,
-                         datasets_path=args.hpatches_split+"hpatches_split_a_train.pt",
-                         fliprot=args.fliprot,
-                         n_triplets=args.n_triplets,
-                         batch_hard=args.batch_hard,
-                         name=args.training_set,
-                         download=True,
-                         transform=transform)
+        if  args.batch_hard==0:
+            trainDatasetWithHardNegatives = TotalDatasetsLoader(train=True,
+                            load_random_triplets=False,
+                            batch_size=args.batch_size,
+                            datasets_path=args.hpatches_split+"hpatches_split_a_train.pt",
+                            fliprot=args.fliprot,
+                            n_triplets=args.n_triplets,
+                            batch_hard=args.batch_hard,
+                            name=args.training_set,
+                            download=True,
+                            transform=transform)
+            
+            train_loader = torch.utils.data.DataLoader(trainDatasetWithHardNegatives,
+                                                    batch_size=args.batch_size,
+                                                    shuffle=False, **kwargs)
         
-        train_loader = torch.utils.data.DataLoader(trainDatasetWithHardNegatives,
-                                                   batch_size=args.batch_size,
-                                                   shuffle=False, **kwargs)
-        
-        print(args.batch_hard)
-        if args.batch_hard>0:
+        else:
             trainDatasetWithHardNegatives = TotalDatasetsLoader(train=True,
                          load_random_triplets=False,
                          batch_size=args.batch_size,
@@ -1247,7 +1247,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
                                                     shuffle=False, **kwargs)
 
             print(model)
-            
+
         train_loss_epch = train(train_loader, model, optimizer1, epoch, logger)
         train_losses_arr.append(train_loss_epch)
 
