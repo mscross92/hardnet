@@ -435,10 +435,10 @@ class HardNet(nn.Module):
         super(HardNet, self).__init__()
         self.features = nn.Sequential(
             nn.Conv2d(in_channels=1, out_channels=32, kernel_size=3, bias=False),
-            nn.BatchNorm2d(16,affine=False),
+            nn.BatchNorm2d(32,affine=False),
             nn.ReLU(),
             nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, bias=False),
-            nn.BatchNorm2d(32,affine=False),
+            nn.BatchNorm2d(64,affine=False),
             nn.ReLU(),
 
             # nn.Conv2d(1, 32, kernel_size=3, padding=1, bias=False),
@@ -468,7 +468,7 @@ class HardNet(nn.Module):
             nn.Linear(64 * 8 * 8, 128),
             nn.Tanh()
         )
-        
+
         self.features.apply(weights_init)
         return
 
