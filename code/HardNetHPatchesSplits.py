@@ -1228,6 +1228,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
                                                    batch_size=args.batch_size,
                                                    shuffle=False, **kwargs)
         
+        print(args.batch_hard)
         if args.batch_hard>0:
             trainDatasetWithHardNegatives = TotalDatasetsLoader(train=True,
                          load_random_triplets=False,
@@ -1244,8 +1245,9 @@ def main(train_loader, test_loader, model, logger, file_logger):
                                                     batch_size=args.batch_size,
                                                     model=model,
                                                     shuffle=False, **kwargs)
-        if args.batch_hard>0:
+
             print(model)
+            
         train_loss_epch = train(train_loader, model, optimizer1, epoch, logger)
         train_losses_arr.append(train_loss_epch)
 
