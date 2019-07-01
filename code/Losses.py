@@ -204,12 +204,13 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             unique_rows = valid_idx[:, 0].unique()
             valid_row_idx = [valid_idx[valid_idx[:, 0] == u] for u in unique_rows]
             ret = []
+            counter = 0
             for ii,v in enumerate(valid_row_idx):
                 if v.size(0)>1:
                     choice = torch.multinomial(torch.arange(v.size(0)).float(), 1)
                     ret.append(inc_negs[v[choice].squeeze().chunk(2)])
                 elif v.size(0)>0:
-                    print('only one negative index within range')
+                    counter = counter + 1
                     choice = 0
                     ret.append(inc_negs[v[choice].squeeze().chunk(2)])
                 else: # if none available in range, set loss as that of hard negative
@@ -217,6 +218,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                     ret.append(min_neg[ii])
             min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
             
+            print(counter,'anchors with 1 negative index within range out of',len(anchor))
 
             # min_n = min_neg[visualise_idx]
             # if min_n==min_neg2[visualise_idx]:
