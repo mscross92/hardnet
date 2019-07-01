@@ -497,7 +497,7 @@ class HardNet(nn.Module):
             -1).unsqueeze(1).expand_as(x)
 
     def forward(self, x):
-        x = self.features(x)
+        x = self.features(self.input_norm(input))
         x = x.view(x.size(0), -1)
         x = self.descr(x)
         return L2Norm()(x)
