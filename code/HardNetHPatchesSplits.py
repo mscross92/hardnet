@@ -1254,7 +1254,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
                         else:
                             X.append(ptch)
                             y.append(int(s))
-                            y2.append(int(yy))
+                            y2.append(int(yy)+1)
                         if not int(s) in cl:
                             cl.append(int(s))     
         nC = len(cl)
