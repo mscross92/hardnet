@@ -466,7 +466,7 @@ class HardNet(nn.Module):
 
         self.descr = nn.Sequential(
             nn.Linear(64 * 25 * 25, 128),
-            nn.Tanh()
+            # nn.Tanh()
         )
 
         self.features.apply(weights_init)
