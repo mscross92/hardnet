@@ -1101,7 +1101,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
 
-    if epoch==69:
+    if epoch==49:
         savestr = 'final_val_distances_thresh' + str(thresh) + '.txt'
         np.savetxt(savestr, dist_m_all_val, delimiter=',')   # X is an array
         savestr = 'val_imageids.txt'
