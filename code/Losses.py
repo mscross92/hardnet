@@ -206,7 +206,6 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             ret = []
             counter = 0
             for ii,v in enumerate(valid_row_idx):
-                print(v.shape)
                 if v.size(0)>1:
                     choice = torch.multinomial(torch.arange(v.size(0)).float(), 1)
                     ret.append(inc_negs[v[choice].squeeze().chunk(2)])
