@@ -1301,11 +1301,13 @@ def main(train_loader, test_loader, model, logger, file_logger):
     xt = torch.FloatTensor(np.array(xt)).unsqueeze(1)
  
     patch_fldr = '/content/hardnet/data/sets/turbid/validation_all'
+    inc_list = [0,1,2,3,4,5,6]
     xv, xv_ref, yv_p, yv_i = load_patchDataset_allval(patch_fldr,inc_list)
     xv = torch.FloatTensor(np.array(xv)).unsqueeze(1)
     xv_ref = torch.FloatTensor(np.array(xv_ref)).unsqueeze(1)
     
     patch_fldr = '/content/hardnet/data/sets/turbid/test_data/testing_randomsample'
+    inc_list = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
     xts, xts_ref, yts_p, yts_i = load_patchDataset_allval(patch_fldr,inc_list)
     xts = torch.FloatTensor(np.array(xts)).unsqueeze(1)
     xts_ref = torch.FloatTensor(np.array(xts_ref)).unsqueeze(1)
