@@ -837,7 +837,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
     return loss.item()
 
 
-def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, test_sample_y, all_val_set_x, all_val_set_x_ref, all_val_set_y, all_val_set_images):
+def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, test_sample_y, all_val_set_x, all_val_set_x_ref, all_val_set_y, all_val_set_images, sample_train_set_x, sample_train_set_x_ref, sample_train_set_y, sample_train_set_images):
 
     # switch to evaluate mode
     model.eval()
@@ -1089,7 +1089,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
 
     # plot against patch label
     fig, ax = plt.subplots(figsize=(6,6))
-    plt.plot(all_val_set_y,dist_m_all_val,'.',color=(0.0, 0.0, 1.0, 0.5))
+    plt.plot(all_val_set_y,dist_m_all_val,'.',color=(0.0, 1.0, 0.0, 0.4))
     # plt.plot(average_scores,'o',label='mean distance for image')
     plt.axhline(thresh,linewidth=1, color='k',linestyle='--',label='Threshold')
     plt.xlabel('Patch index')
@@ -1101,7 +1101,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
 
     # plot against patch label
     fig, ax = plt.subplots(figsize=(6,6))
-    plt.plot(all_val_set_images,dist_m_all_val,'.',color=(0.0, 0.0, 1.0, 0.5))
+    plt.plot(all_val_set_images,dist_m_all_val,'.',color=(0.0, 1.0, 0.0, 0.4))
     # plt.plot(average_scores,'o',label='mean distance for image')
     plt.axhline(thresh,linewidth=1, color='k', linestyle='--',label='Threshold')
     plt.xlabel('Image index')
