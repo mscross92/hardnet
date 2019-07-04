@@ -777,7 +777,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                 cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
                 cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(d_n)*255).astype('uint8'))
 
-            if batch_idx==100:
+            if batch_idx==50:
                 # visualise distribution of batch
                 tp, tn = [], []
                 # # get pairwise distances
