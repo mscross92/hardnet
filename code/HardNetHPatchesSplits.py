@@ -1056,7 +1056,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         def pairwise_dstncs_2vec(ref_dsc,all_dsc):
             x_norm = (ref_dsc**2).sum(1).view(-1, 1)
             distances = []
-            splts = torch.chunk(all_dsc, 14)
+            splts = torch.chunk(all_dsc, 6)
             del all_dsc
             for s in splts:
                  # euclidean distance
