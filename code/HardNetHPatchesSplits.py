@@ -1098,7 +1098,9 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
 
-
+    if epoch==69:
+        savestr = 'final_val_distances_thresh' + str(thresh) + '.out'
+        np.savetxt(savestr, distances, delimiter=',')   # X is an array
 
     # # visualise distance against image id / patch id for TRAINING sample
     # sample_train_set_x, sample_train_set_x_ref, sample_train_set_y, sample_train_set_images
