@@ -522,11 +522,14 @@ def create_loaders(load_random_triplets=False):
             # transforms.Normalize((args.mean_image,), (args.std_image,))])
             transforms.Lambda(np_reshape29),
             transforms.ToPILImage(),
+            transforms.RandomRotation(15,PIL.Image.BILINEAR),
+            transforms.RandomHorizontalFlip(p=0.5)
+            transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0, hue=0)
             transforms.Resize(29),
             transforms.ToTensor()])
     if not args.augmentation:
         transform_train = transform
-        transform_test = transform
+        transform_test = transform_test
 
     # train_loader = torch.utils.data.DataLoader(
     #     TotalDatasetsLoader(train=True,
@@ -1298,9 +1301,12 @@ def main(train_loader, test_loader, model, logger, file_logger):
     transform = transforms.Compose([
         transforms.Lambda(np_reshape29),
         transforms.ToPILImage(),
+        transforms.RandomRotation(15,PIL.Image.BILINEAR),
+        transforms.RandomHorizontalFlip(p=0.5)
+        transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0, hue=0)
         transforms.Resize(29),
         transforms.ToTensor()])
-    
+
     patch_fldr = '/content/hardnet/data/sets/turbid/test_data/patches'
     inc_list = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
     xt, yt = load_patchDataset_test(patch_fldr,inc_list)
