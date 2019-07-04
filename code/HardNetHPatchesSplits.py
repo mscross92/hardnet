@@ -1099,10 +1099,12 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.close()
 
     if epoch==69:
-        savestr = 'final_val_distances_thresh' + str(thresh) + '.out'
+        savestr = 'final_val_distances_thresh' + str(thresh) + '.txt'
         np.savetxt(savestr, distances, delimiter=',')   # X is an array
-        savestr = 'val_imageids.out'
+        savestr = 'val_imageids.txt'
         np.savetxt(savestr, all_val_set_images, delimiter=',')   # X is an array
+        savestr = 'val_patchids.txt'
+        np.savetxt(savestr, all_val_set_y, delimiter=',')   # X is an array
 
     # # visualise distance against image id / patch id for TRAINING sample
     # sample_train_set_x, sample_train_set_x_ref, sample_train_set_y, sample_train_set_images
