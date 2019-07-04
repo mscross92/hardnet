@@ -1307,8 +1307,8 @@ def main(train_loader, test_loader, model, logger, file_logger):
     
     patch_fldr = '/content/hardnet/data/sets/turbid/test_data/testing_randomsample'
     xts, xts_ref, yts_p, yts_i = load_patchDataset_allval(patch_fldr,inc_list)
-    xt = torch.FloatTensor(np.array(xt)).unsqueeze(1)
-    xt_ref = torch.FloatTensor(np.array(xt_ref)).unsqueeze(1)
+    xts = torch.FloatTensor(np.array(xts)).unsqueeze(1)
+    xts_ref = torch.FloatTensor(np.array(xts_ref)).unsqueeze(1)
     
     start = args.start_epoch
     end = start + args.epochs
