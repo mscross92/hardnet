@@ -523,8 +523,8 @@ def create_loaders(load_random_triplets=False):
             transforms.Lambda(np_reshape29),
             transforms.ToPILImage(),
             transforms.RandomRotation(15,PIL.Image.BILINEAR),
-            transforms.RandomHorizontalFlip(p=0.5)
-            transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0, hue=0)
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0, hue=0),
             transforms.Resize(29),
             transforms.ToTensor()])
     if not args.augmentation:
@@ -1116,7 +1116,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         sample_train_set_x_ref = sample_train_set_x_ref.cuda()
     
     with torch.no_grad():
-        def pairwise_dstncs_2vec(ref_dsc,all_dsc):
+        def pairwise_dstncs_2vec2(ref_dsc,all_dsc):
             x_norm = (ref_dsc**2).sum(1).view(-1, 1)
             distances = []
             splts = torch.chunk(all_dsc, 14)
@@ -1135,7 +1135,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         sample_train_set_x_ref = Variable(sample_train_set_x_ref)
         desc_all_val = model(sample_train_set_x)
         ref_desc = model(sample_train_set_x_ref)
-        dist_m_all_val = pairwise_dstncs_2vec(ref_desc,desc_all_val)
+        dist_m_all_val = pairwise_dstncs_2vec2(ref_desc,desc_all_val)
 
     # plot against patch label
     fig, ax = plt.subplots(figsize=(6,6))
@@ -1302,8 +1302,8 @@ def main(train_loader, test_loader, model, logger, file_logger):
         transforms.Lambda(np_reshape29),
         transforms.ToPILImage(),
         transforms.RandomRotation(15,PIL.Image.BILINEAR),
-        transforms.RandomHorizontalFlip(p=0.5)
-        transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0, hue=0)
+        transforms.RandomHorizontalFlip(p=0.5),
+        transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0, hue=0),
         transforms.Resize(29),
         transforms.ToTensor()])
 
