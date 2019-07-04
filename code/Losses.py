@@ -197,7 +197,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             cat_d = torch.cat((dist_matrix_a,dist_matrix_p),1)
             cat_mins = torch.cat([mn.unsqueeze(-1)]*(len(anchor) + len(positive)),1)
             del mn
-            inc_negs = torch.le((torch.gt(cat_d,cat_mins)),torch.add(cat_mins.byte(), 0.7))
+            inc_negs = torch.le((torch.gt(cat_d,cat_mins)),torch.add(cat_mins.byte(), 0.3))
 
             # randomly select a negative distance for each row
             valid_idx = inc_negs.nonzero()
@@ -206,6 +206,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             ret = []
             counter = 0
             for ii,v in enumerate(valid_row_idx):
+                print(v.shape)
                 if v.size(0)>1:
                     choice = torch.multinomial(torch.arange(v.size(0)).float(), 1)
                     ret.append(inc_negs[v[choice].squeeze().chunk(2)])
