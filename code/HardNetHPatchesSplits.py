@@ -434,40 +434,40 @@ class HardNet(nn.Module):
     def __init__(self):
         super(HardNet, self).__init__()
         self.features = nn.Sequential(
-            nn.Conv2d(in_channels=1, out_channels=32, kernel_size=3, bias=False),
-            nn.BatchNorm2d(32,affine=False),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, bias=False),
-            nn.BatchNorm2d(64,affine=False),
-            nn.ReLU(),
+            # nn.Conv2d(in_channels=1, out_channels=32, kernel_size=3, bias=False),
+            # nn.BatchNorm2d(32,affine=False),
+            # nn.ReLU(),
+            # nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, bias=False),
+            # nn.BatchNorm2d(64,affine=False),
+            # nn.ReLU(),
 
-            # nn.Conv2d(1, 32, kernel_size=3, padding=1, bias=False),
-            # nn.BatchNorm2d(32, affine=False),
-            # nn.ReLU(),
-            # nn.Conv2d(32, 32, kernel_size=3, padding=1, bias=False),
-            # nn.BatchNorm2d(32, affine=False),
-            # nn.ReLU(),
-            # nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1, bias=False),
-            # nn.BatchNorm2d(64, affine=False),
-            # nn.ReLU(),
-            # nn.Conv2d(64, 64, kernel_size=3, padding=1, bias=False),
-            # nn.BatchNorm2d(64, affine=False),
-            # nn.ReLU(),
-            # nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1, bias=False),
-            # nn.BatchNorm2d(128, affine=False),
-            # nn.ReLU(),
-            # nn.Conv2d(128, 128, kernel_size=3, padding=1, bias=False),
-            # nn.BatchNorm2d(128, affine=False),
-            # nn.ReLU(),
-            # nn.Dropout(0.3),
-            # nn.Conv2d(128, 128, kernel_size=8, bias=False),
-            # nn.BatchNorm2d(128, affine=False),
+            nn.Conv2d(1, 32, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm2d(32, affine=False),
+            nn.ReLU(),
+            nn.Conv2d(32, 32, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm2d(32, affine=False),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1, bias=False),
+            nn.BatchNorm2d(64, affine=False),
+            nn.ReLU(),
+            nn.Conv2d(64, 64, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm2d(64, affine=False),
+            nn.ReLU(),
+            nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1, bias=False),
+            nn.BatchNorm2d(128, affine=False),
+            nn.ReLU(),
+            nn.Conv2d(128, 128, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm2d(128, affine=False),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Conv2d(128, 128, kernel_size=8, bias=False),
+            nn.BatchNorm2d(128, affine=False),
         )
 
-        self.descr = nn.Sequential(
-            nn.Linear(64 * 25 * 25, 128),
-            # nn.Tanh()
-        )
+        # self.descr = nn.Sequential(
+        #     nn.Linear(64 * 25 * 25, 128),
+        #     # nn.Tanh()
+        # )
 
         self.features.apply(weights_init)
         return
@@ -484,7 +484,7 @@ class HardNet(nn.Module):
         x_features = self.features(self.input_norm(input))
         x = x_features.view(x_features.size(0), -1)
         # print(x.shape)
-        x = self.descr(x)
+        # x = self.descr(x)
         return L2Norm()(x)
 
 
