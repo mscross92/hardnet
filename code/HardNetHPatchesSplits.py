@@ -1089,7 +1089,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
 
     # plot against patch label
     fig, ax = plt.subplots(figsize=(6,6))
-    plt.plot(all_val_set_y,dist_m_all_val,'.',color='(0.0, 0.0, 1.0, 0.5)')
+    plt.plot(all_val_set_y,dist_m_all_val,'.',color=(0.0, 0.0, 1.0, 0.5))
     # plt.plot(average_scores,'o',label='mean distance for image')
     plt.axhline(thresh,linewidth=1, color='k',linestyle='--',label='Threshold')
     plt.xlabel('Patch index')
@@ -1103,7 +1103,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     fig, ax = plt.subplots(figsize=(6,6))
     plt.plot(all_val_set_images,dist_m_all_val,'.')
     # plt.plot(average_scores,'o',label='mean distance for image')
-    plt.axhline(thresh,linewidth=1, markerfacecolor='(0.0, 0.0, 1.0, 0.5)',markeredgecolor='(0.0, 0.0, 1.0, 1.0)',linestyle='--',label='Threshold')
+    plt.axhline(thresh,linewidth=1, markerfacecolor=(0.0, 0.0, 1.0, 0.5),markeredgecolor=(0.0, 0.0, 1.0, 1.0),linestyle='--',label='Threshold')
     plt.xlabel('Image index')
     plt.ylabel('distance')
     plt.legend()
