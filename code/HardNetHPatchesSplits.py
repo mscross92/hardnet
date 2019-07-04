@@ -1100,7 +1100,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
 
     if epoch==69:
         savestr = 'final_val_distances_thresh' + str(thresh) + '.txt'
-        np.savetxt(savestr, distances, delimiter=',')   # X is an array
+        np.savetxt(savestr, dist_m_all_val, delimiter=',')   # X is an array
         savestr = 'val_imageids.txt'
         np.savetxt(savestr, all_val_set_images, delimiter=',')   # X is an array
         savestr = 'val_patchids.txt'
