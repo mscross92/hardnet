@@ -1074,19 +1074,6 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         ref_desc = model(all_val_set_x_ref)
         dist_m_all_val = pairwise_dstncs_2vec(ref_desc,desc_all_val)
 
-
-    # compute distances
-    # all_counts = []
-    # all_scores = []
-    # average_scores = []
-    # for d in ref_desc:
-        # pairwise distance matrix
-
-        # get diagonal distances only
-
-        # add distances to array for plotting
-        # average_scores.append(np.average(dists))
-
     # plot against patch label
     fig, ax = plt.subplots(figsize=(6,6))
     plt.plot(all_val_set_y,dist_m_all_val,'.',color=(0.0, 1.0, 0.0, 0.4))
@@ -1107,6 +1094,60 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.xlabel('Image index')
     plt.ylabel('distance')
     plt.legend()
+    savestr = 'imageid-v-dist_epoch' + str(epoch) + '.png'
+    plt.savefig(savestr, bbox_inches='tight')
+    plt.close()
+
+
+
+    # # visualise distance against image id / patch id for TRAINING sample
+    # sample_train_set_x, sample_train_set_x_ref, sample_train_set_y, sample_train_set_images
+    if args.cuda:
+        sample_train_set_x = sample_train_set_x.cuda()
+        sample_train_set_x_ref = sample_train_set_x_ref.cuda()
+    
+    with torch.no_grad():
+        def pairwise_dstncs_2vec(ref_dsc,all_dsc):
+            x_norm = (ref_dsc**2).sum(1).view(-1, 1)
+            distances = []
+            splts = torch.chunk(all_dsc, 14)
+            del all_dsc
+            for s in splts:
+                 # euclidean distance
+                y_t = torch.transpose(s, 0, 1)
+                y_norm = (s**2).sum(1).view(1, -1)
+                dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(ref_dsc, y_t),0.0,np.inf))
+                dists = torch.diag(dists) # get diagonal only
+                distances.extend(dists.data.cpu().numpy())        
+            return distances
+
+        # predict descriptors
+        sample_train_set_x = Variable(sample_train_set_x)
+        sample_train_set_x_ref = Variable(sample_train_set_x_ref)
+        desc_all_val = model(sample_train_set_x)
+        ref_desc = model(sample_train_set_x_ref)
+        dist_m_all_val = pairwise_dstncs_2vec(ref_desc,desc_all_val)
+
+    # plot against patch label
+    fig, ax = plt.subplots(figsize=(6,6))
+    plt.plot(sample_train_set_y,dist_m_all_val,'.',color=(0.0, 1.0, 0.0, 0.4))
+    # plt.plot(average_scores,'o',label='mean distance for image')
+    # plt.axhline(thresh,linewidth=1, color='k',linestyle='--',label='Threshold')
+    plt.xlabel('Patch index')
+    plt.ylabel('distance')
+    # plt.legend()
+    savestr = 'patchid-v-dist_epoch' + str(epoch) + '.png'
+    plt.savefig(savestr, bbox_inches='tight')
+    plt.close()
+
+    # plot against patch label
+    fig, ax = plt.subplots(figsize=(6,6))
+    plt.plot(sample_train_set_images,dist_m_all_val,'.',color=(0.0, 1.0, 0.0, 0.4))
+    # plt.plot(average_scores,'o',label='mean distance for image')
+    # plt.axhline(thresh,linewidth=1, color='k', linestyle='--',label='Threshold')
+    plt.xlabel('Image index')
+    plt.ylabel('distance')
+    # plt.legend()
     savestr = 'imageid-v-dist_epoch' + str(epoch) + '.png'
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
@@ -1264,6 +1305,11 @@ def main(train_loader, test_loader, model, logger, file_logger):
     xv = torch.FloatTensor(np.array(xv)).unsqueeze(1)
     xv_ref = torch.FloatTensor(np.array(xv_ref)).unsqueeze(1)
     
+    patch_fldr = '/content/hardnet/data/sets/turbid/test_data/testing_randomsample'
+    xt, xt_ref, yt_p, yt_i = load_patchDataset_allval(patch_fldr,inc_list)
+    xt = torch.FloatTensor(np.array(xt)).unsqueeze(1)
+    xt_ref = torch.FloatTensor(np.array(xt_ref)).unsqueeze(1)
+    
     start = args.start_epoch
     end = start + args.epochs
     for epoch in range(start, end):
@@ -1314,7 +1360,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
         # # visualise 
         # test on deepblue set
-        test_loss_epch, fpr95_epch = test(test_loader, model, epoch, logger,"a_test_log", xt, yt, xv, xv_ref, yv_p, yv_i)
+        test_loss_epch, fpr95_epch = test(test_loader, model, epoch, logger,"a_test_log", xt, yt, xv, xv_ref, yv_p, yv_i, xt, xt_ref, yt_p, yt_i)
         test_losses_arr.append(test_loss_epch)
         test_fpr95_arr.append(fpr95_epch)
 
