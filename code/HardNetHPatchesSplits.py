@@ -1306,7 +1306,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
     xv_ref = torch.FloatTensor(np.array(xv_ref)).unsqueeze(1)
     
     patch_fldr = '/content/hardnet/data/sets/turbid/test_data/testing_randomsample'
-    xt, xt_ref, yt_p, yt_i = load_patchDataset_allval(patch_fldr,inc_list)
+    xts, xts_ref, yts_p, yts_i = load_patchDataset_allval(patch_fldr,inc_list)
     xt = torch.FloatTensor(np.array(xt)).unsqueeze(1)
     xt_ref = torch.FloatTensor(np.array(xt_ref)).unsqueeze(1)
     
@@ -1360,7 +1360,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
         # # visualise 
         # test on deepblue set
-        test_loss_epch, fpr95_epch = test(test_loader, model, epoch, logger,"a_test_log", xt, yt, xv, xv_ref, yv_p, yv_i, xt, xt_ref, yt_p, yt_i)
+        test_loss_epch, fpr95_epch = test(test_loader, model, epoch, logger,"a_test_log", xt, yt, xv, xv_ref, yv_p, yv_i, xts, xts_ref, yts_p, yts_i)
         test_losses_arr.append(test_loss_epch)
         test_fpr95_arr.append(fpr95_epch)
 
