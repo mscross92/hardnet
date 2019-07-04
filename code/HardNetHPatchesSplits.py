@@ -1082,7 +1082,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.xlabel('Patch index')
     plt.ylabel('distance')
     plt.legend()
-    savestr = 'patchid-v-dist_epoch' + str(epoch) + '.png'
+    savestr = 'val_patchid-v-dist_epoch' + str(epoch) + '.png'
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
 
@@ -1094,7 +1094,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.xlabel('Image index')
     plt.ylabel('distance')
     plt.legend()
-    savestr = 'imageid-v-dist_epoch' + str(epoch) + '.png'
+    savestr = 'val_imageid-v-dist_epoch' + str(epoch) + '.png'
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
 
@@ -1136,7 +1136,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.xlabel('Patch index')
     plt.ylabel('distance')
     # plt.legend()
-    savestr = 'patchid-v-dist_epoch' + str(epoch) + '.png'
+    savestr = 'train_patchid-v-dist_epoch' + str(epoch) + '.png'
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
 
@@ -1148,7 +1148,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.xlabel('Image index')
     plt.ylabel('distance')
     # plt.legend()
-    savestr = 'imageid-v-dist_epoch' + str(epoch) + '.png'
+    savestr = 'train_imageid-v-dist_epoch' + str(epoch) + '.png'
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
 
