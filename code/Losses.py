@@ -227,7 +227,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             ret = []
             for ii in range(len(anchor)):
                 valid_dists = inc_negs[ii].nonzero() # get indices of non-zero elements in row
-
+                print(valid_dists.shape)
                 if len(valid_dists)>1:
                     # randomly select distance from list
                     jj = torch.randint(len(valid_dists), (1,))
