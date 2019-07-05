@@ -54,6 +54,33 @@ class HPatches(data.Dataset):
         print(counter)
         return torch.ByteTensor(np.array(patches, dtype=np.uint8)), torch.LongTensor(labels)
 
+def read_image_file_test(self, data_dir):
+        """Return a Tensor containing the patches
+        """
+        typs = ['0','1','2','3','4','5','6','7']
+
+        patches = []
+        labels = []
+        counter = 0
+        hpatches_sequences = [x[1] for x in os.walk(data_dir)][0]
+        for directory in hpatches_sequences:
+           if (directory in good_fnames):
+            print(directory)
+            for type in typs:
+                sequence_path = os.path.join(data_dir, directory,type)+'.png'
+                image = cv2.imread(sequence_path, 0)
+                h, w = image.shape
+                n_patches = int(h / w)
+                for i in range(n_patches):
+                    patch = image[i * (w): (i + 1) * (w), 0:w]
+                    patch = cv2.resize(patch, (29, 29))
+                    patch = np.array(patch, dtype=np.uint8)
+                    patches.append(patch)
+                    labels.append(i+counter)
+            counter += n_patches
+        print(counter)
+        return torch.ByteTensor(np.array(patches, dtype=np.uint8)), torch.LongTensor(labels)
+
 if __name__ == '__main__':
     # need to be specified
     try:
@@ -82,7 +109,7 @@ if __name__ == '__main__':
         t = 'test'
         good_fnames = splits_json[split][t]
         hPatches = HPatches(good_fnames = good_fnames)
-        images, labels = hPatches.read_image_file(path_to_hpatches_dir)
+        images, labels = hPatches.read_image_file_test(path_to_hpatches_dir)
         with open(os.path.join(output_dir, 'hpatches_split_' + split +  '_' + t + '.pt'), 'wb') as f:
             torch.save((images, labels), f)
         print(split, t, 'Saved')

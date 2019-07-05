@@ -1064,7 +1064,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         def pairwise_dstncs_2vec(ref_dsc,all_dsc):
             x_norm = (ref_dsc**2).sum(1).view(-1, 1)
             distances = []
-            splts = torch.chunk(all_dsc, 6)
+            splts = torch.chunk(all_dsc, 7)
             del all_dsc
             for s in splts:
                  # euclidean distance
@@ -1318,7 +1318,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
     xt = torch.FloatTensor(np.array(xt)).unsqueeze(1)
  
     patch_fldr = '/content/hardnet/data/sets/turbid/validation_all'
-    inc_list = [0,1,2,3,4,5,6]
+    inc_list = [0,1,2,3,4,5,6,7]
     xv, xv_ref, yv_p, yv_i = load_patchDataset_allval(patch_fldr,inc_list)
     xv = torch.FloatTensor(np.array(xv)).unsqueeze(1)
     xv_ref = torch.FloatTensor(np.array(xv_ref)).unsqueeze(1)
