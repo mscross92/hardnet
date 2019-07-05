@@ -220,10 +220,13 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
 
             ret = []
             for ii in range(len(anchor)):
-                valid_dists = inc_negs[ii].squeeze(-1).nonzero().cpu().numpy().astype('float64')
+                valid_dists = inc_negs[ii].nonzero()
                 print(valid_dists.shape)
+                print(len(valid_dists))
                 if len(valid_dists)>0:
-                    d = np.random.choice(valid_dists)
+                    d = torch.multinomial(torch.arange(valid_dists.size(0)).float(), 1)
+                    print(d)
+                    # d = np.random.choice(valid_dists)
                 else:
                     d = min_neg[ii]
                 ret.append(d)
