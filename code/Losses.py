@@ -218,7 +218,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             # cat_mins = torch.cat([mn.unsqueeze(-1)]*len(anchor),1)
             # del mn
             # inc_negs = torch.le((torch.gt(dist_without_min_on_diag_a,cat_mins)),torch.add(cat_mins.byte(), 0.2))
-            print(inc_negs[0])
+            # print(inc_negs[0])
 
             ret = []
             for ii in range(len(anchor)):
@@ -233,6 +233,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                     d = valid_dists[0]
                 else:
                     # if no appropriate distance, set as hardest negative?
+                    # TODO set as anchor-positive distance
                     d = min_neg[ii]
                     print('no appropriate distance - setting as hard negative')
                 ret.append(d)
@@ -332,6 +333,8 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
         sys.exit(1)
     loss = torch.mean(loss)
 
+    print(loss)
+    
     # if batch_reduce == 'random_sh' and anchor_swap:
     #     return loss, n_idx, n_type
     # return loss
