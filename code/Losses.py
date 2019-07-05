@@ -218,6 +218,16 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                     ret.append(min_neg[ii])
             min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
             
+            # get row 
+            dist_row = inc_negs[visualise_idx]
+            n_dist = min_neg[visualise_idx]
+            n_idx = np.where(dist_row == n_dist)
+            if n_idx<len(anchor):
+                n_type = 0
+            else:
+                n_type = 1
+                n_idx = n_idx - len(anchor)
+
             # print(counter,'anchors with 1 negative index within range out of',len(anchor))
 
             # min_n = min_neg[visualise_idx]
@@ -276,8 +286,8 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
 
     # if batch_reduce == 'random_sh' and anchor_swap:
     #     return loss, n_idx, n_type
-    
-    return loss
+    # return loss
+    return loss, n_idx, n_type
 
 def global_orthogonal_regularization(anchor, negative):
 
