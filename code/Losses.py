@@ -217,7 +217,8 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             # cat_mins = torch.cat([mn.unsqueeze(-1)]*len(anchor),1)
             # del mn
             # inc_negs = torch.le((torch.gt(dist_without_min_on_diag_a,cat_mins)),torch.add(cat_mins.byte(), 0.2))
-
+            print(inc_negs[0])
+            
             ret = []
             for ii in range(len(anchor)):
                 valid_dists = inc_negs[ii].squeeze().nonzero()
