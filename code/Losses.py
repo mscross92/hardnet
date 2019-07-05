@@ -196,7 +196,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             mn = min_neg
             # concat d(a,a) and d(a,p)
             # cat_d = torch.cat((torch.add(dist_matrix_a, 0.01),torch.add(dist_matrix_p, 0.01)),1)
-            cat_d = torch.cat(dist_matrix_a,dist_matrix_p,1)
+            cat_d = torch.cat((dist_matrix_a,dist_matrix_p),1)
             cat_mins = torch.cat([mn.unsqueeze(-1)]*(len(anchor) + len(positive)),1)
             del mn
             inc_negs = torch.le((torch.gt(torch.add(cat_d, eps),cat_mins)),torch.add(cat_mins.byte(), 0.2))
