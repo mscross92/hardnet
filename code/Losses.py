@@ -245,8 +245,8 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                     d = dist_matrix_p[ii][ii].squeeze()
                     counter = counter + 1
                 ret.append(d)
-                if counter>0:
-                    print(counter,'instance(s) where no distance within range')
+                # if counter>0:
+                #     print(counter,'instance(s) where no distance within range')
             
             min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
 
@@ -345,7 +345,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
         sys.exit(1)
     loss = torch.mean(loss)
 
-    print(loss)
+    # print(loss)
 
     # if batch_reduce == 'random_sh' and anchor_swap:
     #     return loss, n_idx, n_type
