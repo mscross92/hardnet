@@ -241,7 +241,8 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                 else:
                     # if no appropriate distance, set as hardest negative?
                     d = dist_matrix_p[ii][ii]
-                    print('no appropriate distance - setting as hard negative')
+                    print(d.shape)
+                    print('no appropriate distance - setting as positive')
                     print(d)
                 ret.append(d)
                 
