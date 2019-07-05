@@ -199,13 +199,24 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
         mask = torch.le(dist_without_min_on_diag,cat_mins).float()*10
         dist_without_min_on_diag = dist_without_min_on_diag + mask
         min_neg = torch.min(dist_without_min_on_diag,1)[0]
-        # neg_ids = torch.min(dist_without_min_on_diag,1)[1]
+        neg_ids = torch.min(dist_without_min_on_diag,1)[1]
 
         if anchor_swap:
             min_neg2 = torch.min(dist_without_min_on_diag,0)[0]
+            neg2_ids = torch.min(dist_without_min_on_diag,0)[1]
             min_neg = torch.min(min_neg,min_neg2)
-
             
+            n_type = 0
+            n_idx = 0
+            if visualise_idx!=99999:
+                min_n = min_neg[visualise_idx]
+                if min_n==min_neg2[visualise_idx]:
+                    n_idx = neg2_ids[visualise_idx]
+                    n_type = 1
+                else:
+                    n_idx = neg_ids[visualise_idx]
+                    n_type = 0
+
             # dist_without_min_on_diag_a = dist_matrix_a+eye*10
             # mask = (dist_without_min_on_diag_a.ge(0.008).float()-1.0)*(-1)
             # mask = mask.type_as(dist_without_min_on_diag_a)*10
@@ -253,8 +264,8 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             # min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
 
             # get row 
-            n_type = 0
-            n_idx = 0
+            # n_type = 0
+            # n_idx = 0
             # if visualise_idx!=99999:
             #     dr = inc_negs[visualise_idx]
             #     dist_row = dr.cpu().detach().numpy().astype('float64')
@@ -326,8 +337,6 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
         print ('Unknown loss type. Try triplet_margin, softmax or contrastive')
         sys.exit(1)
     loss = torch.mean(loss)
-
-    print(loss)
 
     # if batch_reduce == 'random_sh' and anchor_swap:
     #     return loss, n_idx, n_type
