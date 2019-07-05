@@ -202,9 +202,9 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
 
             # changed so only select from other anchors as was sometimes giving patches of the same class as anchor
             dist_without_min_on_diag_a = dist_matrix_a+eye*10
-            mask = (dist_without_min_on_diag_a.ge(0.008).float()-1.0)*(-1)
-            mask = mask.type_as(dist_without_min_on_diag_a)*10
-            dist_without_min_on_diag_a = dist_without_min_on_diag_a+mask
+            # mask = (dist_without_min_on_diag_a.ge(0.008).float()-1.0)*(-1)
+            # mask = mask.type_as(dist_without_min_on_diag_a)*10
+            # dist_without_min_on_diag_a = dist_without_min_on_diag_a+mask
             cat_mins = torch.cat([mn.unsqueeze(-1)]*len(anchor),1)
             del mn
             inc_negs = torch.le((torch.gt(dist_without_min_on_diag_a,cat_mins)),torch.add(cat_mins.byte(), 0.2))
