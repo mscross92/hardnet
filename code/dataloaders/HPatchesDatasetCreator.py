@@ -54,7 +54,7 @@ class HPatches(data.Dataset):
         print(counter)
         return torch.ByteTensor(np.array(patches, dtype=np.uint8)), torch.LongTensor(labels)
 
-def read_image_file_test(self, data_dir):
+    def read_image_file_test(self, data_dir):
         """Return a Tensor containing the patches
         """
         typs = ['0','1','2','3','4','5','6','7']
