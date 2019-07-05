@@ -221,14 +221,15 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             ret = []
             for ii in range(len(anchor)):
                 valid_dists = inc_negs[ii].nonzero()
-                print(valid_dists.shape)
                 print(len(valid_dists))
-                if len(valid_dists)>0:
-                    d = torch.multinomial(torch.arange(valid_dists.size(0)).float(), 1)
-                    print(d)
+                if len(valid_dists)>1:
+                    d = torch.multinomial(valid_dists, 1)
                     # d = np.random.choice(valid_dists)
+                elif len(valid_dists>0):
+                    d = valid_dists[0]
                 else:
                     d = min_neg[ii]
+                print(d)
                 ret.append(d)
             min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
 
