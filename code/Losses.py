@@ -226,6 +226,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
 
             ret = []
             for ii in range(len(anchor)):
+                print(len(inc_negs[ii].squeeze()))
                 valid_dists = inc_negs[ii].squeeze().nonzero() # get indices of non-zero elements in row
 
                 if len(valid_dists)>1:
