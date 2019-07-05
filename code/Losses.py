@@ -221,7 +221,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             
             # get row 
             dist_row = inc_negs[visualise_idx]
-            n_dist = float(min_neg[visualise_idx])
+            n_dist = float(min_neg[visualise_idx].cpu())
             n_idx = np.where(dist_row.numpy().astype('float64') == n_dist)
             if n_idx<len(anchor):
                 n_type = 0
