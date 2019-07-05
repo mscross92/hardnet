@@ -206,8 +206,8 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             cat_d = torch.cat((dist_without_min_on_diag_a,dist_without_min_on_diag),1)
             cat_mins = torch.cat([mn.unsqueeze(-1)]*(len(anchor) + len(positive)),1)
             del mn
-            cat_d = torch.gt(cat_d,cat_mins) * cat_d
-            inc_negs = torch.le(cat_d,torch.add(cat_mins.byte(), 0.2)) * cat_d
+            cat_d = torch.gt(cat_d,cat_mins).float() * cat_d
+            inc_negs = torch.le(cat_d,torch.add(cat_mins, 0.2)).float() * cat_d
             # print(inc_negs.shape)
             # changed so only select from other anchors as was sometimes giving patches of the same class as anchor
             # eye = torch.autograd.Variable(torch.eye(dist_matrix_a.size(1))).cuda()
