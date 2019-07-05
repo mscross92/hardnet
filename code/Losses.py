@@ -191,40 +191,46 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
     mask = mask.type_as(dist_without_min_on_diag)*10
     dist_without_min_on_diag = dist_without_min_on_diag+mask
     if batch_reduce == 'random_sh':
+
+        mn = pos1
+        mn = mn.detach()
+        cat_mins = torch.cat([mn.unsqueeze(-1)]*(len(anchor) + len(positive)),1)
+
+        mask = torch.le(dist_without_min_on_diag,cat_mins)*10
+        dist_without_min_on_diag = dist_without_min_on_diag + mask
         min_neg = torch.min(dist_without_min_on_diag,1)[0]
+        # neg_ids = torch.min(dist_without_min_on_diag,1)[1]
+
         if anchor_swap:
             min_neg2 = torch.min(dist_without_min_on_diag,0)[0]
             min_neg = torch.min(min_neg,min_neg2)
-            
-            mn = pos1
-            mn = mn.detach()
-            
-            dist_without_min_on_diag_a = dist_matrix_a+eye*10
-            mask = (dist_without_min_on_diag_a.ge(0.008).float()-1.0)*(-1)
-            mask = mask.type_as(dist_without_min_on_diag_a)*10
-            dist_without_min_on_diag_a = dist_without_min_on_diag_a+mask
-                
-            cat_d = torch.cat((dist_without_min_on_diag_a,dist_without_min_on_diag),1)
-            cat_mins = torch.cat([mn.unsqueeze(-1)]*(len(anchor) + len(positive)),1)
-            del mn
-            cat_d = torch.gt(cat_d,cat_mins).float() * cat_d
-            inc_negs = torch.le(cat_d,torch.add(cat_mins, 1.0)).float() * cat_d
 
-            ret = []
-            counter = 0
-            for ii in range(len(anchor)):
-                valid_dists = inc_negs[ii].nonzero() # get indices of non-zero elements in row
-                if valid_dists.shape[0]>0:
-                    # randomly select distance from list
-                    jj = torch.randint(len(valid_dists), (1,))
-                    d = inc_negs[ii][valid_dists[jj]].squeeze()
-                else:
-                    # if no appropriate distance, set as hardest negative?
-                    d = dist_matrix_p[ii][ii].squeeze()
-                    counter = counter + 1
-                ret.append(d)
             
-            min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
+            # dist_without_min_on_diag_a = dist_matrix_a+eye*10
+            # mask = (dist_without_min_on_diag_a.ge(0.008).float()-1.0)*(-1)
+            # mask = mask.type_as(dist_without_min_on_diag_a)*10
+            # dist_without_min_on_diag_a = dist_without_min_on_diag_a+mask
+                
+            # cat_d = torch.cat((dist_without_min_on_diag_a,dist_without_min_on_diag),1)
+            # del mn
+            # cat_d = torch.gt(cat_d,cat_mins).float() * cat_d
+            # inc_negs = torch.le(cat_d,torch.add(cat_mins, 1.0)).float() * cat_d
+
+            # ret = []
+            # counter = 0
+            # for ii in range(len(anchor)):
+            #     valid_dists = inc_negs[ii].nonzero() # get indices of non-zero elements in row
+            #     if valid_dists.shape[0]>0:
+            #         # randomly select distance from list
+            #         jj = torch.randint(len(valid_dists), (1,))
+            #         d = inc_negs[ii][valid_dists[jj]].squeeze()
+            #     else:
+            #         # if no appropriate distance, set as hardest negative?
+            #         d = dist_matrix_p[ii][ii].squeeze()
+            #         counter = counter + 1
+            #     ret.append(d)
+            
+            # min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
 
             # randomly select a negative distance for each row
             # valid_idx = inc_negs.nonzero()
