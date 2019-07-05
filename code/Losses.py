@@ -233,7 +233,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                     # randomly select distance from list
                     jj = torch.randint(len(valid_dists), (1,))
                     d = inc_negs[ii].squeeze()[valid_dists[jj]]
-                    print(d.type)
+                    print(d.type())
                 elif len(valid_dists>0):
                     # only 1 distance in range - select
                     d = valid_dists[0]
@@ -241,7 +241,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                     # if no appropriate distance, set as hardest negative?
                     # TODO set as anchor-positive distance
                     d = dist_matrix_p[ii][ii]
-                    print(d.type)
+                    print(d.type())
                     print('no appropriate distance - setting as hard negative')
                 ret.append(d)
             
