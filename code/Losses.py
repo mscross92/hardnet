@@ -218,25 +218,30 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             # del mn
             # inc_negs = torch.le((torch.gt(dist_without_min_on_diag_a,cat_mins)),torch.add(cat_mins.byte(), 0.2))
 
+            for ii in enumerate(anchor):
+                valid_idx = inc_negs[ii].nonzero()
+                print(l)
+                if len(valid_idx)>0:
+
             # randomly select a negative distance for each row
-            valid_idx = inc_negs.nonzero()
-            unique_rows = valid_idx[:, 0].unique()
-            print(len(unique_rows))
-            valid_row_idx = [valid_idx[valid_idx[:, 0] == u] for u in unique_rows]
-            print(len(valid_row_idx))
-            ret = []
-            # print(len(valid_row_idx),'valid rows')
-            for ii,v in enumerate(valid_row_idx):
-                if v.size(0)>1:
-                    choice = torch.multinomial(torch.arange(v.size(0)).float(), 1)
-                    ret.append(inc_negs[v[choice].squeeze().chunk(2)])
-                elif v.size(0)>0:
-                    choice = 0
-                    ret.append(inc_negs[v[choice].squeeze().chunk(2)])
-                else: # if none available in range, set loss as that of hard negative
-                    print('no negative index')
-                    ret.append(min_neg[ii])
-            min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
+            # valid_idx = inc_negs.nonzero()
+            # unique_rows = valid_idx[:, 0].unique()
+            # print(len(unique_rows))
+            # valid_row_idx = [valid_idx[valid_idx[:, 0] == u] for u in unique_rows]
+            # print(len(valid_row_idx))
+            # ret = []
+            # # print(len(valid_row_idx),'valid rows')
+            # for ii,v in enumerate(valid_row_idx):
+            #     if v.size(0)>1:
+            #         choice = torch.multinomial(torch.arange(v.size(0)).float(), 1)
+            #         ret.append(inc_negs[v[choice].squeeze().chunk(2)])
+            #     elif v.size(0)>0:
+            #         choice = 0
+            #         ret.append(inc_negs[v[choice].squeeze().chunk(2)])
+            #     else: # if none available in range, set loss as that of hard negative
+            #         print('no negative index')
+            #         ret.append(min_neg[ii])
+            # min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
 
             # get row 
             n_type = 0
