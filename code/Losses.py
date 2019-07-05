@@ -220,6 +220,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
 
             # randomly select a negative distance for each row
             valid_idx = inc_negs.nonzero()
+            print(valid_idx.shape)
             unique_rows = valid_idx[:, 0].unique()
             valid_row_idx = [valid_idx[valid_idx[:, 0] == u] for u in unique_rows]
             ret = []
