@@ -345,7 +345,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
         sys.exit(1)
     loss = torch.mean(loss)
 
-    # print(loss)
+    print(loss)
 
     # if batch_reduce == 'random_sh' and anchor_swap:
     #     return loss, n_idx, n_type
