@@ -186,6 +186,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
 
     # steps to filter out same patches that occur in distance matrix as negatives
     pos1 = torch.diag(dist_matrix_p)
+    print(pos1.shape)
     dist_without_min_on_diag = dist_matrix_p+eye*2.0
     mask = (dist_without_min_on_diag.ge(0.008).float()-1.0)*(-1)
     mask = mask.type_as(dist_without_min_on_diag)*10
