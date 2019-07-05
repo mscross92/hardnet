@@ -231,6 +231,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                     # randomly select distance from list
                     jj = torch.randint(len(valid_dists), (1,))
                     d = inc_negs[ii].squeeze()[valid_dists[jj]]
+                    print(d)
                 # elif valid_dists.shape[0]>0:
                 #     # only 1 distance in range - select
                 #     jj = valid_dists[0]
