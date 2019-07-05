@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import sys
+import numpy as np
 
 def distance_matrix_vector(anchor, positive):
     """Given batch of anchor descriptors and positive descriptors calculate distance matrix"""
