@@ -215,7 +215,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             unique_rows = valid_idx[:, 0].unique()
             valid_row_idx = [valid_idx[valid_idx[:, 0] == u] for u in unique_rows]
             ret = []
-            print(len(valid_row_idx),'valid rows')
+            # print(len(valid_row_idx),'valid rows')
             for ii,v in enumerate(valid_row_idx):
                 if v.size(0)>1:
                     choice = torch.multinomial(torch.arange(v.size(0)).float(), 1)
