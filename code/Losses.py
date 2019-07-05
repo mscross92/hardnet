@@ -192,15 +192,11 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
     dist_without_min_on_diag = dist_without_min_on_diag+mask
     if batch_reduce == 'random_sh':
         min_neg = torch.min(dist_without_min_on_diag,1)[0]
-        # neg_ids = torch.min(dist_without_min_on_diag,1)[1]
         if anchor_swap:
             min_neg2 = torch.min(dist_without_min_on_diag,0)[0]
-            # neg2_ids = torch.min(dist_without_min_on_diag,0)[1]
             min_neg = torch.min(min_neg,min_neg2)
-            mn = min_neg
-            # concat d(a,a) and d(a,p)
-            # cat_d = torch.cat((torch.add(dist_matrix_a, 0.01),torch.add(dist_matrix_p, 0.01)),1)
-            # cat_d = torch.cat((dist_matrix_a,dist_matrix_p),1)
+            
+            mn = pos1
 
             dist_without_min_on_diag_a = dist_matrix_a+eye*10
             mask = (dist_without_min_on_diag_a.ge(0.008).float()-1.0)*(-1)
@@ -211,18 +207,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             cat_mins = torch.cat([mn.unsqueeze(-1)]*(len(anchor) + len(positive)),1)
             del mn
             cat_d = torch.gt(cat_d,cat_mins).float() * cat_d
-            inc_negs = torch.le(cat_d,torch.add(cat_mins, 0.2)).float() * cat_d
-            # print(inc_negs.shape)
-            # changed so only select from other anchors as was sometimes giving patches of the same class as anchor
-            # eye = torch.autograd.Variable(torch.eye(dist_matrix_a.size(1))).cuda()
-            # dist_without_min_on_diag_a = dist_matrix_a+eye*10
-            # mask = (dist_without_min_on_diag_a.ge(0.008).float()-1.0)*(-1)
-            # mask = mask.type_as(dist_without_min_on_diag_a)*10
-            # dist_without_min_on_diag_a = dist_without_min_on_diag_a+mask
-            # cat_mins = torch.cat([mn.unsqueeze(-1)]*len(anchor),1)
-            # del mn
-            # inc_negs = torch.le((torch.gt(dist_without_min_on_diag_a,cat_mins)),torch.add(cat_mins.byte(), 0.2))
-            # print(inc_negs[0])
+            inc_negs = torch.le(cat_d,torch.add(cat_mins, 0.4)).float() * cat_d
 
             ret = []
             counter = 0
@@ -232,21 +217,11 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                     # randomly select distance from list
                     jj = torch.randint(len(valid_dists), (1,))
                     d = inc_negs[ii][valid_dists[jj]].squeeze()
-                # elif valid_dists.shape[0]>0:
-                #     # only 1 distance in range - select
-                #     jj = valid_dists[0]
-                #     print(jj)
-                #     d = inc_negs[ii].squeeze()[valid_dists[jj]]
-                #     print('Only 1 appropriate distance found')
-                #     print(d)
                 else:
                     # if no appropriate distance, set as hardest negative?
-                    # d = min_neg[ii]
                     d = dist_matrix_p[ii][ii].squeeze()
                     counter = counter + 1
                 ret.append(d)
-                # if counter>0:
-                #     print(counter,'instance(s) where no distance within range')
             
             min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
 
