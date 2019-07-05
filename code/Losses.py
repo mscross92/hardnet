@@ -223,6 +223,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             ret = []
             for ii in range(len(anchor)):
                 valid_dists = inc_negs[ii].squeeze().nonzero()
+                print(valid_dists)
                 print(len(valid_dists))
                 if len(valid_dists)>1:
                     jj = torch.randint(len(valid_dists), (1,))
