@@ -201,9 +201,10 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             # inc_negs = torch.le((torch.gt(torch.add(cat_d, eps),cat_mins)),torch.add(cat_mins.byte(), 0.2))
 
             # changed so only select from other anchors as was sometimes giving patches of the same class as anchor
+            dist_matrix_a = dist_matrix_a + 0.02
             cat_mins = torch.cat([mn.unsqueeze(-1)]*len(anchor),1)
             del mn
-            inc_negs = torch.le((torch.gt(torch.add(dist_matrix_a, eps),cat_mins)),torch.add(cat_mins.byte(), 0.2))
+            inc_negs = torch.le((torch.gt(dist_matrix_a,cat_mins)),torch.add(cat_mins.byte(), 0.2))
 
             # randomly select a negative distance for each row
             valid_idx = inc_negs.nonzero()
