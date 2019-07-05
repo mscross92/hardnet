@@ -224,7 +224,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                 print(len(valid_dists))
                 if len(valid_dists)>1:
                     jj = torch.randint(len(valid_dists), (1,))
-                    d = valid_dists[jj]
+                    d = inc_negs[ii].squeeze()[valid_dists[jj]]
                     # d = np.random.choice(valid_dists)
                 elif len(valid_dists>0):
                     d = valid_dists[0]
