@@ -228,22 +228,21 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             for ii in range(len(anchor)):
                 valid_dists = inc_negs[ii].nonzero() # get indices of non-zero elements in row
                 print(valid_dists.shape)
-                if len(valid_dists)>1:
+                if lvalid_dists.shape[0]>1:
                     # randomly select distance from list
                     jj = torch.randint(len(valid_dists), (1,))
                     d = inc_negs[ii].squeeze()[valid_dists[jj]]
-                elif len(valid_dists>0):
+                elif valid_dists.shape[0]>0):
                     # only 1 distance in range - select
                     jj = valid_dists[0]
                     d = inc_negs[ii].squeeze()[valid_dists[jj]]
                 else:
                     # if no appropriate distance, set as hardest negative?
-                    # TODO set as anchor-positive distance
                     d = dist_matrix_p[ii][ii].squeeze()
-                    print(d)
                     print('no appropriate distance - setting as hard negative')
-                ret.append(d)
                 print(d)
+                ret.append(d)
+                
             
             min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
 
