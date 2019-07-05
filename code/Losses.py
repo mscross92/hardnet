@@ -227,19 +227,17 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             ret = []
             for ii in range(len(anchor)):
                 valid_dists = inc_negs[ii].nonzero() # get indices of non-zero elements in row
-                print(valid_dists.shape)
-                if valid_dists.shape[0]>1:
+                if valid_dists.shape[0]>0:
                     # randomly select distance from list
                     jj = torch.randint(len(valid_dists), (1,))
-                    print(jj)
                     d = inc_negs[ii].squeeze()[valid_dists[jj]]
-                elif valid_dists.shape[0]>0:
-                    # only 1 distance in range - select
-                    jj = valid_dists[0]
-                    print(jj)
-                    d = inc_negs[ii].squeeze()[valid_dists[jj]]
-                    print('Only 1 appropriate distance found')
-                    print(d)
+                # elif valid_dists.shape[0]>0:
+                #     # only 1 distance in range - select
+                #     jj = valid_dists[0]
+                #     print(jj)
+                #     d = inc_negs[ii].squeeze()[valid_dists[jj]]
+                #     print('Only 1 appropriate distance found')
+                #     print(d)
                 else:
                     # if no appropriate distance, set as hardest negative?
                     d = dist_matrix_p[ii][ii]
