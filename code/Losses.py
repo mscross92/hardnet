@@ -236,11 +236,13 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                     # only 1 distance in range - select
                     jj = valid_dists[0]
                     d = inc_negs[ii].squeeze()[valid_dists[jj]]
+                    print('Only 1 appropriate distance found')
+                    print(d)
                 else:
                     # if no appropriate distance, set as hardest negative?
-                    d = dist_matrix_p[ii][ii].squeeze()
+                    d = dist_matrix_p[ii][ii]
                     print('no appropriate distance - setting as hard negative')
-                print(d)
+                    print(d)
                 ret.append(d)
                 
             
