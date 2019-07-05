@@ -695,6 +695,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                             loss_type=args.loss,
                             visualise_idx=vis_id)
             
+            print(n_idx)
             if n_type>0:
                 d_n = data_p[n_idx,0,:,:].cpu()
             else:
