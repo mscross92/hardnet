@@ -239,7 +239,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                 else:
                     # if no appropriate distance, set as hardest negative?
                     # TODO set as anchor-positive distance
-                    d = dist_matrix_p[ii][ii]
+                    d = dist_matrix_p[ii][ii].squeeze()
                     print(d)
                     print('no appropriate distance - setting as hard negative')
                 ret.append(d)
