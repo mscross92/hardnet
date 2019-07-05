@@ -224,7 +224,6 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             # inc_negs = torch.le((torch.gt(dist_without_min_on_diag_a,cat_mins)),torch.add(cat_mins.byte(), 0.2))
             # print(inc_negs[0])
 
-            print(inc_negs.shape)
             ret = []
             for ii in range(len(anchor)):
                 valid_dists = inc_negs[ii].squeeze().nonzero() # get indices of non-zero elements in row
