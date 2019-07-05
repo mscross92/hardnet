@@ -235,6 +235,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                 elif valid_dists.shape[0]>0:
                     # only 1 distance in range - select
                     jj = valid_dists[0]
+                    print(jj)
                     d = inc_negs[ii].squeeze()[valid_dists[jj]]
                     print('Only 1 appropriate distance found')
                     print(d)
