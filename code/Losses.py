@@ -219,7 +219,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             # inc_negs = torch.le((torch.gt(dist_without_min_on_diag_a,cat_mins)),torch.add(cat_mins.byte(), 0.2))
 
             ret = []
-            for ii in enumerate(anchor):
+            for ii in range(len(anchor)):
                 valid_dists = inc_negs[ii].nonzero().cpu().numpy().astype('float64')
                 print(len(valid_dists))
                 if len(valid_dists)>0:
@@ -228,7 +228,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                     d = min_neg[ii]
                 ret.append(d)
             min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
-            
+
             # randomly select a negative distance for each row
             # valid_idx = inc_negs.nonzero()
             # unique_rows = valid_idx[:, 0].unique()
