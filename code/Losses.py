@@ -227,7 +227,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             print(inc_negs.shape)
             ret = []
             for ii in range(len(anchor)):
-                valid_dists = inc_negs[ii].squeeze().nonzero().detach() # get indices of non-zero elements in row
+                valid_dists = inc_negs[ii].squeeze().nonzero() # get indices of non-zero elements in row
 
                 if len(valid_dists)>1:
                     # randomly select distance from list
@@ -239,7 +239,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                 else:
                     # if no appropriate distance, set as hardest negative?
                     # TODO set as anchor-positive distance
-                    d = min_neg[ii]
+                    d = min_neg[ii].float()
                     print('no appropriate distance - setting as hard negative')
                 ret.append(d)
             
