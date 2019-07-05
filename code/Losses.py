@@ -197,7 +197,8 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             min_neg = torch.min(min_neg,min_neg2)
             
             mn = pos1
-
+            mn = mn.detach()
+            
             dist_without_min_on_diag_a = dist_matrix_a+eye*10
             mask = (dist_without_min_on_diag_a.ge(0.008).float()-1.0)*(-1)
             mask = mask.type_as(dist_without_min_on_diag_a)*10
