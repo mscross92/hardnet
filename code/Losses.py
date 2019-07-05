@@ -220,6 +220,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
             
             # get row 
+            print(len(dist_row))
             dist_row = inc_negs[visualise_idx]
             n_dist = float(min_neg[visualise_idx].cpu())
             n_idx = np.where(dist_row.cpu().numpy().astype('float64') == n_dist)[0]
