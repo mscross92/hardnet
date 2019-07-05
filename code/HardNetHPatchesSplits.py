@@ -687,8 +687,8 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                 del tn, d_n
        
         elif args.batch_reduce == 'random_sh':
-            if batch_idx==0:
-                vis_id = np.random.randint(0, data_a.shape[0])
+            # if batch_idx==0:
+            #     vis_id = np.random.randint(0, data_a.shape[0])
             loss, n_idx, n_type = loss_semi_hard(out_a, out_p,
                             margin=args.margin,
                             anchor_swap=args.anchorswap,
