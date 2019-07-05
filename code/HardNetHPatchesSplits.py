@@ -524,7 +524,7 @@ def create_loaders(load_random_triplets=False):
             transforms.ToPILImage(),
             # transforms.RandomRotation(15,PIL.Image.BILINEAR),
             transforms.RandomHorizontalFlip(p=0.5),
-            transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0, hue=0),
+            transforms.ColorJitter(brightness=0.1, contrast=0, saturation=0, hue=0),
             transforms.Resize(29),
             transforms.ToTensor()])
     if not args.augmentation:
@@ -1291,7 +1291,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
         transforms.ToPILImage(),
         # transforms.RandomRotation(15,PIL.Image.BILINEAR),
         transforms.RandomHorizontalFlip(p=0.5),
-        transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0, hue=0),
+        transforms.ColorJitter(brightness=0.1, contrast=0, saturation=0, hue=0),
         transforms.Resize(29),
         transforms.ToTensor()])
 
