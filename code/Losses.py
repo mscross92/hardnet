@@ -204,6 +204,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
         neg_ids = torch.min(dist_without_min_on_diag,1)[1]
 
         if anchor_swap:
+            mn = mn.view(1,len(mn))
             cat_mins = torch.cat([mn.unsqueeze(-1)]*(len(anchor)),0)
             print(cat_mins.shape)
             mask = torch.le(dist_without_min_on_diag,cat_mins).float()*10
