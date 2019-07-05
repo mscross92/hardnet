@@ -207,7 +207,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             cat_mins = torch.cat([mn.unsqueeze(-1)]*(len(anchor) + len(positive)),1)
             del mn
             cat_d = torch.gt(cat_d,cat_mins).float() * cat_d
-            inc_negs = torch.le(cat_d,torch.add(cat_mins, 0.4)).float() * cat_d
+            inc_negs = torch.le(cat_d,torch.add(cat_mins, 1.0)).float() * cat_d
 
             ret = []
             counter = 0
