@@ -208,20 +208,18 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             # dist_without_min_on_diag_a = dist_without_min_on_diag_a+mask
             cat_mins = torch.cat([mn.unsqueeze(-1)]*len(anchor),1)
             del mn
-            inc_negs = torch.le((torch.gt(dist_matrix_a,cat_mins)),torch.add(cat_mins.byte(), 0.2))
+            inc_negs = torch.le((torch.gt(dist_without_min_on_diag_a,cat_mins)),torch.add(cat_mins.byte(), 0.2))
 
             # randomly select a negative distance for each row
             valid_idx = inc_negs.nonzero()
             unique_rows = valid_idx[:, 0].unique()
             valid_row_idx = [valid_idx[valid_idx[:, 0] == u] for u in unique_rows]
             ret = []
-            counter = 0
             for ii,v in enumerate(valid_row_idx):
                 if v.size(0)>1:
                     choice = torch.multinomial(torch.arange(v.size(0)).float(), 1)
                     ret.append(inc_negs[v[choice].squeeze().chunk(2)])
                 elif v.size(0)>0:
-                    counter = counter + 1
                     choice = 0
                     ret.append(inc_negs[v[choice].squeeze().chunk(2)])
                 else: # if none available in range, set loss as that of hard negative
@@ -230,9 +228,11 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
             
             # get row 
-            dist_row = inc_negs[visualise_idx]
+            dist_row = inc_negs[visualise_idx].cpu().numpy().astype('float64')
+            if len(dist_row)<1:
+                print('no suitable negative found')
             n_dist = float(min_neg[visualise_idx].cpu())
-            n_idx = np.where(dist_row.cpu().numpy().astype('float64') == n_dist)[0][0]
+            n_idx = np.where(dist_row == n_dist)[0][0]
             if n_idx<len(anchor):
                 n_type = 0
             else:
