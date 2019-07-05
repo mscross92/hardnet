@@ -208,7 +208,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             # dist_without_min_on_diag_a = dist_without_min_on_diag_a+mask
             cat_mins = torch.cat([mn.unsqueeze(-1)]*len(anchor),1)
             del mn
-            inc_negs = torch.le((torch.gt(dist_without_min_on_diag_a,cat_mins)),torch.add(cat_mins.byte(), 0.2))
+            inc_negs = torch.le((torch.gt(dist_matrix_a,cat_mins)),torch.add(cat_mins.byte(), 0.2))
 
             # randomly select a negative distance for each row
             valid_idx = inc_negs.nonzero()
