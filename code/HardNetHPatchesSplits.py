@@ -670,8 +670,8 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                 del tn, d_n
        
         elif args.batch_reduce == 'random_sh':
-            # if batch_idx==0:
-            #     vis_id = np.random.randint(0, data_a.shape[0])
+            if batch_idx==0:
+                vis_id = np.random.randint(0, data_a.shape[0])
             loss, n_idx, n_type = loss_semi_hard(out_a, out_p,
                             margin=args.margin,
                             anchor_swap=args.anchorswap,
@@ -686,11 +686,11 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                 d_n = data_a[n_idx,0,:,:].cpu()
 
             # visualise random semi-hard sample
-            # if batch_idx==0:
-            #     print(n_idx,vis_id)
-            #     cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
-            #     cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
-            #     cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(d_n)*255).astype('uint8'))
+            if batch_idx==0:
+                print(n_idx,vis_id)
+                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
+                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
+                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(d_n)*255).astype('uint8'))
 
             if batch_idx==50:
                 # visualise distribution of batch
