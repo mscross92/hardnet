@@ -620,16 +620,17 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
             data_n = Variable(data_n)
             out_n = model(data_n)
 
+        vis_id = 99999
         if args.batch_reduce == 'L2Net':
             loss = loss_L2Net(out_a, out_p, anchor_swap=args.anchorswap,
                               margin=args.margin, loss_type=args.loss)
         elif args.batch_reduce == 'random_global':
-            vis_id = np.random.randint(0, data_a.shape[0])
             loss = loss_random_sampling(out_a, out_p, out_n,
                                         margin=args.margin,
                                         anchor_swap=args.anchorswap,
                                         loss_type=args.loss)
             if batch_idx==0:
+                vis_id = np.random.randint(0, data_a.shape[0])
                 # visualise random sample
                 # plt.figure()
                 # plt.subplot(1, 3, 1)
@@ -686,7 +687,8 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                 del tn, d_n
        
         elif args.batch_reduce == 'random_sh':
-            vis_id = np.random.randint(0, data_a.shape[0])
+            if batch_idx==0:
+                vis_id = np.random.randint(0, data_a.shape[0])
             loss, n_idx, n_type = loss_semi_hard(out_a, out_p,
                             margin=args.margin,
                             anchor_swap=args.anchorswap,
@@ -742,7 +744,8 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                 del tn, d_n
 
         else:
-            vis_id = np.random.randint(0, data_a.shape[0])
+            if batch_idx==0:
+                vis_id = np.random.randint(0, data_a.shape[0])
             loss, n_idx,n_type = loss_HardNet(out_a, out_p,
                                 margin=args.margin,
                                 anchor_swap=args.anchorswap,

@@ -237,19 +237,22 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
 
             # get row 
-            dist_row = inc_negs[visualise_idx].cpu().numpy().astype('float64')
-            if len(dist_row)<1:
-                print('no suitable negative found - selecting random')
-                n_idx = visualise_idx
-            else:
-                n_dist = float(min_neg[visualise_idx].cpu())
-                n_idx = np.where(dist_row == n_dist)[0][0]
-            
-            if n_idx<len(anchor):
-                n_type = 0
-            else:
-                n_type = 1
-                n_idx = n_idx - len(anchor)
+            n_type = 0
+            n_idx = 0
+            if visualise_idx!=99999:
+                dist_row = inc_negs[visualise_idx].cpu().numpy().astype('float64')
+                if len(dist_row)<1:
+                    print('no suitable negative found - selecting random')
+                    n_idx = visualise_idx
+                else:
+                    n_dist = float(min_neg[visualise_idx].cpu())
+                    n_idx = np.where(dist_row == n_dist)[0][0]
+                
+                if n_idx<len(anchor):
+                    n_type = 0
+                else:
+                    n_type = 1
+                    n_idx = n_idx - len(anchor)
 
             # print(counter,'anchors with 1 negative index within range out of',len(anchor))
 
