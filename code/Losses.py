@@ -243,6 +243,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                     print(d)
                     print('no appropriate distance - setting as hard negative')
                 ret.append(d)
+                print(d)
             
             min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
 
