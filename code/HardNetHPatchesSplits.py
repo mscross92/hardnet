@@ -109,9 +109,9 @@ parser.add_argument('--epochs', type=int, default=10, metavar='E',
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--anchorswap', type=bool, default=True,
                     help='turns on anchor swap')
-parser.add_argument('--batch-size', type=int, default=512, metavar='BS',
+parser.add_argument('--batch-size', type=int, default=1024, metavar='BS',
                     help='input batch size for training (default: 1024)')
-parser.add_argument('--test-batch-size', type=int, default=512, metavar='BST',
+parser.add_argument('--test-batch-size', type=int, default=256, metavar='BST',
                     help='input batch size for testing (default: 1024)')
 parser.add_argument('--n-triplets', type=int, default=11697, metavar='N',
                     help='how many triplets will generate from the dataset')
