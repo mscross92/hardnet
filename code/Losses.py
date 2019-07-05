@@ -235,12 +235,12 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                     d = inc_negs[ii].squeeze()[valid_dists[jj]].type(torch.cuda.FloatTensor)
                 elif len(valid_dists>0):
                     # only 1 distance in range - select
-                    jj = valid_dists[0].type(torch.cuda.FloatTensor)
+                    jj = valid_dists[0]
                     d = inc_negs[ii].squeeze()[valid_dists[jj]].type(torch.cuda.FloatTensor)
                 else:
                     # if no appropriate distance, set as hardest negative?
                     # TODO set as anchor-positive distance
-                    d = dist_matrix_p[ii][ii]
+                    d = dist_matrix_p[ii][ii].type(torch.cuda.FloatTensor)
                     print('no appropriate distance - setting as hard negative')
                 ret.append(d)
             
