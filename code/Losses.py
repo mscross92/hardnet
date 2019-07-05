@@ -195,7 +195,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             min_neg = torch.min(min_neg,min_neg2)
             mn = min_neg
             # concat d(a,a) and d(a,p)
-            cat_d = torch.cat((dist_matrix_a,dist_matrix_p),1)
+            cat_d = torch.cat((torch.add(dist_matrix_a, eps),torch.add(dist_matrix_p, eps)),1)
             cat_mins = torch.cat([mn.unsqueeze(-1)]*(len(anchor) + len(positive)),1)
             del mn
             inc_negs = torch.le((torch.gt(torch.add(cat_d, eps),cat_mins)),torch.add(cat_mins.byte(), 0.2))
@@ -215,7 +215,6 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             unique_rows = valid_idx[:, 0].unique()
             valid_row_idx = [valid_idx[valid_idx[:, 0] == u] for u in unique_rows]
             ret = []
-            print(len(valid_row_idx),'valid rows')
             for ii,v in enumerate(valid_row_idx):
                 if v.size(0)>1:
                     choice = torch.multinomial(torch.arange(v.size(0)).float(), 1)
@@ -227,7 +226,6 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                     print('no negative index')
                     ret.append(min_neg[ii])
             min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
-            print(len(min_neg.shape),'negative distances')
 
             # get row 
             dist_row = inc_negs[visualise_idx].cpu().numpy().astype('float64')
