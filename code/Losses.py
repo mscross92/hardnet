@@ -226,6 +226,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
                     print('no negative index')
                     ret.append(min_neg[ii])
             min_neg = torch.stack(ret).type(torch.cuda.FloatTensor)
+            print(len(min_neg.shape),'negative distances')
 
             # get row 
             dist_row = inc_negs[visualise_idx].cpu().numpy().astype('float64')
