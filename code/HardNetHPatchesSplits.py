@@ -631,23 +631,6 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                                         loss_type=args.loss)
             if batch_idx==0:
                 vis_id = np.random.randint(0, data_a.shape[0])
-                # visualise random sample
-                # plt.figure()
-                # plt.subplot(1, 3, 1)
-                # plt.imshow((np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
-                # plt.gca().set_xticks([])
-                # plt.gca().set_yticks([])
-                # plt.subplot(1,3,2)
-                # plt.imshow((np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
-                # plt.gca().set_xticks([])
-                # plt.gca().set_yticks([])
-                # plt.subplot(1,3,3)
-                # plt.imshow((np.array(data_n[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
-                # plt.gca().set_xticks([])
-                # plt.gca().set_yticks([])
-                # savestr = 'batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '.png'
-                # plt.savefig(savestr, bbox_inches='tight')
-                # plt.close()
                 cv2.imwrite('batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
                 cv2.imwrite('batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
                 cv2.imwrite('batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(data_n[vis_id,0,:,:].cpu())*255).astype('uint8'))
@@ -703,11 +686,11 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                 d_n = data_a[n_idx,0,:,:].cpu()
 
             # visualise random semi-hard sample
-            if batch_idx==0:
-                print(n_idx,vis_id)
-                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
-                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
-                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(d_n)*255).astype('uint8'))
+            # if batch_idx==0:
+            #     print(n_idx,vis_id)
+            #     cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
+            #     cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
+            #     cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(d_n)*255).astype('uint8'))
 
             if batch_idx==50:
                 # visualise distribution of batch
