@@ -511,7 +511,7 @@ def create_loaders(load_random_triplets=False):
     transform_train = transforms.Compose([
             transforms.Lambda(np_reshape29),
             transforms.ToPILImage(),
-            transforms.RandomRotation(5,PIL.Image.BILINEAR),
+            # transforms.RandomRotation(5,PIL.Image.BILINEAR),
             transforms.RandomResizedCrop(29, scale = (0.9,1.0),ratio = (0.9,1.1)),
             transforms.Resize(29),
             transforms.ToTensor()])
@@ -522,7 +522,7 @@ def create_loaders(load_random_triplets=False):
             # transforms.Normalize((args.mean_image,), (args.std_image,))])
             transforms.Lambda(np_reshape29),
             transforms.ToPILImage(),
-            transforms.RandomRotation(15,PIL.Image.BILINEAR),
+            # transforms.RandomRotation(15,PIL.Image.BILINEAR),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0, hue=0),
             transforms.Resize(29),
@@ -1301,7 +1301,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
     transform = transforms.Compose([
         transforms.Lambda(np_reshape29),
         transforms.ToPILImage(),
-        transforms.RandomRotation(15,PIL.Image.BILINEAR),
+        # transforms.RandomRotation(15,PIL.Image.BILINEAR),
         transforms.RandomHorizontalFlip(p=0.5),
         transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0, hue=0),
         transforms.Resize(29),
