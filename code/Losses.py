@@ -308,7 +308,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
         print ('Unknown batch reduce mode. Try min, average or random')
         sys.exit(1)
     if loss_type == "triplet_margin":
-        loss = torch.clamp(margin + pos - min_neg, min=0.0)
+        loss = torch.clamp(margin + pos - min_neg, min=0.0,max=2.0)
     elif loss_type == 'softmax':
         exp_pos = torch.exp(2.0 - pos)
         exp_den = exp_pos + torch.exp(2.0 - min_neg) + eps
