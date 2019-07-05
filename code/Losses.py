@@ -261,7 +261,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
             n_type = 0
             n_idx = 0
             if visualise_idx!=99999:
-                dist_row = inc_negs[visualise_idx].cpu().numpy().astype('float64')
+                dist_row = inc_negs[visualise_idx].cpu().detach().numpy().astype('float64')
                 if len(dist_row)<1:
                     print('no suitable negative found - selecting random')
                     n_idx = visualise_idx
