@@ -181,12 +181,11 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
     assert anchor.dim() == 2, "Inputd must be a 2D matrix."
     eps = 1e-8
     dist_matrix_p = distance_matrix_vector(anchor, positive) +eps
-    dist_matrix_a = distance_matrix_vector(anchor, anchor) +eps
+    # dist_matrix_a = distance_matrix_vector(anchor, anchor) +eps
     eye = torch.autograd.Variable(torch.eye(dist_matrix_p.size(1))).cuda()
 
     # steps to filter out same patches that occur in distance matrix as negatives
     pos1 = torch.diag(dist_matrix_p)
-    print(pos1.shape)
     dist_without_min_on_diag = dist_matrix_p+eye*2.0
     mask = (dist_without_min_on_diag.ge(0.008).float()-1.0)*(-1)
     mask = mask.type_as(dist_without_min_on_diag)*10
@@ -196,7 +195,6 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
         mn = pos1
         mn = mn.detach()
         cat_mins = torch.cat([mn.unsqueeze(-1)]*(len(anchor)),1)
-        print(cat_mins.shape)
 
         mask = torch.le(dist_without_min_on_diag,cat_mins).float()*10
         dist_without_min_on_diag = dist_without_min_on_diag + mask
@@ -205,7 +203,7 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
 
         if anchor_swap:
             mn = mn.view(1,len(mn))
-            cat_mins = torch.cat([mn.unsqueeze(-1)]*(len(anchor)),0)
+            cat_mins = torch.cat([mn]*(len(anchor)),0)
             print(cat_mins.shape)
             mask = torch.le(dist_without_min_on_diag,cat_mins).float()*10
             dist_without_min_on_diag = dist_without_min_on_diag + mask
