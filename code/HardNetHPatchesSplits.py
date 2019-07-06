@@ -1028,7 +1028,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
                 bins=int(30), color = 'darkred', 
                 hist_kws={'edgecolor':'black'},
                 kde_kws={'linewidth': 2})
-    plt.axvline(thresh,linewidth=1, color='k',linestyle='--')
+    # plt.axvline(thresh,linewidth=1, color='k',linestyle='--')
     savestr = 'testdistances_epoch' + str(epoch) + '.png'
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
@@ -1047,7 +1047,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         def pairwise_dstncs_2vec(ref_dsc,all_dsc):
             x_norm = (ref_dsc**2).sum(1).view(-1, 1)
             distances = []
-            splts = torch.chunk(all_dsc, 6)
+            splts = torch.chunk(all_dsc, 14)
             del all_dsc
             for s in splts:
                  # euclidean distance
@@ -1069,7 +1069,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     fig, ax = plt.subplots(figsize=(6,6))
     plt.plot(all_val_set_y,dist_m_all_val,'.',color=(0.0, 0.5, 0.0, 0.4))
     # plt.plot(average_scores,'o',label='mean distance for image')
-    plt.axhline(thresh,linewidth=1, color='k',linestyle='--',label='Threshold')
+    # plt.axhline(thresh,linewidth=1, color='k',linestyle='--',label='Threshold')
     plt.xlabel('Patch index')
     plt.ylabel('distance')
     plt.legend()
@@ -1081,7 +1081,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     fig, ax = plt.subplots(figsize=(6,6))
     plt.plot(all_val_set_images,dist_m_all_val,'.',color=(0.0, 0.5, 0.0, 0.4))
     # plt.plot(average_scores,'o',label='mean distance for image')
-    plt.axhline(thresh,linewidth=1, color='k', linestyle='--',label='Threshold')
+    # plt.axhline(thresh,linewidth=1, color='k', linestyle='--',label='Threshold')
     plt.xlabel('Image index')
     plt.ylabel('distance')
     plt.legend()
@@ -1301,7 +1301,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
     xt = torch.FloatTensor(np.array(xt)).unsqueeze(1)
  
     patch_fldr = '/content/hardnet/data/sets/turbid/validation_all'
-    inc_list = [0,1,2,3,4,5,6]
+    # inc_list = [0,1,2,3,4,5,6]
     xv, xv_ref, yv_p, yv_i = load_patchDataset_allval(patch_fldr,inc_list)
     xv = torch.FloatTensor(np.array(xv)).unsqueeze(1)
     xv_ref = torch.FloatTensor(np.array(xv_ref)).unsqueeze(1)
