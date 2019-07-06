@@ -66,7 +66,7 @@ class HPatches(data.Dataset):
         for directory in hpatches_sequences:
            if (directory in good_fnames):
             print(directory)
-            for type in types:
+            for type in typs:
                 sequence_path = os.path.join(data_dir, directory,type)+'.png'
                 image = cv2.imread(sequence_path, 0)
                 h, w = image.shape
