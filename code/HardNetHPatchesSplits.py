@@ -653,16 +653,17 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                 # # plot positives
                 tp = np.asarray(tp)
                 plt.figure(figsize=(8, 5))
-                sns.distplot(tp, hist=False, 
+                sns.distplot(tp, hist=False, label='Positives',
                             bins=int(30), color = 'green', 
                             hist_kws={'edgecolor':'black'},
                             kde_kws={'linewidth': 2})
                 # # plot negatives
                 tn = np.asarray(tn)
-                sns.distplot(tn, hist=False, kde=True, 
+                sns.distplot(tn, hist=False, kde=True, label='Negatives',
                             bins=int(30), color = 'darkred', 
                             hist_kws={'edgecolor':'black'},
                             kde_kws={'linewidth': 2})
+                plt.legend()
                 savestr = 'traindistances_epoch' + str(epoch) + '_batch50.png'
                 plt.savefig(savestr, bbox_inches='tight')
                 plt.close()
@@ -720,6 +721,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                             bins=int(30), color = 'darkred', 
                             hist_kws={'edgecolor':'black'},
                             kde_kws={'linewidth': 2})
+                plt.legend()
                 savestr = 'traindistances_epoch' + str(epoch) + '_batch100.png'
                 plt.savefig(savestr, bbox_inches='tight')
                 plt.close()
@@ -1019,12 +1021,12 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
 
     plt.figure(figsize=(8, 5))
     sns.distplot(tp, hist=False, 
-                bins=int(30), color = 'green', 
+                bins=int(30), color = 'green', label='Positives',
                 hist_kws={'edgecolor':'black'},
                 kde_kws={'linewidth': 2})
     # # true positives
     tn = np.asarray(tn)
-    sns.distplot(tn, hist=False, kde=True, 
+    sns.distplot(tn, hist=False, kde=True, label='Negatives', 
                 bins=int(30), color = 'darkred', 
                 hist_kws={'edgecolor':'black'},
                 kde_kws={'linewidth': 2})
