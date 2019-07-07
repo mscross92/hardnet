@@ -1325,6 +1325,10 @@ def main(train_loader, test_loader, model, logger, file_logger):
     end = start + args.epochs
     for epoch in range(start, end):
 
+        if epoch==25:
+            args.batch_reduce = 'min'
+            print("swapping to hard negative mining",args.batch_reduce)
+            
         model.eval()
         
         if  args.batch_hard==0:
