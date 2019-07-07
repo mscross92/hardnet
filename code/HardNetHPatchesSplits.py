@@ -109,7 +109,7 @@ parser.add_argument('--epochs', type=int, default=10, metavar='E',
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--anchorswap', type=bool, default=True,
                     help='turns on anchor swap')
-parser.add_argument('--batch-size', type=int, default=1024, metavar='BS',
+parser.add_argument('--batch-size', type=int, default=2048, metavar='BS',
                     help='input batch size for training (default: 1024)')
 parser.add_argument('--test-batch-size', type=int, default=256, metavar='BST',
                     help='input batch size for testing (default: 1024)')
@@ -564,7 +564,7 @@ def create_loaders(load_random_triplets=False):
                          batch_size=256,
                          datasets_path=args.hpatches_split+"hpatches_split_a_test.pt",
                          fliprot=args.fliprot,
-                         n_triplets=4680,
+                         n_triplets=2135,
                          batch_hard=0,
                          name="turbid_deepblue",
                          download=True,
