@@ -109,7 +109,7 @@ parser.add_argument('--epochs', type=int, default=10, metavar='E',
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--anchorswap', type=bool, default=True,
                     help='turns on anchor swap')
-parser.add_argument('--batch-size', type=int, default=256, metavar='BS',
+parser.add_argument('--batch-size', type=int, default=512, metavar='BS',
                     help='input batch size for training (default: 1024)')
 parser.add_argument('--test-batch-size', type=int, default=256, metavar='BST',
                     help='input batch size for testing (default: 1024)')
@@ -1328,7 +1328,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
         if epoch==25:
             args.batch_reduce = 'min'
             print("swapping to hard negative mining",args.batch_reduce)
-            
+
         model.eval()
         
         if  args.batch_hard==0:
