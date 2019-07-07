@@ -109,7 +109,7 @@ parser.add_argument('--epochs', type=int, default=10, metavar='E',
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--anchorswap', type=bool, default=True,
                     help='turns on anchor swap')
-parser.add_argument('--batch-size', type=int, default=256, metavar='BS',
+parser.add_argument('--batch-size', type=int, default=128, metavar='BS',
                     help='input batch size for training (default: 1024)')
 parser.add_argument('--test-batch-size', type=int, default=256, metavar='BST',
                     help='input batch size for testing (default: 1024)')
@@ -1423,6 +1423,10 @@ def main(train_loader, test_loader, model, logger, file_logger):
     savestr = 'losses_plot.png'
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
+
+    # save fpr data to file
+    savestr = 'fpr95_test_data.txt'
+    np.savetxt(savestr, test_fpr95_arr, delimiter=',') 
 
 if __name__ == '__main__':
     LOG_DIR = args.log_dir
