@@ -202,13 +202,21 @@ def loss_semi_hard(anchor, positive, visualise_idx, anchor_swap = False, anchor_
         neg_ids = torch.min(dist_without_min_on_diag,1)[1]
 
         if anchor_swap:
-            mn = mn.view(1,len(mn))
-            cat_mins = torch.cat([mn]*(len(anchor)),0)
-            mask = torch.le(dist_without_min_on_diag,cat_mins).float()*10
-            dist_without_min_on_diag = dist_without_min_on_diag + mask
+            # mn = mn.view(1,len(mn))
+            # cat_mins = torch.cat([mn]*(len(anchor)),0)
+            # mask = torch.le(dist_without_min_on_diag,cat_mins).float()*10
+            # dist_without_min_on_diag = dist_without_min_on_diag + mask
+            dist_matrix_a = distance_matrix_vector(anchor, anchor) +eps
+            dist_without_min_on_diag_a = dist_matrix_a+eye*2.0
+            mask = (dist_without_min_on_diag_a.ge(0.008).float()-1.0)*(-1)
+            mask = mask.type_as(dist_without_min_on_diag_a)*10
+            dist_without_min_on_diag_a = dist_without_min_on_diag_a+mask
             
-            min_neg2 = torch.min(dist_without_min_on_diag,0)[0]
-            neg2_ids = torch.min(dist_without_min_on_diag,0)[1]
+            mask = torch.le(dist_without_min_on_diag_a,cat_mins).float()*10
+            dist_without_min_on_diag_a = dist_without_min_on_diag_a + mask
+
+            min_neg2 = torch.min(dist_without_min_on_diag_a,0)[0]
+            neg2_ids = torch.min(dist_without_min_on_diag_a,0)[1]
             min_neg = torch.min(min_neg,min_neg2)
             
             n_type = 0
