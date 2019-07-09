@@ -405,11 +405,12 @@ class TotalDatasetsLoader(data.Dataset):
             a, p, n = self.data[t[0]].float(), self.data[t[1]].float(), self.data[t[2]].float()
             
             # subtract mean
+            print(torch.min(a),torch.mean(a))
+
             a = a - torch.mean(a)
             p = p - torch.mean(p)
             n = n - torch.mean(n)
 
-            print(torch.min(a)[0],torch.mean(a))
 
             img_a = transform_img(a)
             img_p = transform_img(p)
