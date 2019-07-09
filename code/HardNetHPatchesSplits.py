@@ -402,8 +402,8 @@ class TotalDatasetsLoader(data.Dataset):
                 return img
 
             t = self.triplets[index]
-            a, p, n = self.data[t[0]], self.data[t[1]], self.data[t[2]]
-            # a, p, n = self.data[t[0]].float(), self.data[t[1]].float(), self.data[t[2]].float()
+            # a, p, n = self.data[t[0]], self.data[t[1]], self.data[t[2]]
+            a, p, n = self.data[t[0]].float(), self.data[t[1]].float(), self.data[t[2]].float()
             
             # normalise range [0,1]
             a = a / 255
