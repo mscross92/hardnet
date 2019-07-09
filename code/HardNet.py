@@ -149,7 +149,8 @@ if args.anchorave:
 if args.fliprot:
         suffix = suffix + '_fliprot'
 
-triplet_flag = (args.batch_reduce == 'random_global') or args.gor
+# triplet_flag = (args.batch_reduce == 'random_global') or args.gor
+triplet_flag = True
 
 dataset_names = ['liberty', 'notredame', 'yosemite']
 
