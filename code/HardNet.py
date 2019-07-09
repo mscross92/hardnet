@@ -86,7 +86,7 @@ parser.add_argument('--decor',type=str2bool, default = False,
                     help='L2Net decorrelation penalty')
 parser.add_argument('--anchorave', type=str2bool, default=False,
                     help='anchorave')
-parser.add_argument('--imageSize', type=int, default=29,
+parser.add_argument('--imageSize', type=int, default=32,
                     help='the height / width of the input image to network')
 parser.add_argument('--mean-image', type=float, default=0.443728476019,
                     help='mean of train dataset for normalization')
@@ -151,14 +151,14 @@ if args.fliprot:
 
 triplet_flag = (args.batch_reduce == 'random_global') or args.gor
 
-dataset_names = ['turbid_milk', 'turbid_deepblue']
+dataset_names = ['liberty', 'notredame', 'yosemite']
 
 TEST_ON_W1BS = False
 # check if path to w1bs dataset testing module exists
-# if os.path.isdir(args.w1bsroot):
-#     sys.path.insert(0, args.w1bsroot)
-#     import utils.w1bs as w1bs
-#     TEST_ON_W1BS = True
+if os.path.isdir(args.w1bsroot):
+    sys.path.insert(0, args.w1bsroot)
+    import utils.w1bs as w1bs
+    TEST_ON_W1BS = True
 
 # set the device to use by setting CUDA_VISIBLE_DEVICES env variable in
 # order to prevent any memory allocation on unused GPUs
@@ -341,18 +341,18 @@ def create_loaders(load_random_triplets = False):
 
     kwargs = {'num_workers': args.num_workers, 'pin_memory': args.pin_memory} if args.cuda else {}
 
-    np_reshape64 = lambda x: np.reshape(x, (29, 29, 1))
+    np_reshape64 = lambda x: np.reshape(x, (64, 64, 1))
     transform_test = transforms.Compose([
             transforms.Lambda(np_reshape64),
             transforms.ToPILImage(),
-            # transforms.Resize(32),
+            transforms.Resize(32),
             transforms.ToTensor()])
     transform_train = transforms.Compose([
             transforms.Lambda(np_reshape64),
             transforms.ToPILImage(),
             transforms.RandomRotation(5,PIL.Image.BILINEAR),
-            # transforms.RandomResizedCrop(32, scale = (0.9,1.0),ratio = (0.9,1.1)),
-            # transforms.Resize(32),
+            transforms.RandomResizedCrop(32, scale = (0.9,1.0),ratio = (0.9,1.1)),
+            transforms.Resize(32),
             transforms.ToTensor()])
     transform = transforms.Compose([
             transforms.Lambda(cv2_scale),
@@ -438,10 +438,10 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets  = False)
                 'Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     epoch, batch_idx * len(data_a), len(train_loader.dataset),
                            100. * batch_idx / len(train_loader),
-                    loss.data[0]))
+                    loss.item()))
 
     if (args.enable_logging):
-        logger.log_value('loss', loss.data[0]).step()
+        logger.log_value('loss', loss.item()).step()
 
     try:
         os.stat('{}{}'.format(args.model_dir,suffix))
