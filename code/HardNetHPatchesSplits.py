@@ -493,7 +493,7 @@ class HardNet(nn.Module):
         sp = torch.std(flat, dim=1) + 1e-7
         # return (x - mp.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1).expand_as(x)) / sp.unsqueeze(-1).unsqueeze(
         #     -1).unsqueeze(1).expand_as(x)
-        return(flat)
+        return(flat.unsqueeze(-1).unsqueeze(-1))
 
     def forward(self, input):
         x_features = self.features(self.input_norm(input))
