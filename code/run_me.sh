@@ -8,16 +8,16 @@ mkdir -p "$DATASETS"
 mkdir -p "$DATALOGS"
 
 
-( # Download and prepare data
-    cd "$DATASETS"
-    if [ ! -d "wxbs-descriptors-benchmark/data/W1BS" ]; then
-        git clone https://github.com/ducha-aiki/wxbs-descriptors-benchmark.git
-        chmod +x wxbs-descriptors-benchmark/data/download_W1BS_dataset.sh
-        ./wxbs-descriptors-benchmark/data/download_W1BS_dataset.sh
-        mv W1BS wxbs-descriptors-benchmark/data/
-        rm -f W1BS*.tar.gz
-    fi
-)
+# ( # Download and prepare data
+#     cd "$DATASETS"
+#     if [ ! -d "wxbs-descriptors-benchmark/data/W1BS" ]; then
+#         git clone https://github.com/ducha-aiki/wxbs-descriptors-benchmark.git
+#         chmod +x wxbs-descriptors-benchmark/data/download_W1BS_dataset.sh
+#         ./wxbs-descriptors-benchmark/data/download_W1BS_dataset.sh
+#         mv W1BS wxbs-descriptors-benchmark/data/
+#         rm -f W1BS*.tar.gz
+#     fi
+# )
 
 ( # Run the code
     cd "$RUNPATH"
