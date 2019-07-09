@@ -405,9 +405,9 @@ class TotalDatasetsLoader(data.Dataset):
             a, p, n = self.data[t[0]], self.data[t[1]], self.data[t[2]]
             
             # subtract mean
-            a = a - np.mean(a)
-            p = p - np.mean(p)
-            n = n - np.mean(n)
+            a = a - torch.mean(a)
+            p = p - torch.mean(p)
+            n = n - torch.mean(n)
 
             img_a = transform_img(a)
             img_p = transform_img(p)
