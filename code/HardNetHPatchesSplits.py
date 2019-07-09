@@ -491,10 +491,9 @@ class HardNet(nn.Module):
         flat = x.view(x.size(0), -1)
         mp = torch.mean(flat, dim=1)
         sp = torch.std(flat, dim=1) + 1e-7
-        print((x - mp.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1).expand_as(x)) / sp.unsqueeze(-1).unsqueeze(
-            -1).unsqueeze(1).expand_as(x).shape)
-        return (x - mp.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1).expand_as(x)) / sp.unsqueeze(-1).unsqueeze(
-            -1).unsqueeze(1).expand_as(x)
+        # return (x - mp.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1).expand_as(x)) / sp.unsqueeze(-1).unsqueeze(
+        #     -1).unsqueeze(1).expand_as(x)
+        return(flat)
 
     def forward(self, input):
         x_features = self.features(self.input_norm(input))
