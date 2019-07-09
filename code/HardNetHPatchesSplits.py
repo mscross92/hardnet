@@ -404,6 +404,7 @@ class TotalDatasetsLoader(data.Dataset):
             t = self.triplets[index]
             a, p, n = self.data[t[0]], self.data[t[1]], self.data[t[2]]
             
+            print(a.shape)
             img_a = transform_img(a)
             img_p = transform_img(p)
             img_n = transform_img(n)
@@ -528,8 +529,8 @@ def create_loaders(load_random_triplets=False):
             transforms.Lambda(np_reshape29),
             transforms.ToPILImage(),
             # transforms.RandomRotation(15,PIL.Image.BILINEAR),
-            transforms.RandomHorizontalFlip(p=0.5),
-            transforms.ColorJitter(brightness=0.1, contrast=0, saturation=0, hue=0),
+            # transforms.RandomHorizontalFlip(p=0.5),
+            # transforms.ColorJitter(brightness=0.1, contrast=0, saturation=0, hue=0),
             transforms.Resize(29),
             transforms.ToTensor()])
     if not args.augmentation:
@@ -1304,8 +1305,8 @@ def main(train_loader, test_loader, model, logger, file_logger):
         transforms.Lambda(np_reshape29),
         transforms.ToPILImage(),
         # transforms.RandomRotation(15,PIL.Image.BILINEAR),
-        transforms.RandomHorizontalFlip(p=0.5),
-        transforms.ColorJitter(brightness=0.1, contrast=0, saturation=0, hue=0),
+        # transforms.RandomHorizontalFlip(p=0.5),
+        # transforms.ColorJitter(brightness=0.1, contrast=0, saturation=0, hue=0),
         transforms.Resize(29),
         transforms.ToTensor()])
 
