@@ -1187,7 +1187,7 @@ def adjust_learning_rate(optimizer):
         group['lr'] = args.lr * (
             1.0 - float(group['step']) * float(args.batch_size) / (args.n_triplets * float(args.epochs)))
         
-        print(1.0 - float(group['step']) * float(args.batch_size) / (args.n_triplets * float(args.epochs))))
+        print(args.lr * (1.0 - float(group['step']) * float(args.batch_size) / (args.n_triplets * float(args.epochs))))
     return
 
 
