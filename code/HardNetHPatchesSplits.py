@@ -409,9 +409,9 @@ class TotalDatasetsLoader(data.Dataset):
             img_n = transform_img(n)
 
             # subtract mean
-            img_a = img_a - torch.mean(img_a,axis=(1,2),keepdim=True)
-            img_p = img_p - torch.mean(img_p,axis=(1,2),keepdim=True)
-            img_n = img_n - torch.mean(img_n,axis=(1,2),keepdim=True)
+            img_a = img_a - torch.mean(img_a,dim=(1,2),keepdim=True)
+            img_p = img_p - torch.mean(img_p,dim=(1,2),keepdim=True)
+            img_n = img_n - torch.mean(img_n,dim=(1,2),keepdim=True)
 
             # transform images if required
             if self.fliprot:
