@@ -402,12 +402,12 @@ class TotalDatasetsLoader(data.Dataset):
                 return img
 
             t = self.triplets[index]
-            a, p, n = self.data[t[0]], self.data[t[1]], self.data[t[2]]
+            a, p, n = self.data[t[0]].float(), self.data[t[1]].float(), self.data[t[2]].float()
             
             # subtract mean
-            a = a - torch.mean(a.float()).byte()
-            p = p - torch.mean(p.float()).byte()
-            n = n - torch.mean(n.float()).byte()
+            a = a - torch.mean(a)
+            p = p - torch.mean(p)
+            n = n - torch.mean(n)
 
             img_a = transform_img(a)
             img_p = transform_img(p)
