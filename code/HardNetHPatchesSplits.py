@@ -416,7 +416,7 @@ class TotalDatasetsLoader(data.Dataset):
             img_p = transform_img(p)
             img_n = transform_img(n)
 
-            print(torch.min(a),'\n')
+            print(torch.min(a),torch.min(img_a),'\n')
             # subtract mean
             # img_a = img_a - torch.mean(img_a,dim=(1,2),keepdim=True)
             # img_p = img_p - torch.mean(img_p,dim=(1,2),keepdim=True)
