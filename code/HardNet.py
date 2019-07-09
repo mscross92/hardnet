@@ -489,25 +489,25 @@ def test(test_loader, model, epoch, logger, logger_test_name):
             pbar.set_description(logger_test_name+' Test Epoch: {} [{}/{} ({:.0f}%)]'.format(
                 epoch, batch_idx * len(data_a), len(test_loader.dataset),
                        100. * batch_idx / len(test_loader)))
-            
-            # plot distribution
-            distances = np.asarray(distances)
-            distances_n = np.asarray(distances_n)
-            plt.figure(figsize=(8, 5))
-            sns.distplot(distances, hist=True, 
-                        bins=int(30), color = 'green', label='Positives',
-                        hist_kws={'edgecolor':'black'},
-                        kde_kws={'linewidth': 2})
-            # # true positives
-            tn = np.asarray(tn)
-            sns.distplot(distances_n, hist=True, kde=True, label='Negatives', 
-                        bins=int(30), color = 'darkred', 
-                        hist_kws={'edgecolor':'black'},
-                        kde_kws={'linewidth': 2})
-            # plt.axvline(thresh,linewidth=1, color='k',linestyle='--')
-            savestr = 'testdistances_epoch' + str(epoch) + '.png'
-            plt.savefig(savestr, bbox_inches='tight')
-            plt.close()
+
+    # plot distribution
+    distances = np.asarray(distances)
+    distances_n = np.asarray(distances_n)
+    plt.figure(figsize=(8, 5))
+    sns.distplot(distances, hist=True, 
+                bins=int(30), color = 'green', label='Positives',
+                hist_kws={'edgecolor':'black'},
+                kde_kws={'linewidth': 2})
+    # # true positives
+    tn = np.asarray(tn)
+    sns.distplot(distances_n, hist=True, kde=True, label='Negatives', 
+                bins=int(30), color = 'darkred', 
+                hist_kws={'edgecolor':'black'},
+                kde_kws={'linewidth': 2})
+    # plt.axvline(thresh,linewidth=1, color='k',linestyle='--')
+    savestr = 'testdistances_epoch' + str(epoch) + '.png'
+    plt.savefig(savestr, bbox_inches='tight')
+    plt.close()
 
 
     fpr95 = ErrorRateAt95Recall(labels, 1.0 / (distances + 1e-8))
