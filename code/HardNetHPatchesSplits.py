@@ -409,10 +409,11 @@ class TotalDatasetsLoader(data.Dataset):
             img_n = transform_img(n)
 
             # subtract mean
-            img_a = img_a - torch.mean(img_a,keepdim=True)
+            img_a = img_a - torch.mean(img_a)
             print(img_a.shape)
-            img_p = img_p - torch.mean(img_p,keepdim=True)
-            img_n = img_n - torch.mean(img_n,keepdim=True)
+            print(torch.mean(img_a))
+            img_p = img_p - torch.mean(img_p)
+            img_n = img_n - torch.mean(img_n)
 
             # transform images if required
             if self.fliprot:
