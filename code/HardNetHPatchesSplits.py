@@ -403,10 +403,16 @@ class TotalDatasetsLoader(data.Dataset):
 
             t = self.triplets[index]
             a, p, n = self.data[t[0]], self.data[t[1]], self.data[t[2]]
-
+            
             img_a = transform_img(a)
             img_p = transform_img(p)
             img_n = transform_img(n)
+
+            # subtract mean
+            img_a = img_a - torch.mean(img_a,keepdim=True)
+            print(img_a.shape)
+            img_p = img_p - torch.mean(img_p,keepdim=True)
+            img_n = img_n - torch.mean(img_n,keepdim=True)
 
             # transform images if required
             if self.fliprot:
