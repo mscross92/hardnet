@@ -41,6 +41,9 @@ from Utils import str2bool
 import torch.nn as nn
 import torch.nn.functional as F
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 class CorrelationPenaltyLoss(nn.Module):
     def __init__(self):
         super(CorrelationPenaltyLoss, self).__init__()
@@ -456,35 +459,60 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     # switch to evaluate mode
     model.eval()
 
-    labels, distances = [], []
+    labels, distances, distances_n = [], []
 
     pbar = tqdm(enumerate(test_loader))
-    for batch_idx, (data_a, data_p, label) in pbar:
+    for batch_idx, (data_a, data_p, data_n, label) in pbar:
 
         if args.cuda:
-            data_a, data_p = data_a.cuda(), data_p.cuda()
+            data_a, data_p, data_n = data_a.cuda(), data_p.cuda(), data_n.cuda()
 
-        data_a, data_p, label = Variable(data_a, volatile=True), \
-                                Variable(data_p, volatile=True), Variable(label)
+        data_a, data_p, data_n, label = Variable(data_a, volatile=True), \
+                                Variable(data_p, volatile=True), Variable(data_n, volatile=True), Variable(label)
         out_a = model(data_a)
         out_p = model(data_p)
+        out_n = model(data_n)
         dists = torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
         distances.append(dists.data.cpu().numpy().reshape(-1,1))
         ll = label.data.cpu().numpy().reshape(-1, 1)
         labels.append(ll)
 
+        dists_n = torch.sqrt(torch.sum((out_a - out_n) ** 2, 1))  # euclidean distance
+        distances_n.append(dists_n.data.cpu().numpy().reshape(-1,1))
+
+        num_tests = test_loader.dataset.matches.size(0)
+        labels = np.vstack(labels).reshape(num_tests)
+        distances = np.vstack(distances).reshape(num_tests)
+        distances_n = np.vstack(distances_n).reshape(num_tests)
+
         if batch_idx % args.log_interval == 0:
             pbar.set_description(logger_test_name+' Test Epoch: {} [{}/{} ({:.0f}%)]'.format(
                 epoch, batch_idx * len(data_a), len(test_loader.dataset),
                        100. * batch_idx / len(test_loader)))
+            
+            # plot distribution
+            distances = np.asarray(distances)
+            distances_n = np.asarray(distances_n)
+            plt.figure(figsize=(8, 5))
+            sns.distplot(distances, hist=True, 
+                        bins=int(30), color = 'green', label='Positives',
+                        hist_kws={'edgecolor':'black'},
+                        kde_kws={'linewidth': 2})
+            # # true positives
+            tn = np.asarray(tn)
+            sns.distplot(distances_n, hist=True, kde=True, label='Negatives', 
+                        bins=int(30), color = 'darkred', 
+                        hist_kws={'edgecolor':'black'},
+                        kde_kws={'linewidth': 2})
+            # plt.axvline(thresh,linewidth=1, color='k',linestyle='--')
+            savestr = 'testdistances_epoch' + str(epoch) + '.png'
+            plt.savefig(savestr, bbox_inches='tight')
+            plt.close()
 
-    num_tests = test_loader.dataset.matches.size(0)
-    labels = np.vstack(labels).reshape(num_tests)
-    distances = np.vstack(distances).reshape(num_tests)
 
     fpr95 = ErrorRateAt95Recall(labels, 1.0 / (distances + 1e-8))
     print('\33[91mTest set: Accuracy(FPR95): {:.8f}\n\33[0m'.format(fpr95))
-
+    
     if (args.enable_logging):
         logger.log_value(logger_test_name+' fpr95', fpr95)
     return
