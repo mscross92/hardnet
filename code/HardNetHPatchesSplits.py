@@ -410,8 +410,6 @@ class TotalDatasetsLoader(data.Dataset):
 
             # subtract mean
             img_a = img_a - torch.mean(img_a)
-            print(img_a.shape)
-            print(torch.mean(img_a))
             img_p = img_p - torch.mean(img_p)
             img_n = img_n - torch.mean(img_n)
 
