@@ -559,7 +559,7 @@ def main(train_loader, test_loaders, model, logger, file_logger):
     # optionally resume from a checkpoint
     checkpoint = torch.load('/content/hardnet/pretrained/train_liberty/checkpoint_liberty_no_aug.pth')
     args.start_epoch = checkpoint['epoch']
-    checkpoint = torch.load(args.resume)
+    checkpoint = torch.load('/content/hardnet/pretrained/train_liberty/checkpoint_liberty_no_aug.pth')
     model.load_state_dict(checkpoint['state_dict'])
 
     if args.resume:
