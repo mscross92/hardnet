@@ -200,9 +200,9 @@ class TripletPhotoTour(dset.PhotoTour):
         self.n_triplets = args.n_triplets
         self.batch_size = batch_size
 
-        if self.train:
-            print('Generating {} triplets'.format(self.n_triplets))
-            self.triplets = self.generate_triplets(self.labels, self.n_triplets)
+        # if self.train:
+        print('Generating {} triplets'.format(self.n_triplets))
+        self.triplets = self.generate_triplets(self.labels, self.n_triplets)
 
     @staticmethod
     def generate_triplets(labels, num_triplets):
@@ -252,7 +252,8 @@ class TripletPhotoTour(dset.PhotoTour):
         #     m = self.matches[index]
         #     img1 = transform_img(self.data[m[0]])
         #     img2 = transform_img(self.data[m[1]])
-        #     return img1, img2, m[2]
+        #     img3 = transform_img(self.data[m[2]])
+        #     return img1, img2, img3
 
         t = self.triplets[index]
         a, p, n = self.data[t[0]], self.data[t[1]], self.data[t[2]]
