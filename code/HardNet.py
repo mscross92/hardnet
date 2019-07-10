@@ -107,7 +107,7 @@ parser.add_argument('--batch-size', type=int, default=1024, metavar='BS',
                     help='input batch size for training (default: 1024)')
 parser.add_argument('--test-batch-size', type=int, default=1024, metavar='BST',
                     help='input batch size for testing (default: 1024)')
-parser.add_argument('--n-triplets', type=int, default=1024, metavar='N',
+parser.add_argument('--n-triplets', type=int, default=2048, metavar='N',
                     help='how many triplets will generate from the dataset')
 parser.add_argument('--margin', type=float, default=1.0, metavar='MARGIN',
                     help='the margin value for the triplet loss function (default: 1.0')
@@ -487,7 +487,7 @@ def test(test_loader, model, epoch, logger, logger_test_name):
         # labels.extend(np.zeros(len(d_n)))
         tn.extend(d_n.data.cpu().numpy()) 
 
-        num_tests = 1024
+        num_tests = 2048
         # num_tests = test_loader.dataset.matches.size(0)
         # labels = np.vstack(labels).reshape(num_tests)
         distances = np.vstack(distances).reshape(num_tests)
