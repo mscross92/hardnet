@@ -107,7 +107,7 @@ parser.add_argument('--batch-size', type=int, default=1024, metavar='BS',
                     help='input batch size for training (default: 1024)')
 parser.add_argument('--test-batch-size', type=int, default=1024, metavar='BST',
                     help='input batch size for testing (default: 1024)')
-parser.add_argument('--n-triplets', type=int, default=2048, metavar='N',
+parser.add_argument('--n-triplets', type=int, default=5000000, metavar='N',
                     help='how many triplets will generate from the dataset')
 parser.add_argument('--margin', type=float, default=1.0, metavar='MARGIN',
                     help='the margin value for the triplet loss function (default: 1.0')
@@ -195,14 +195,14 @@ class TripletPhotoTour(dset.PhotoTour):
     def __init__(self, train=True, transform=None, batch_size = None,load_random_triplets = False,  *arg, **kw):
         super(TripletPhotoTour, self).__init__(*arg, **kw)
         self.transform = transform
-        self.out_triplets = True
+        self.out_triplets = load_random_triplets
         self.train = train
         self.n_triplets = args.n_triplets
         self.batch_size = batch_size
 
-        # if self.train:
-        print('Generating {} triplets'.format(self.n_triplets))
-        self.triplets = self.generate_triplets(self.labels, self.n_triplets)
+        if self.train:
+            print('Generating {} triplets'.format(self.n_triplets))
+            self.triplets = self.generate_triplets(self.labels, self.n_triplets)
 
     @staticmethod
     def generate_triplets(labels, num_triplets):
@@ -248,12 +248,11 @@ class TripletPhotoTour(dset.PhotoTour):
                 img = self.transform(img.numpy())
             return img
 
-        # if not self.train:
-        #     m = self.matches[index]
-        #     img1 = transform_img(self.data[m[0]])
-        #     img2 = transform_img(self.data[m[1]])
-        #     img3 = transform_img(self.data[m[2]])
-        #     return img1, img2, img3
+        if not self.train:
+            m = self.matches[index]
+            img1 = transform_img(self.data[m[0]])
+            img2 = transform_img(self.data[m[1]])
+            return img1, img2, m[2]
 
         t = self.triplets[index]
         a, p, n = self.data[t[0]], self.data[t[1]], self.data[t[2]]
@@ -463,33 +462,32 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     labels, distances, tp, tn = [], [], [], []
 
     pbar = tqdm(enumerate(test_loader))
-    for batch_idx, (data_a, data_p, data_n) in pbar:
+    for batch_idx, (data_a, data_p, labels) in pbar:
 
         if args.cuda:
-            data_a, data_p, data_n = data_a.cuda(), data_p.cuda(), data_n.cuda()
+            data_a, data_p, labels = data_a.cuda(), data_p.cuda(), labels.cuda()
 
-        data_a, data_p, data_n = Variable(data_a, volatile=True), \
-                                Variable(data_p, volatile=True), Variable(data_n, volatile=True)
+        data_a, data_p, labels = Variable(data_a, volatile=True), \
+                                Variable(data_p, volatile=True), Variable(labels)
         out_a = model(data_a)
         out_p = model(data_p)
-        out_n = model(data_n)
+        # out_n = model(data_n)
         dists = torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
         distances.append(dists.data.cpu().numpy().reshape(-1,1))
-        # ll = label.data.cpu().numpy().reshape(-1, 1)
-        # labels.append(ll)
+        ll = label.data.cpu().numpy().reshape(-1, 1)
+        labels.append(ll)
         d_p = torch.diag(dists) # 1D tensor of distances for positive samples
         labels.extend(np.ones(len(d_p)))
-        tp.extend(d_p.data.cpu().numpy())
+        # tp.extend(d_p.data.cpu().numpy())
         
-        dists_n = torch.sqrt(torch.sum((out_a - out_n) ** 2, 1))  # euclidean distance
-        d_n = torch.diag(dists_n) # 1D tensor of distances for positive samples
+        # dists_n = torch.sqrt(torch.sum((out_a - out_n) ** 2, 1))  # euclidean distance
+        # d_n = torch.diag(dists_n) # 1D tensor of distances for positive samples
         # distances.extend(d_n.data.cpu().numpy())        
         # labels.extend(np.zeros(len(d_n)))
-        tn.extend(d_n.data.cpu().numpy()) 
+        # tn.extend(d_n.data.cpu().numpy()) 
 
-        num_tests = 2048
-        # num_tests = test_loader.dataset.matches.size(0)
-        # labels = np.vstack(labels).reshape(num_tests)
+        num_tests = test_loader.dataset.matches.size(0)
+        labels = np.vstack(labels).reshape(num_tests)
         distances = np.vstack(distances).reshape(num_tests)
         # distances_n = np.vstack(distances_n).reshape(num_tests)
 
@@ -498,24 +496,24 @@ def test(test_loader, model, epoch, logger, logger_test_name):
                 epoch, batch_idx * len(data_a), len(test_loader.dataset),
                        100. * batch_idx / len(test_loader)))
 
-    # plot distribution
-    tp = np.asarray(tp)
-    tn = np.asarray(tn)
-    plt.figure(figsize=(8, 5))
-    sns.distplot(tp, hist=True, 
-                bins=int(30), color = 'green', label='Positives',
-                hist_kws={'edgecolor':'black'},
-                kde_kws={'linewidth': 2})
-    # # true positives
-    tn = np.asarray(tn)
-    sns.distplot(tn, hist=True, kde=True, label='Negatives', 
-                bins=int(30), color = 'darkred', 
-                hist_kws={'edgecolor':'black'},
-                kde_kws={'linewidth': 2})
-    # plt.axvline(thresh,linewidth=1, color='k',linestyle='--')
-    savestr = 'testdistances_epoch' + str(epoch) + '.png'
-    plt.savefig(savestr, bbox_inches='tight')
-    plt.close()
+    # # plot distribution
+    # tp = np.asarray(tp)
+    # tn = np.asarray(tn)
+    # plt.figure(figsize=(8, 5))
+    # sns.distplot(tp, hist=True, 
+    #             bins=int(30), color = 'green', label='Positives',
+    #             hist_kws={'edgecolor':'black'},
+    #             kde_kws={'linewidth': 2})
+    # # # true positives
+    # tn = np.asarray(tn)
+    # sns.distplot(tn, hist=True, kde=True, label='Negatives', 
+    #             bins=int(30), color = 'darkred', 
+    #             hist_kws={'edgecolor':'black'},
+    #             kde_kws={'linewidth': 2})
+    # # plt.axvline(thresh,linewidth=1, color='k',linestyle='--')
+    # savestr = 'testdistances_epoch' + str(epoch) + '.png'
+    # plt.savefig(savestr, bbox_inches='tight')
+    # plt.close()
 
 
     fpr95 = ErrorRateAt95Recall(labels, 1.0 / (distances + 1e-8))
