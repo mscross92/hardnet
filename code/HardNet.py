@@ -467,8 +467,8 @@ def test(test_loader, model, epoch, logger, logger_test_name):
         if args.cuda:
             data_a, data_p, data_n = data_a.cuda(), data_p.cuda(), data_n.cuda()
 
-        data_a, data_p, data_n, label = Variable(data_a, volatile=True), \
-                                Variable(data_p, volatile=True), Variable(data_n, volatile=True), Variable(label)
+        data_a, data_p, data_n = Variable(data_a, volatile=True), \
+                                Variable(data_p, volatile=True), Variable(data_n, volatile=True)
         out_a = model(data_a)
         out_p = model(data_p)
         out_n = model(data_n)
