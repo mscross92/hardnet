@@ -459,10 +459,10 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     # switch to evaluate mode
     model.eval()
 
-    labels, distances, distances_n = [], [], []
+    labels, distances, tp, tn = [], [], [], []
 
     pbar = tqdm(enumerate(test_loader))
-    for batch_idx, (data_a, data_p, data_n, label) in pbar:
+    for batch_idx, (data_a, data_p, data_n) in pbar:
 
         if args.cuda:
             data_a, data_p, data_n = data_a.cuda(), data_p.cuda(), data_n.cuda()
@@ -474,14 +474,20 @@ def test(test_loader, model, epoch, logger, logger_test_name):
         out_n = model(data_n)
         dists = torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
         distances.append(dists.data.cpu().numpy().reshape(-1,1))
-        ll = label.data.cpu().numpy().reshape(-1, 1)
-        labels.append(ll)
-
+        # ll = label.data.cpu().numpy().reshape(-1, 1)
+        # labels.append(ll)
+        d_p = torch.diag(dists) # 1D tensor of distances for positive samples
+        labels.extend(np.ones(len(d_p)))
+        tp.extend(d_p.data.cpu().numpy())
+        
         dists_n = torch.sqrt(torch.sum((out_a - out_n) ** 2, 1))  # euclidean distance
-        distances_n.append(dists_n.data.cpu().numpy().reshape(-1,1))
+        d_n = torch.diag(dists_n) # 1D tensor of distances for positive samples
+        # distances.extend(d_n.data.cpu().numpy())        
+        # labels.extend(np.zeros(len(d_n)))
+        tn.extend(d_n.data.cpu().numpy()) 
 
         num_tests = test_loader.dataset.matches.size(0)
-        labels = np.vstack(labels).reshape(num_tests)
+        # labels = np.vstack(labels).reshape(num_tests)
         distances = np.vstack(distances).reshape(num_tests)
         distances_n = np.vstack(distances_n).reshape(num_tests)
 
@@ -491,16 +497,16 @@ def test(test_loader, model, epoch, logger, logger_test_name):
                        100. * batch_idx / len(test_loader)))
 
     # plot distribution
-    distances = np.asarray(distances)
-    distances_n = np.asarray(distances_n)
+    tp = np.asarray(tp)
+    tn = np.asarray(tn)
     plt.figure(figsize=(8, 5))
-    sns.distplot(distances, hist=True, 
+    sns.distplot(tp, hist=True, 
                 bins=int(30), color = 'green', label='Positives',
                 hist_kws={'edgecolor':'black'},
                 kde_kws={'linewidth': 2})
     # # true positives
     tn = np.asarray(tn)
-    sns.distplot(distances_n, hist=True, kde=True, label='Negatives', 
+    sns.distplot(tn, hist=True, kde=True, label='Negatives', 
                 bins=int(30), color = 'darkred', 
                 hist_kws={'edgecolor':'black'},
                 kde_kws={'linewidth': 2})
