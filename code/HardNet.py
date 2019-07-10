@@ -487,7 +487,8 @@ def test(test_loader, model, epoch, logger, logger_test_name):
         # labels.extend(np.zeros(len(d_n)))
         tn.extend(d_n.data.cpu().numpy()) 
 
-        num_tests = test_loader.dataset.matches.size(0)
+        num_tests = 1024
+        # num_tests = test_loader.dataset.matches.size(0)
         # labels = np.vstack(labels).reshape(num_tests)
         distances = np.vstack(distances).reshape(num_tests)
         distances_n = np.vstack(distances_n).reshape(num_tests)
