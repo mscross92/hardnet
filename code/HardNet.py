@@ -107,7 +107,7 @@ parser.add_argument('--batch-size', type=int, default=1024, metavar='BS',
                     help='input batch size for training (default: 1024)')
 parser.add_argument('--test-batch-size', type=int, default=1024, metavar='BST',
                     help='input batch size for testing (default: 1024)')
-parser.add_argument('--n-triplets', type=int, default=5000000, metavar='N',
+parser.add_argument('--n-triplets', type=int, default=1024, metavar='N',
                     help='how many triplets will generate from the dataset')
 parser.add_argument('--margin', type=float, default=1.0, metavar='MARGIN',
                     help='the margin value for the triplet loss function (default: 1.0')
@@ -195,7 +195,7 @@ class TripletPhotoTour(dset.PhotoTour):
     def __init__(self, train=True, transform=None, batch_size = None,load_random_triplets = False,  *arg, **kw):
         super(TripletPhotoTour, self).__init__(*arg, **kw)
         self.transform = transform
-        self.out_triplets = load_random_triplets
+        self.out_triplets = True
         self.train = train
         self.n_triplets = args.n_triplets
         self.batch_size = batch_size
