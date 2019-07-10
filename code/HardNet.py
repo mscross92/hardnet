@@ -528,6 +528,11 @@ def main(train_loader, test_loaders, model, logger, file_logger):
     # optimizer1 = create_optimizer(model.features, args.lr)
 
     # optionally resume from a checkpoint
+    checkpoint = torch.load('/content/hardnet/pretrained/train_liberty/checkpoint_liberty_no_aug.pth')
+    args.start_epoch = checkpoint['epoch']
+    checkpoint = torch.load('/content/hardnet/pretrained/train_liberty/checkpoint_liberty_no_aug.pth')
+    model.load_state_dict(checkpoint['state_dict'])
+
     if args.resume:
         if os.path.isfile(args.resume):
             print('=> loading checkpoint {}'.format(args.resume))
