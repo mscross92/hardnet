@@ -96,7 +96,7 @@ parser.add_argument('--resume', default='', type=str, metavar='PATH',
                     help='path to latest checkpoint (default: none)')
 parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
-parser.add_argument('--epochs', type=int, default=10, metavar='E',
+parser.add_argument('--epochs', type=int, default=1, metavar='E',
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--anchorswap', type=str2bool, default=True,
                     help='turns on anchor swap')
@@ -483,6 +483,11 @@ def test(test_loader, model, epoch, logger, logger_test_name):
 
     fpr95 = ErrorRateAt95Recall(labels, 1.0 / (distances + 1e-8))
     print('\33[91mTest set: Accuracy(FPR95): {:.8f}\n\33[0m'.format(fpr95))
+    
+    savestr = logger_test_name + '_distances.txt'
+    np.savetxt(savestr, distances, delimiter=',')
+    savestr = logger_test_name + '_labels.txt'
+    np.savetxt(savestr, labels, delimiter=',')
 
     if (args.enable_logging):
         logger.log_value(logger_test_name+' fpr95', fpr95)
