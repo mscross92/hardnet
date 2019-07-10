@@ -41,9 +41,6 @@ from Utils import str2bool
 import torch.nn as nn
 import torch.nn.functional as F
 
-import matplotlib.pyplot as plt
-import seaborn as sns
-
 class CorrelationPenaltyLoss(nn.Module):
     def __init__(self):
         super(CorrelationPenaltyLoss, self).__init__()
@@ -152,8 +149,7 @@ if args.anchorave:
 if args.fliprot:
         suffix = suffix + '_fliprot'
 
-# triplet_flag = (args.batch_reduce == 'random_global') or args.gor
-triplet_flag = True
+triplet_flag = (args.batch_reduce == 'random_global') or args.gor
 
 dataset_names = ['liberty', 'notredame', 'yosemite']
 
@@ -437,12 +433,12 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets  = False)
         loss.backward()
         optimizer.step()
         adjust_learning_rate(optimizer)
-        # if batch_idx % args.log_interval == 0:
-        #     pbar.set_description(
-                # 'Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                #     epoch, batch_idx * len(data_a), len(train_loader.dataset),
-                #            100. * batch_idx / len(train_loader),
-                #     loss.item()))
+        if batch_idx % args.log_interval == 0:
+            pbar.set_description(
+                'Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                    epoch, batch_idx * len(data_a), len(train_loader.dataset),
+                           100. * batch_idx / len(train_loader),
+                    loss.item()))
 
     if (args.enable_logging):
         logger.log_value('loss', loss.item()).step()
@@ -459,66 +455,35 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     # switch to evaluate mode
     model.eval()
 
-    labels, distances, tp, tn = [], [], [], []
+    labels, distances = [], []
 
     pbar = tqdm(enumerate(test_loader))
-    for batch_idx, (data_a, data_p, labels) in pbar:
+    for batch_idx, (data_a, data_p, label) in pbar:
 
         if args.cuda:
-            data_a, data_p, labels = data_a.cuda(), data_p.cuda(), labels.cuda()
+            data_a, data_p = data_a.cuda(), data_p.cuda()
 
-        data_a, data_p, labels = Variable(data_a, volatile=True), \
-                                Variable(data_p, volatile=True), Variable(labels)
+        data_a, data_p, label = Variable(data_a, volatile=True), \
+                                Variable(data_p, volatile=True), Variable(label)
         out_a = model(data_a)
         out_p = model(data_p)
-        # out_n = model(data_n)
         dists = torch.sqrt(torch.sum((out_a - out_p) ** 2, 1))  # euclidean distance
         distances.append(dists.data.cpu().numpy().reshape(-1,1))
         ll = label.data.cpu().numpy().reshape(-1, 1)
         labels.append(ll)
-        d_p = torch.diag(dists) # 1D tensor of distances for positive samples
-        labels.extend(np.ones(len(d_p)))
-        # tp.extend(d_p.data.cpu().numpy())
-        
-        # dists_n = torch.sqrt(torch.sum((out_a - out_n) ** 2, 1))  # euclidean distance
-        # d_n = torch.diag(dists_n) # 1D tensor of distances for positive samples
-        # distances.extend(d_n.data.cpu().numpy())        
-        # labels.extend(np.zeros(len(d_n)))
-        # tn.extend(d_n.data.cpu().numpy()) 
-
-        num_tests = test_loader.dataset.matches.size(0)
-        labels = np.vstack(labels).reshape(num_tests)
-        distances = np.vstack(distances).reshape(num_tests)
-        # distances_n = np.vstack(distances_n).reshape(num_tests)
 
         if batch_idx % args.log_interval == 0:
             pbar.set_description(logger_test_name+' Test Epoch: {} [{}/{} ({:.0f}%)]'.format(
                 epoch, batch_idx * len(data_a), len(test_loader.dataset),
                        100. * batch_idx / len(test_loader)))
 
-    # # plot distribution
-    # tp = np.asarray(tp)
-    # tn = np.asarray(tn)
-    # plt.figure(figsize=(8, 5))
-    # sns.distplot(tp, hist=True, 
-    #             bins=int(30), color = 'green', label='Positives',
-    #             hist_kws={'edgecolor':'black'},
-    #             kde_kws={'linewidth': 2})
-    # # # true positives
-    # tn = np.asarray(tn)
-    # sns.distplot(tn, hist=True, kde=True, label='Negatives', 
-    #             bins=int(30), color = 'darkred', 
-    #             hist_kws={'edgecolor':'black'},
-    #             kde_kws={'linewidth': 2})
-    # # plt.axvline(thresh,linewidth=1, color='k',linestyle='--')
-    # savestr = 'testdistances_epoch' + str(epoch) + '.png'
-    # plt.savefig(savestr, bbox_inches='tight')
-    # plt.close()
-
+    num_tests = test_loader.dataset.matches.size(0)
+    labels = np.vstack(labels).reshape(num_tests)
+    distances = np.vstack(distances).reshape(num_tests)
 
     fpr95 = ErrorRateAt95Recall(labels, 1.0 / (distances + 1e-8))
     print('\33[91mTest set: Accuracy(FPR95): {:.8f}\n\33[0m'.format(fpr95))
-    
+
     if (args.enable_logging):
         logger.log_value(logger_test_name+' fpr95', fpr95)
     return
@@ -560,14 +525,9 @@ def main(train_loader, test_loaders, model, logger, file_logger):
     if args.cuda:
         model.cuda()
 
-    optimizer1 = create_optimizer(model.features, args.lr)
+    # optimizer1 = create_optimizer(model.features, args.lr)
 
     # optionally resume from a checkpoint
-    checkpoint = torch.load('/content/hardnet/pretrained/train_liberty/checkpoint_liberty_no_aug.pth')
-    args.start_epoch = checkpoint['epoch']
-    checkpoint = torch.load('/content/hardnet/pretrained/train_liberty/checkpoint_liberty_no_aug.pth')
-    model.load_state_dict(checkpoint['state_dict'])
-
     if args.resume:
         if os.path.isfile(args.resume):
             print('=> loading checkpoint {}'.format(args.resume))
@@ -618,7 +578,7 @@ def main(train_loader, test_loaders, model, logger, file_logger):
         #                                  methods=["SNN_ratio"],
         #                                  descs_to_draw=[desc_name])
         #randomize train loader batches
-        train_loader, test_loaders2 = create_loaders(load_random_triplets=triplet_flag)
+        # train_loader, test_loaders2 = create_loaders(load_random_triplets=triplet_flag)
 
 
 if __name__ == '__main__':
