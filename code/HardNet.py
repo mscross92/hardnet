@@ -459,7 +459,7 @@ def test(test_loader, model, epoch, logger, logger_test_name):
     # switch to evaluate mode
     model.eval()
 
-    labels, distances, distances_n = [], []
+    labels, distances, distances_n = [], [], []
 
     pbar = tqdm(enumerate(test_loader))
     for batch_idx, (data_a, data_p, data_n, label) in pbar:
