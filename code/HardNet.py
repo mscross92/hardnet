@@ -248,11 +248,11 @@ class TripletPhotoTour(dset.PhotoTour):
                 img = self.transform(img.numpy())
             return img
 
-        if not self.train:
-            m = self.matches[index]
-            img1 = transform_img(self.data[m[0]])
-            img2 = transform_img(self.data[m[1]])
-            return img1, img2, m[2]
+        # if not self.train:
+        #     m = self.matches[index]
+        #     img1 = transform_img(self.data[m[0]])
+        #     img2 = transform_img(self.data[m[1]])
+        #     return img1, img2, m[2]
 
         t = self.triplets[index]
         a, p, n = self.data[t[0]], self.data[t[1]], self.data[t[2]]
