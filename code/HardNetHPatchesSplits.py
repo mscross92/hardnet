@@ -1079,9 +1079,10 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
 
         # compute average for each image
         average_scores = []
+        dist_m_all_val = np.array(dist_m_all_val)
         for ly in img_y_labels:
-            in_l = np.where(all_val_set_images==3)
-            av = np.mean(np.array(dist_m_all_val)[in_l]) 
+            in_l = np.where(all_val_set_images==ly)
+            av = np.mean(dist_m_all_val[in_l]) 
             average_scores.append(av)
 
     # # plot against patch label
@@ -1146,9 +1147,10 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         dist_m_all_val, average_scores = pairwise_dstncs_2vec2(ref_desc,desc_all_val)
 
         average_scores = []
+        dist_m_all_val = np.array(dist_m_all_val)
         for ly in img_y_labels:
-            in_l = np.where(sample_train_set_images==3)
-            av = np.mean(np.array(dist_m_all_val)[in_l])
+            in_l = np.where(sample_train_set_images==ly)
+            av = np.mean(dist_m_all_val[in_l])
             average_scores.append(av)
 
 
