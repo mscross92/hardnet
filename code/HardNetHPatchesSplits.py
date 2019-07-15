@@ -114,7 +114,7 @@ parser.add_argument('--batch-size', type=int, default=512, metavar='BS',
                     help='input batch size for training (default: 1024)')
 parser.add_argument('--test-batch-size', type=int, default=256, metavar='BST',
                     help='input batch size for testing (default: 1024)')
-parser.add_argument('--n-triplets', type=int, default=146272, metavar='N',
+parser.add_argument('--n-triplets', type=int, default=150000, metavar='N',
                     help='how many triplets will generate from the dataset')
 parser.add_argument('--margin', type=float, default=1.0, metavar='MARGIN',
                     help='the margin value for the triplet loss function (default: 1.0')
@@ -580,7 +580,7 @@ def create_loaders(load_random_triplets=False):
                          batch_size=512,
                          datasets_path=args.hpatches_split+"hpatches_split_a_test.pt",
                          fliprot=args.fliprot,
-                         n_triplets=19544,
+                         n_triplets=20000,
                          batch_hard=0,
                          name="turbid_deepblue",
                          download=True,
@@ -1058,7 +1058,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         def pairwise_dstncs_2vec(ref_dsc,all_dsc):
             x_norm = (ref_dsc**2).sum(1).view(-1, 1)
             distances, av_d = [], []
-            splts = torch.chunk(all_dsc, 7)
+            splts = torch.chunk(all_dsc, 9)
             del all_dsc
             for s in splts:
                  # euclidean distance
@@ -1128,7 +1128,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         def pairwise_dstncs_2vec2(ref_dsc,all_dsc):
             x_norm = (ref_dsc**2).sum(1).view(-1, 1)
             distances, av_d = [], []
-            splts = torch.chunk(all_dsc, 7)
+            splts = torch.chunk(all_dsc, 9)
             del all_dsc
             for s in splts:
                  # euclidean distance
@@ -1329,7 +1329,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
         transforms.ToTensor()])
 
     # patch_fldr = '/content/hardnet/data/sets/turbid/test_data/patches'
-    inc_list = [0,1,2,3,4,5,6,7]
+    inc_list = [0,1,2,3,4,5,6,7,8,9]
     # xt, yt = load_patchDataset_test(patch_fldr,inc_list)
     # xt = torch.FloatTensor(np.array(xt)).unsqueeze(1)
     xt, yt = [], []
