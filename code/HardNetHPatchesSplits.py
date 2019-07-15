@@ -1078,13 +1078,16 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         dist_m_all_val,average_scores = pairwise_dstncs_2vec(ref_desc,desc_all_val)
 
         # compute average for each image
-        # average_scores = []
-        # dist_m_all_val = np.array(dist_m_all_val)
-        # sample_train_set_images = np.array(sample_train_set_images)
-        # for ly in img_y_labels:
-        #     in_l = np.where(sample_train_set_images==ly)
-        #     av = np.median(dist_m_all_val[in_l])
-        #     average_scores.append(av)
+        average_scores = []
+        dist_m_all_val = np.array(dist_m_all_val)
+        sample_train_set_images = np.array(sample_train_set_images)
+        print(len(sample_train_set_images))
+        print(len(dist_m_all_val))
+        for ly in img_y_labels:
+            in_l = np.where(sample_train_set_images==ly)
+            av = np.median(dist_m_all_val[in_l])
+            average_scores.append(av)
+        print(len(average_scores))
 
     # # plot against patch label
     # fig, ax = plt.subplots(figsize=(6,6))
@@ -1101,7 +1104,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     # plot against image label
     fig, ax = plt.subplots(figsize=(6,6))
     plt.plot(all_val_set_images,dist_m_all_val,'.',color=(0.0, 0.5, 0.0, 0.4))
-    # plt.plot(img_y_labels,average_scores,'o-', color='orange',label='Mean distance')
+    plt.plot(img_y_labels,average_scores,'o-', color='orange',label='Mean distance')
     # plt.axhline(thresh,linewidth=1, color='k', linestyle='--',label='Threshold')
     plt.xlabel('Image index')
     plt.ylabel('distance')
@@ -1150,13 +1153,10 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         average_scores = []
         dist_m_all_val = np.array(dist_m_all_val)
         sample_train_set_images = np.array(sample_train_set_images)
-        print(len(sample_train_set_images))
-        print(len(dist_m_all_val))
         for ly in img_y_labels:
             in_l = np.where(sample_train_set_images==ly)
             av = np.median(dist_m_all_val[in_l])
             average_scores.append(av)
-        print(len(average_scores))
 
     # # plot against patch label
     # fig, ax = plt.subplots(figsize=(6,6))
