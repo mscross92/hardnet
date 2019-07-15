@@ -12,7 +12,7 @@ If you use this code, please cite
      year = 2017}
 (c) 2017 by Anastasiia Mishchuk, Dmytro Mishkin
 """
-# 5224 milk, 717 db
+# 5224 milk, 698 db
 
 from __future__ import division, print_function
 import sys
@@ -114,7 +114,7 @@ parser.add_argument('--batch-size', type=int, default=512, metavar='BS',
                     help='input batch size for training (default: 1024)')
 parser.add_argument('--test-batch-size', type=int, default=256, metavar='BST',
                     help='input batch size for testing (default: 1024)')
-parser.add_argument('--n-triplets', type=int, default=94032, metavar='N',
+parser.add_argument('--n-triplets', type=int, default=146272, metavar='N',
                     help='how many triplets will generate from the dataset')
 parser.add_argument('--margin', type=float, default=1.0, metavar='MARGIN',
                     help='the margin value for the triplet loss function (default: 1.0')
@@ -580,7 +580,7 @@ def create_loaders(load_random_triplets=False):
                          batch_size=512,
                          datasets_path=args.hpatches_split+"hpatches_split_a_test.pt",
                          fliprot=args.fliprot,
-                         n_triplets=12000,
+                         n_triplets=19544,
                          batch_hard=0,
                          name="turbid_deepblue",
                          download=True,
