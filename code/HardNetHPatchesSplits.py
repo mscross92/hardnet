@@ -1082,8 +1082,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         dist_m_all_val = np.array(dist_m_all_val)
         sample_train_set_images = np.array(sample_train_set_images)
         for ly in img_y_labels:
-            yyy = int(ly - 1)
-            in_l = np.where(sample_train_set_images==yyy)
+            in_l = np.where(sample_train_set_images==ly)
             av = np.median(dist_m_all_val[in_l])
             average_scores.append(av)
 
@@ -1152,8 +1151,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         dist_m_all_val = np.array(dist_m_all_val)
         sample_train_set_images = np.array(sample_train_set_images)
         for ly in img_y_labels:
-            yyy = int(ly - 1)
-            in_l = np.where(sample_train_set_images==yyy)
+            in_l = np.where(sample_train_set_images==ly)
             av = np.median(dist_m_all_val[in_l])
             average_scores.append(av)
 
