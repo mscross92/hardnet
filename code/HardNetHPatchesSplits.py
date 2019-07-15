@@ -1149,7 +1149,9 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         average_scores = []
         dist_m_all_val = np.array(dist_m_all_val)
         for ly in img_y_labels:
+            print(ly)
             in_l = np.where(sample_train_set_images==(ly-1))
+            print(in_l)
             av = np.mean(dist_m_all_val[in_l])
             average_scores.append(av)
 
