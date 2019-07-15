@@ -680,7 +680,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                             bins=int(30), color = 'darkred', 
                             hist_kws={'edgecolor':'black'},
                             kde_kws={'linewidth': 2})
-                plt.legend()
+                # plt.legend()
                 savestr = 'traindistances_epoch' + str(epoch) + '_batch50.png'
                 plt.savefig(savestr, bbox_inches='tight')
                 plt.close()
@@ -738,7 +738,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                             bins=int(30), color = 'darkred', 
                             hist_kws={'edgecolor':'black'},
                             kde_kws={'linewidth': 2})
-                plt.legend()
+                # plt.legend()
                 savestr = 'traindistances_epoch' + str(epoch) + '_batch100.png'
                 plt.savefig(savestr, bbox_inches='tight')
                 plt.close()
