@@ -1328,7 +1328,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
     xts, xts_ref, yts_p, yts_i = load_patchDataset_allval(patch_fldr,inc_list)
     xts = torch.FloatTensor(np.array(xts)).unsqueeze(1)
     xts_ref = torch.FloatTensor(np.array(xts_ref)).unsqueeze(1)
-    xts, xts_ref, yts_p, yts_i = [], [], [], []
+    # xts, xts_ref, yts_p, yts_i = [], [], [], []
 
     start = args.start_epoch
     end = start + args.epochs
