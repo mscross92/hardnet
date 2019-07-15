@@ -1077,19 +1077,24 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         ref_desc = model(all_val_set_x_ref)
         dist_m_all_val,average_scores = pairwise_dstncs_2vec(ref_desc,desc_all_val)
 
-    # compute average for each image
+        # compute average for each image
+        average_scores = []
+        for ly in img_y_labels:
+            in_l = np.where(all_val_set_images==3)
+            av = np.mean(dist_m_all_val[in_l]) 
+            average_scores.append(av)
 
-    # plot against patch label
-    fig, ax = plt.subplots(figsize=(6,6))
-    plt.plot(all_val_set_y,dist_m_all_val,'.',color=(0.0, 0.5, 0.0, 0.4))
-    # plt.plot(average_scores,'o-', color='orange',label='Mean distance')
-    # plt.axhline(thresh,linewidth=1, color='k',linestyle='--',label='Threshold')
-    plt.xlabel('Patch index')
-    plt.ylabel('distance')
-    # plt.legend()
-    savestr = 'val_patchid-v-dist_epoch' + str(epoch) + '.png'
-    plt.savefig(savestr, bbox_inches='tight')
-    plt.close()
+    # # plot against patch label
+    # fig, ax = plt.subplots(figsize=(6,6))
+    # plt.plot(all_val_set_y,dist_m_all_val,'.',color=(0.0, 0.5, 0.0, 0.4))
+    # # plt.plot(average_scores,'o-', color='orange',label='Mean distance')
+    # # plt.axhline(thresh,linewidth=1, color='k',linestyle='--',label='Threshold')
+    # plt.xlabel('Patch index')
+    # plt.ylabel('distance')
+    # # plt.legend()
+    # savestr = 'val_patchid-v-dist_epoch' + str(epoch) + '.png'
+    # plt.savefig(savestr, bbox_inches='tight')
+    # plt.close()
 
     # plot against image label
     fig, ax = plt.subplots(figsize=(6,6))
@@ -1140,17 +1145,24 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         ref_desc = model(sample_train_set_x_ref)
         dist_m_all_val, average_scores = pairwise_dstncs_2vec2(ref_desc,desc_all_val)
 
-    # plot against patch label
-    fig, ax = plt.subplots(figsize=(6,6))
-    plt.plot(sample_train_set_y,dist_m_all_val,'.',color=(0.0, 0.5, 0.0, 0.4))
-    # plt.plot(average_scores,'o',label='mean distance for image')
-    # plt.axhline(thresh,linewidth=1, color='k',linestyle='--',label='Threshold')
-    plt.xlabel('Patch index')
-    plt.ylabel('distance')
-    # plt.legend()
-    savestr = 'train_patchid-v-dist_epoch' + str(epoch) + '.png'
-    plt.savefig(savestr, bbox_inches='tight')
-    plt.close()
+        average_scores = []
+        for ly in img_y_labels:
+            in_l = np.where(sample_train_set_images==3)
+            av = np.mean(dist_m_all_val[in_l])
+            average_scores.append(av)
+
+
+    # # plot against patch label
+    # fig, ax = plt.subplots(figsize=(6,6))
+    # plt.plot(sample_train_set_y,dist_m_all_val,'.',color=(0.0, 0.5, 0.0, 0.4))
+    # # plt.plot(average_scores,'o',label='mean distance for image')
+    # # plt.axhline(thresh,linewidth=1, color='k',linestyle='--',label='Threshold')
+    # plt.xlabel('Patch index')
+    # plt.ylabel('distance')
+    # # plt.legend()
+    # savestr = 'train_patchid-v-dist_epoch' + str(epoch) + '.png'
+    # plt.savefig(savestr, bbox_inches='tight')
+    # plt.close()
 
     # plot against image label
     fig, ax = plt.subplots(figsize=(6,6))
