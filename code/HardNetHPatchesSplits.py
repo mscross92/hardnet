@@ -1081,13 +1081,10 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         average_scores = []
         dist_m_all_val = np.array(dist_m_all_val)
         all_val_set_images = np.array(all_val_set_images)
-        print(len(all_val_set_images))
-        print(len(dist_m_all_val))
         for ly in img_y_labels:
             in_l = np.where(all_val_set_images==ly)
             av = np.median(dist_m_all_val[in_l])
             average_scores.append(av)
-        print(len(average_scores))
 
     # # plot against patch label
     # fig, ax = plt.subplots(figsize=(6,6))
