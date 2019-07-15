@@ -1174,7 +1174,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     fig, ax = plt.subplots(figsize=(6,6))
     plt.plot(sample_train_set_images,dist_m_all_val,'.',color=(0.0, 0.5, 0.0, 0.4))
     # plt.plot(average_scores,'o',label='mean distance for image')
-    # plt.plot(img_y_labels,average_scores,'o-', color='orange',label='Mean distance')
+    plt.plot(img_y_labels,average_scores,'o-', color='orange',label='Mean distance')
     plt.xlabel('Image index')
     plt.ylabel('distance')
     # plt.legend()
