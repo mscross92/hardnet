@@ -1081,7 +1081,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         average_scores = []
         for ly in img_y_labels:
             in_l = np.where(all_val_set_images==3)
-            av = np.mean(dist_m_all_val[in_l]) 
+            av = np.mean(np.array(dist_m_all_val)[in_l]) 
             average_scores.append(av)
 
     # # plot against patch label
@@ -1148,7 +1148,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         average_scores = []
         for ly in img_y_labels:
             in_l = np.where(sample_train_set_images==3)
-            av = np.mean(dist_m_all_val[in_l])
+            av = np.mean(np.array(dist_m_all_val)[in_l])
             average_scores.append(av)
 
 
