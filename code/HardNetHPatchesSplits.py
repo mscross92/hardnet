@@ -1151,7 +1151,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         for ly in img_y_labels:
             yyy = float(ly - 1)
             in_l = np.where(sample_train_set_images==yyy)
-            print(yyy,len(in_l))
+            print(yyy,in_l)
             av = np.mean(dist_m_all_val[in_l])
             average_scores.append(av)
 
