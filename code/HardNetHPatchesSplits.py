@@ -12,6 +12,7 @@ If you use this code, please cite
      year = 2017}
 (c) 2017 by Anastasiia Mishchuk, Dmytro Mishkin
 """
+# 5224 milk, 717 db
 
 from __future__ import division, print_function
 import sys
@@ -95,7 +96,7 @@ parser.add_argument('--decor', type=str2bool, default=False,
                     help='L2Net decorrelation penalty')
 parser.add_argument('--anchorave', type=str2bool, default=False,
                     help='anchorave')
-parser.add_argument('--imageSize', type=int, default=29,
+parser.add_argument('--imageSize', type=int, default=32,
                     help='the height / width of the input image to network')
 parser.add_argument('--mean-image', type=float, default=0.443728476019,
                     help='mean of train dataset for normalization')
@@ -113,7 +114,7 @@ parser.add_argument('--batch-size', type=int, default=512, metavar='BS',
                     help='input batch size for training (default: 1024)')
 parser.add_argument('--test-batch-size', type=int, default=256, metavar='BST',
                     help='input batch size for testing (default: 1024)')
-parser.add_argument('--n-triplets', type=int, default=11697, metavar='N',
+parser.add_argument('--n-triplets', type=int, default=94032, metavar='N',
                     help='how many triplets will generate from the dataset')
 parser.add_argument('--margin', type=float, default=1.0, metavar='MARGIN',
                     help='the margin value for the triplet loss function (default: 1.0')
@@ -516,30 +517,31 @@ def create_loaders(load_random_triplets=False):
     test_dataset_names = copy.copy(dataset_names)
     test_dataset_names.remove(args.training_set)
     kwargs = {'num_workers': args.num_workers, 'pin_memory': args.pin_memory} if args.cuda else {}
-    np_reshape29 = lambda x: np.reshape(x, (29, 29, 1))
+    np_reshape32 = lambda x: np.reshape(x, (32, 32, 1))
+    # np_reshape29 = lambda x: np.reshape(x, (29, 29, 1))
     transform_test = transforms.Compose([
-            transforms.Lambda(np_reshape29),
+            transforms.Lambda(np_reshape32),
             transforms.ToPILImage(),
-            transforms.Resize(29),
+            transforms.Resize(32),
             transforms.ToTensor()])
     transform_train = transforms.Compose([
-            transforms.Lambda(np_reshape29),
+            transforms.Lambda(np_reshape32),
             transforms.ToPILImage(),
             # transforms.RandomRotation(5,PIL.Image.BILINEAR),
-            transforms.RandomResizedCrop(29, scale = (0.9,1.0),ratio = (0.9,1.1)),
-            transforms.Resize(29),
+            # transforms.RandomResizedCrop(29, scale = (0.9,1.0),ratio = (0.9,1.1)),
+            transforms.Resize(32),
             transforms.ToTensor()])
     transform = transforms.Compose([
             # transforms.Lambda(cv2_scale),
             # transforms.Lambda(np_reshape),
             # transforms.ToTensor(),
             # transforms.Normalize((args.mean_image,), (args.std_image,))])
-            transforms.Lambda(np_reshape29),
+            transforms.Lambda(np_reshape32),
             transforms.ToPILImage(),
             # transforms.RandomRotation(15,PIL.Image.BILINEAR),
             # transforms.RandomHorizontalFlip(p=0.5),
             # transforms.ColorJitter(brightness=0.1, contrast=0, saturation=0, hue=0),
-            transforms.Resize(29),
+            transforms.Resize(32),
             transforms.ToTensor()])
     if not args.augmentation:
         transform_train = transform
@@ -575,10 +577,10 @@ def create_loaders(load_random_triplets=False):
     test_loader = torch.utils.data.DataLoader(
         TotalDatasetsLoader(train=False,
                          load_random_triplets = False,
-                         batch_size=256,
+                         batch_size=512,
                          datasets_path=args.hpatches_split+"hpatches_split_a_test.pt",
                          fliprot=args.fliprot,
-                         n_triplets=2135,
+                         n_triplets=12906,
                          batch_hard=0,
                          name="turbid_deepblue",
                          download=True,
@@ -593,6 +595,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
     # switch to train mode
     model.train()
     pbar = tqdm(enumerate(train_loader))
+    tp, tn = [], []
     for batch_idx, data in pbar:
         if load_triplets:
             data_a, data_p, data_n = data
@@ -643,11 +646,11 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                                         margin=args.margin,
                                         anchor_swap=args.anchorswap,
                                         loss_type=args.loss)
-            if batch_idx==0:
-                vis_id = np.random.randint(0, data_a.shape[0])
-                cv2.imwrite('batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
-                cv2.imwrite('batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
-                cv2.imwrite('batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(data_n[vis_id,0,:,:].cpu())*255).astype('uint8'))
+            # if batch_idx==0:
+            #     vis_id = np.random.randint(0, data_a.shape[0])
+            #     cv2.imwrite('batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
+            #     cv2.imwrite('batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
+            #     cv2.imwrite('batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(data_n[vis_id,0,:,:].cpu())*255).astype('uint8'))
 
             if batch_idx==20:
                 # visualise distribution of batch
@@ -701,11 +704,11 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                 d_n = data_a[n_idx,0,:,:].cpu()
 
             # visualise random semi-hard sample
-            if batch_idx==0:
-                print(n_idx,vis_id)
-                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
-                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
-                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(d_n)*255).astype('uint8'))
+            # if batch_idx==0:
+                # print(n_idx,vis_id)
+                # cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
+                # cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
+                # cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(d_n)*255).astype('uint8'))
 
             if batch_idx==20:
                 # visualise distribution of batch
@@ -759,27 +762,11 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                 d_n = data_a[n_idx,0,:,:].cpu()
 
             # visualise random hard sample
-            if batch_idx==0:
-                print(n_idx,vis_id)
-                # plt.figure()
-                # plt.subplot(1, 3, 1)
-                # plt.imshow((np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
-                # plt.gca().set_xticks([])
-                # plt.gca().set_yticks([])
-                # plt.subplot(1,3,2)
-                # plt.imshow((np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
-                # plt.gca().set_xticks([])
-                # plt.gca().set_yticks([])
-                # plt.subplot(1,3,3)
-                # plt.imshow((np.array(d_n)*255).astype('uint8'), cmap='gray',vmax=255,vmin=0) 
-                # plt.gca().set_xticks([])
-                # plt.gca().set_yticks([])
-                # savestr = 'batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '.png'
-                # plt.savefig(savestr, bbox_inches='tight')
-                # plt.close()
-                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
-                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
-                cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(d_n)*255).astype('uint8'))
+            # if batch_idx==0:
+                # print(n_idx,vis_id)
+                # cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
+                # cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
+                # cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(d_n)*255).astype('uint8'))
 
             if batch_idx==20:
                 # visualise distribution of batch
@@ -962,13 +949,13 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         # plt.close()
 
 
-    if args.cuda:
-        test_sample_x = test_sample_x.cuda()
-    with torch.no_grad():
-        test_sample_x = Variable(test_sample_x)
-        des_eg_test = model(test_sample_x)
-        dist_m_test = pairwise_dstncs(des_eg_test)
-        visualise_distance_matrix(dist_m_test,epoch)
+    # if args.cuda:
+    #     test_sample_x = test_sample_x.cuda()
+    # with torch.no_grad():
+    #     test_sample_x = Variable(test_sample_x)
+    #     des_eg_test = model(test_sample_x)
+    #     dist_m_test = pairwise_dstncs(des_eg_test)
+    #     visualise_distance_matrix(dist_m_test,epoch)
 
     # plot ROC curve
     y_pred_te = np.concatenate((tp,tn))
@@ -1034,13 +1021,13 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     print("\n")
 
     plt.figure(figsize=(8, 5))
-    sns.distplot(tp, hist=False, 
+    sns.distplot(tp, hist=True, 
                 bins=int(30), color = 'green', label='Positives',
                 hist_kws={'edgecolor':'black'},
                 kde_kws={'linewidth': 2})
     # # true positives
     tn = np.asarray(tn)
-    sns.distplot(tn, hist=False, kde=True, label='Negatives', 
+    sns.distplot(tn, hist=True, kde=True, label='Negatives', 
                 bins=int(30), color = 'darkred', 
                 hist_kws={'edgecolor':'black'},
                 kde_kws={'linewidth': 2})
@@ -1050,11 +1037,11 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.close()
     
     # store ROC data to replot later
-    if epoch==49:
-        savestr = 'final_roc_fpr_thresh' + str(thresh) + '.txt'
-        np.savetxt(savestr, te_fpr, delimiter=',') 
-        savestr = 'final_roc_tpr_thresh' + str(thresh) + '.txt'
-        np.savetxt(savestr, te_tpr, delimiter=',') 
+    # if epoch==49:
+    #     savestr = 'final_roc_fpr_thresh' + str(thresh) + '.txt'
+    #     np.savetxt(savestr, te_fpr, delimiter=',') 
+    #     savestr = 'final_roc_tpr_thresh' + str(thresh) + '.txt'
+    #     np.savetxt(savestr, te_tpr, delimiter=',') 
 
     del tn, tp
     del y_pred_te, te_tpr, te_fpr, roc_difs
@@ -1069,8 +1056,8 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     with torch.no_grad():
         def pairwise_dstncs_2vec(ref_dsc,all_dsc):
             x_norm = (ref_dsc**2).sum(1).view(-1, 1)
-            distances = []
-            splts = torch.chunk(all_dsc, 6)
+            distances, av_d = [], []
+            splts = torch.chunk(all_dsc, 18)
             del all_dsc
             for s in splts:
                  # euclidean distance
@@ -1078,20 +1065,23 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
                 y_norm = (s**2).sum(1).view(1, -1)
                 dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(ref_dsc, y_t),0.0,np.inf))
                 dists = torch.diag(dists) # get diagonal only
-                distances.extend(dists.data.cpu().numpy())        
-            return distances
+                distances.extend(dists.data.cpu().numpy())   
+                av_d.append(np.average(distances))
+            return distances,av_d
 
         # predict descriptors
         all_val_set_x = Variable(all_val_set_x)
         all_val_set_x_ref = Variable(all_val_set_x_ref)
         desc_all_val = model(all_val_set_x)
         ref_desc = model(all_val_set_x_ref)
-        dist_m_all_val = pairwise_dstncs_2vec(ref_desc,desc_all_val)
+        dist_m_all_val,average_scores = pairwise_dstncs_2vec(ref_desc,desc_all_val)
+
+    # compute average for each image
 
     # plot against patch label
     fig, ax = plt.subplots(figsize=(6,6))
     plt.plot(all_val_set_y,dist_m_all_val,'.',color=(0.0, 0.5, 0.0, 0.4))
-    # plt.plot(average_scores,'o',label='mean distance for image')
+    # plt.plot(average_scores,'o-', color='orange',label='Mean distance')
     # plt.axhline(thresh,linewidth=1, color='k',linestyle='--',label='Threshold')
     plt.xlabel('Patch index')
     plt.ylabel('distance')
@@ -1100,10 +1090,10 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
 
-    # plot against patch label
+    # plot against image label
     fig, ax = plt.subplots(figsize=(6,6))
     plt.plot(all_val_set_images,dist_m_all_val,'.',color=(0.0, 0.5, 0.0, 0.4))
-    # plt.plot(average_scores,'o',label='mean distance for image')
+    plt.plot(average_scores,'o-', color='orange',label='Mean distance')
     # plt.axhline(thresh,linewidth=1, color='k', linestyle='--',label='Threshold')
     plt.xlabel('Image index')
     plt.ylabel('distance')
@@ -1112,13 +1102,13 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
 
-    if epoch==49:
-        savestr = 'final_val_distances_thresh' + str(thresh) + '.txt'
-        np.savetxt(savestr, dist_m_all_val, delimiter=',')   # X is an array
-        savestr = 'val_imageids.txt'
-        np.savetxt(savestr, all_val_set_images, delimiter=',')   # X is an array
-        savestr = 'val_patchids.txt'
-        np.savetxt(savestr, all_val_set_y, delimiter=',')   # X is an array
+    # if epoch==49:
+    #     savestr = 'final_val_distances_thresh' + str(thresh) + '.txt'
+    #     np.savetxt(savestr, dist_m_all_val, delimiter=',')   # X is an array
+    #     savestr = 'val_imageids.txt'
+    #     np.savetxt(savestr, all_val_set_images, delimiter=',')   # X is an array
+    #     savestr = 'val_patchids.txt'
+    #     np.savetxt(savestr, all_val_set_y, delimiter=',')   # X is an array
 
     # # visualise distance against image id / patch id for TRAINING sample
     # sample_train_set_x, sample_train_set_x_ref, sample_train_set_y, sample_train_set_images
@@ -1129,8 +1119,8 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     with torch.no_grad():
         def pairwise_dstncs_2vec2(ref_dsc,all_dsc):
             x_norm = (ref_dsc**2).sum(1).view(-1, 1)
-            distances = []
-            splts = torch.chunk(all_dsc, 14)
+            distances, av_d = [], []
+            splts = torch.chunk(all_dsc, 18)
             del all_dsc
             for s in splts:
                  # euclidean distance
@@ -1138,15 +1128,16 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
                 y_norm = (s**2).sum(1).view(1, -1)
                 dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(ref_dsc, y_t),0.0,np.inf))
                 dists = torch.diag(dists) # get diagonal only
-                distances.extend(dists.data.cpu().numpy())        
-            return distances
+                distances.extend(dists.data.cpu().numpy())  
+                av_d.append(np.average(distances))
+            return distances, av_d
 
         # predict descriptors
         sample_train_set_x = Variable(sample_train_set_x)
         sample_train_set_x_ref = Variable(sample_train_set_x_ref)
         desc_all_val = model(sample_train_set_x)
         ref_desc = model(sample_train_set_x_ref)
-        dist_m_all_val = pairwise_dstncs_2vec2(ref_desc,desc_all_val)
+        dist_m_all_val, average_scores = pairwise_dstncs_2vec2(ref_desc,desc_all_val)
 
     # plot against patch label
     fig, ax = plt.subplots(figsize=(6,6))
@@ -1160,11 +1151,11 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
 
-    # plot against patch label
+    # plot against image label
     fig, ax = plt.subplots(figsize=(6,6))
     plt.plot(sample_train_set_images,dist_m_all_val,'.',color=(0.0, 0.5, 0.0, 0.4))
     # plt.plot(average_scores,'o',label='mean distance for image')
-    # plt.axhline(thresh,linewidth=1, color='k', linestyle='--',label='Threshold')
+    plt.plot(average_scores,'o-', color='orange',label='Mean distance')
     plt.xlabel('Image index')
     plt.ylabel('distance')
     # plt.legend()
@@ -1243,7 +1234,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
                         y.append(int(yyy))
                         f = os.path.join(subdir, file)
                         ptch = cv2.imread(f, cv2.IMREAD_GRAYSCALE)
-                        ptch = cv2.resize(ptch, (29, 29))
+                        ptch = cv2.resize(ptch, (32, 32))
                         ptch = np.array(ptch, dtype=np.uint8)
                         X.append(ptch)
                         if not int(yyy) in cl:
@@ -1269,7 +1260,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
                     if int(yy) in incld:
                         f = os.path.join(subdir, file)
                         ptch = cv2.imread(f, cv2.IMREAD_GRAYSCALE)
-                        ptch = cv2.resize(ptch, (29, 29))
+                        ptch = cv2.resize(ptch, (32, 32))
                         ptch = np.array(ptch, dtype=np.uint8)
                         if int(yy)==0:
                             X_ref.append(ptch)
@@ -1310,33 +1301,35 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
     test_losses_arr, test_fpr95_arr, train_losses_arr = [], [], []
 
-    np_reshape29 = lambda x: np.reshape(x, (29, 29, 1))
+    # np_reshape29 = lambda x: np.reshape(x, (29, 29, 1))
+    np_reshape32 = lambda x: np.reshape(x, (32, 32, 1))
     transform = transforms.Compose([
-        transforms.Lambda(np_reshape29),
+        transforms.Lambda(np_reshape32),
         transforms.ToPILImage(),
         # transforms.RandomRotation(15,PIL.Image.BILINEAR),
         # transforms.RandomHorizontalFlip(p=0.5),
         # transforms.ColorJitter(brightness=0.1, contrast=0, saturation=0, hue=0),
-        transforms.Resize(29),
+        transforms.Resize(32),
         transforms.ToTensor()])
 
-    patch_fldr = '/content/hardnet/data/sets/turbid/test_data/patches'
-    inc_list = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
-    xt, yt = load_patchDataset_test(patch_fldr,inc_list)
-    xt = torch.FloatTensor(np.array(xt)).unsqueeze(1)
- 
-    patch_fldr = '/content/hardnet/data/sets/turbid/validation_all'
-    inc_list = [0,1,2,3,4,5,6]
-    xv, xv_ref, yv_p, yv_i = load_patchDataset_allval(patch_fldr,inc_list)
-    xv = torch.FloatTensor(np.array(xv)).unsqueeze(1)
-    xv_ref = torch.FloatTensor(np.array(xv_ref)).unsqueeze(1)
-    
-    patch_fldr = '/content/hardnet/data/sets/turbid/test_data/testing_randomsample'
-    inc_list = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
-    xts, xts_ref, yts_p, yts_i = load_patchDataset_allval(patch_fldr,inc_list)
-    xts = torch.FloatTensor(np.array(xts)).unsqueeze(1)
-    xts_ref = torch.FloatTensor(np.array(xts_ref)).unsqueeze(1)
-    
+    # patch_fldr = '/content/hardnet/data/sets/turbid/test_data/patches'
+    # inc_list = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+    # xt, yt = load_patchDataset_test(patch_fldr,inc_list)
+    # xt = torch.FloatTensor(np.array(xt)).unsqueeze(1)
+    xt, yt = [], []
+    # patch_fldr = '/content/hardnet/data/sets/turbid/test_data/validation_all'
+    # inc_list = [0,1,2,3,4,5,6]
+    # xv, xv_ref, yv_p, yv_i = load_patchDataset_allval(patch_fldr,inc_list)
+    # xv = torch.FloatTensor(np.array(xv)).unsqueeze(1)
+    # xv_ref = torch.FloatTensor(np.array(xv_ref)).unsqueeze(1)
+    xv, xv_ref, yv_p, yv_i  = [], [], [], []
+    # patch_fldr = '/content/hardnet/data/sets/turbid/test_data/testing_randomsample'
+    # inc_list = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+    # xts, xts_ref, yts_p, yts_i = load_patchDataset_allval(patch_fldr,inc_list)
+    # xts = torch.FloatTensor(np.array(xts)).unsqueeze(1)
+    # xts_ref = torch.FloatTensor(np.array(xts_ref)).unsqueeze(1)
+    xts, xts_ref, yts_p, yts_i = [], [], [], []
+
     start = args.start_epoch
     end = start + args.epochs
     for epoch in range(start, end):

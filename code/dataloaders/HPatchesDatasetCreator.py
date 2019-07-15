@@ -8,7 +8,7 @@ import json
 
 
 types = ['0','1','2','3','4','5','6','7','8','9','10',\
-       '11','12','13','14']
+       '11','12','13','14','15','16','17','18']
 
 # types = ['0','1','2']
 splits = ['a']
@@ -66,7 +66,7 @@ class HPatches(data.Dataset):
         for directory in hpatches_sequences:
            if (directory in good_fnames):
             print(directory)
-            for type in typs:
+            for type in types:
                 sequence_path = os.path.join(data_dir, directory,type)+'.png'
                 image = cv2.imread(sequence_path, 0)
                 h, w = image.shape
