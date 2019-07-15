@@ -1067,7 +1067,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
                 dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(ref_dsc, y_t),0.0,np.inf))
                 dists = torch.diag(dists) # get diagonal only
                 distances.extend(dists.data.cpu().numpy())   
-                av_d.append(np.average(distances))
+                av_d.append(np.average(dists.data.cpu().numpy()))
             return distances,av_d
 
         # predict descriptors
@@ -1130,7 +1130,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
                 dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(ref_dsc, y_t),0.0,np.inf))
                 dists = torch.diag(dists) # get diagonal only
                 distances.extend(dists.data.cpu().numpy())  
-                av_d.append(np.average(distances))
+                av_d.append(np.average(dists.data.cpu().numpy()))
             return distances, av_d
 
         # predict descriptors
