@@ -833,6 +833,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
 
 def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, test_sample_y, all_val_set_x, all_val_set_x_ref, all_val_set_y, all_val_set_images, sample_train_set_x, sample_train_set_x_ref, sample_train_set_y, sample_train_set_images):
 
+    img_y_labels = list(range(2,20))
     # switch to evaluate mode
     model.eval()
 
@@ -1093,7 +1094,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     # plot against image label
     fig, ax = plt.subplots(figsize=(6,6))
     plt.plot(all_val_set_images,dist_m_all_val,'.',color=(0.0, 0.5, 0.0, 0.4))
-    plt.plot(average_scores,'o-', color='orange',label='Mean distance')
+    plt.plot(average_scores,img_y_labels,'o-', color='orange',label='Mean distance')
     # plt.axhline(thresh,linewidth=1, color='k', linestyle='--',label='Threshold')
     plt.xlabel('Image index')
     plt.ylabel('distance')
@@ -1155,7 +1156,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     fig, ax = plt.subplots(figsize=(6,6))
     plt.plot(sample_train_set_images,dist_m_all_val,'.',color=(0.0, 0.5, 0.0, 0.4))
     # plt.plot(average_scores,'o',label='mean distance for image')
-    plt.plot(average_scores,'o-', color='orange',label='Mean distance')
+    plt.plot(average_scores,img_y_labels,'o-', color='orange',label='Mean distance')
     plt.xlabel('Image index')
     plt.ylabel('distance')
     # plt.legend()
