@@ -46,7 +46,7 @@ class HPatches(data.Dataset):
                 n_patches = int(h / w)
                 for i in range(n_patches):
                     patch = image[i * (w): (i + 1) * (w), 0:w]
-                    patch = cv2.resize(patch, (29, 29))
+                    patch = cv2.resize(patch, (32, 32))
                     patch = np.array(patch, dtype=np.uint8)
                     patches.append(patch)
                     labels.append(i+counter)
@@ -73,7 +73,7 @@ class HPatches(data.Dataset):
                 n_patches = int(h / w)
                 for i in range(n_patches):
                     patch = image[i * (w): (i + 1) * (w), 0:w]
-                    patch = cv2.resize(patch, (29, 29))
+                    patch = cv2.resize(patch, (32, 32))
                     patch = np.array(patch, dtype=np.uint8)
                     patches.append(patch)
                     labels.append(i+counter)
