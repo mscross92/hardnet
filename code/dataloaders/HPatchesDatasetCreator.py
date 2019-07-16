@@ -58,7 +58,7 @@ class HPatches(data.Dataset):
     def read_image_file_test(self, data_dir):
         """Return a Tensor containing the patches
         """
-        typs = ['0','1','2','3','4','5']
+        typs = ['0','1','2','3','4','5','6','7','8']
 
         patches = []
         labels = []
