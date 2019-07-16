@@ -6,7 +6,7 @@ import cv2
 import sys
 import json
 
-types = ['0','1','2','3','4','5','6','7','8','9']
+types = ['0','1','2','3','4','5','6','7','8','9','10','11']
 
 # types = ['0','1','2','3','4','5','6','7','8','9','10',\
 #        '11','12','13','14','15','16','17']
@@ -58,7 +58,7 @@ class HPatches(data.Dataset):
     def read_image_file_test(self, data_dir):
         """Return a Tensor containing the patches
         """
-        typs = ['0','1','2','3','4','5','6']
+        typs = ['0','1','2','3','4','5','6','7']
 
         patches = []
         labels = []
@@ -67,7 +67,7 @@ class HPatches(data.Dataset):
         for directory in hpatches_sequences:
            if (directory in good_fnames):
             print(directory)
-            for type in types:
+            for type in typs:
                 sequence_path = os.path.join(data_dir, directory,type)+'.png'
                 image = cv2.imread(sequence_path, 0)
                 h, w = image.shape
