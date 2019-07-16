@@ -1058,7 +1058,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         def pairwise_dstncs_2vec(ref_dsc,all_dsc):
             x_norm = (ref_dsc**2).sum(1).view(-1, 1)
             distances, av_d = [], []
-            splts = torch.chunk(all_dsc, 7)
+            splts = torch.chunk(all_dsc, 6)
             del all_dsc
             for s in splts:
                  # euclidean distance
@@ -1128,7 +1128,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         def pairwise_dstncs_2vec2(ref_dsc,all_dsc):
             x_norm = (ref_dsc**2).sum(1).view(-1, 1)
             distances, av_d = [], []
-            splts = torch.chunk(all_dsc, 10)
+            splts = torch.chunk(all_dsc, 11)
             del all_dsc
             for s in splts:
                  # euclidean distance
@@ -1329,7 +1329,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
         transforms.ToTensor()])
 
     # patch_fldr = '/content/hardnet/data/sets/turbid/test_data/patches'
-    inc_list = [0,1,2,3,4,5,6,7]
+    inc_list = [0,1,2,3,4,5,6]
     # xt, yt = load_patchDataset_test(patch_fldr,inc_list)
     # xt = torch.FloatTensor(np.array(xt)).unsqueeze(1)
     xt, yt = [], []
@@ -1340,7 +1340,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
     xv_ref = torch.FloatTensor(np.array(xv_ref)).unsqueeze(1)
     # xv, xv_ref, yv_p, yv_i  = [], [], [], []
     patch_fldr = '/content/hardnet/data/sets/turbid/test_data/testing_randomsample'
-    inc_list = [0,1,2,3,4,5,6,7,8,9,10]
+    inc_list = [0,1,2,3,4,5,6,7,8,9,10,11]
     xts, xts_ref, yts_p, yts_i = load_patchDataset_allval(patch_fldr,inc_list)
     xts = torch.FloatTensor(np.array(xts)).unsqueeze(1)
     xts_ref = torch.FloatTensor(np.array(xts_ref)).unsqueeze(1)
