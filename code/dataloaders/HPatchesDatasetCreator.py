@@ -6,10 +6,9 @@ import cv2
 import sys
 import json
 
-types = ['0','1','2','3','4','5','6','7','8','9','10','11']
 
-# types = ['0','1','2','3','4','5','6','7','8','9','10',\
-#        '11','12','13','14','15','16','17']
+types = ['0','1','2','3','4','5','6','7','8','9','10',\
+       '11','12','13','14']
 
 # types = ['0','1','2']
 splits = ['a']
@@ -47,7 +46,7 @@ class HPatches(data.Dataset):
                 n_patches = int(h / w)
                 for i in range(n_patches):
                     patch = image[i * (w): (i + 1) * (w), 0:w]
-                    patch = cv2.resize(patch, (32, 32))
+                    patch = cv2.resize(patch, (29, 29))
                     patch = np.array(patch, dtype=np.uint8)
                     patches.append(patch)
                     labels.append(i+counter)
@@ -58,7 +57,7 @@ class HPatches(data.Dataset):
     def read_image_file_test(self, data_dir):
         """Return a Tensor containing the patches
         """
-        typs = ['0','1','2','3','4','5','6','7']
+        typs = ['0','1','2','3','4','5','6']
 
         patches = []
         labels = []
@@ -74,7 +73,7 @@ class HPatches(data.Dataset):
                 n_patches = int(h / w)
                 for i in range(n_patches):
                     patch = image[i * (w): (i + 1) * (w), 0:w]
-                    patch = cv2.resize(patch, (32, 32))
+                    patch = cv2.resize(patch, (29, 29))
                     patch = np.array(patch, dtype=np.uint8)
                     patches.append(patch)
                     labels.append(i+counter)
