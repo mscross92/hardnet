@@ -1037,12 +1037,12 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
     
-    # store ROC data to replot later
-    # if epoch==49:
-    #     savestr = 'final_roc_fpr_thresh' + str(thresh) + '.txt'
-    #     np.savetxt(savestr, te_fpr, delimiter=',') 
-    #     savestr = 'final_roc_tpr_thresh' + str(thresh) + '.txt'
-    #     np.savetxt(savestr, te_tpr, delimiter=',') 
+    # store data to replot later
+    if epoch==(args.start_epoch + args.epochs - 1):
+        savestr = 'test_tp_epoch' + str(epoch) + '.txt'
+        np.savetxt(savestr, tp, delimiter=',') 
+        savestr = 'test_tn_epoch' + str(epoch) + '.txt'
+        np.savetxt(savestr, tn, delimiter=',') 
 
     del tn, tp
     del y_pred_te, te_tpr, te_fpr, roc_difs
