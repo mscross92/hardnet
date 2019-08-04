@@ -839,7 +839,10 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                     bins=int(30), color = 'darkred', 
                     hist_kws={'edgecolor':'black'},
                     kde_kws={'linewidth': 2})
-
+        savestr = 'traindistances_epoch' + str(epoch) + '.png'
+        plt.savefig(savestr, bbox_inches='tight')
+        plt.close()
+        
         savestr = 'train_tp_epoch' + str(epoch) + '.txt'
         np.savetxt(savestr, tp, delimiter=',') 
         savestr = 'train_tn_epoch' + str(epoch) + '.txt'
