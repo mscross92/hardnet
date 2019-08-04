@@ -1138,6 +1138,8 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     if epoch==(args.start_epoch + args.epochs - 1):
         savestr = 'valset_imagelabels_epoch' + str(epoch) + '.txt'
         np.savetxt(savestr, all_val_set_images, delimiter=',') 
+        savestr = 'valset_patchlabels_epoch' + str(epoch) + '.txt'
+        np.savetxt(savestr, all_val_set_y, delimiter=',') 
         savestr = 'valset_distances_epoch' + str(epoch) + '.txt'
         np.savetxt(savestr, dist_m_all_val, delimiter=',') 
 
@@ -1215,6 +1217,8 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         np.savetxt(savestr, sample_train_set_images, delimiter=',') 
         savestr = 'trainset_distances_epoch' + str(epoch) + '.txt'
         np.savetxt(savestr, dist_m_all_val, delimiter=',') 
+        savestr = 'trainset_patchlabels_epoch' + str(epoch) + '.txt'
+        np.savetxt(savestr, sample_train_set_y, delimiter=',') 
 
     return test_loss.item(), fpr95
 
