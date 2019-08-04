@@ -1083,7 +1083,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         def pairwise_dstncs_2vec(ref_dsc,all_dsc):
             x_norm = (ref_dsc**2).sum(1).view(-1, 1)
             distances, av_d = [], []
-            splts = torch.chunk(all_dsc, 18)
+            splts = torch.chunk(all_dsc, 5)
             del all_dsc
             for s in splts:
                  # euclidean distance
@@ -1161,7 +1161,7 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
         def pairwise_dstncs_2vec2(ref_dsc,all_dsc):
             x_norm = (ref_dsc**2).sum(1).view(-1, 1)
             distances, av_d = [], []
-            splts = torch.chunk(all_dsc, 18)
+            splts = torch.chunk(all_dsc, 9)
             del all_dsc
             for s in splts:
                  # euclidean distance
@@ -1370,18 +1370,18 @@ def main(train_loader, test_loader, model, logger, file_logger):
         transforms.ToTensor()])
 
     # patch_fldr = '/content/hardnet/data/sets/turbid/test_data/patches'
-    inc_list = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
+    inc_list = [0,1,2,3,4,5,6,7,8,9]
     # xt, yt = load_patchDataset_test(patch_fldr,inc_list)
     # xt = torch.FloatTensor(np.array(xt)).unsqueeze(1)
     xt, yt = [], []
     patch_fldr = '/content/hardnet/data/sets/turbid/test_data/validation_all'
-    # inc_list = [0,1,2,3,4,5,6]
+    inc_list = [0,1,2,3,4,5]
     xv, xv_ref, yv_p, yv_i = load_patchDataset_allval(patch_fldr,inc_list)
     xv = torch.FloatTensor(np.array(xv)).unsqueeze(1)
     xv_ref = torch.FloatTensor(np.array(xv_ref)).unsqueeze(1)
     # xv, xv_ref, yv_p, yv_i  = [], [], [], []
     patch_fldr = '/content/hardnet/data/sets/turbid/test_data/testing_randomsample'
-    inc_list = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
+    inc_list = [0,1,2,3,4,5,6,7,8,9]
     xts, xts_ref, yts_p, yts_i = load_patchDataset_allval(patch_fldr,inc_list)
     xts = torch.FloatTensor(np.array(xts)).unsqueeze(1)
     xts_ref = torch.FloatTensor(np.array(xts_ref)).unsqueeze(1)
