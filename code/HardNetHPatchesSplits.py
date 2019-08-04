@@ -1132,6 +1132,12 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
 
+    if epoch==(args.start_epoch + args.epochs - 1):
+        savestr = 'valset_imagelabels_epoch' + str(epoch) + '.txt'
+        np.savetxt(savestr, all_val_set_images, delimiter=',') 
+        savestr = 'valset_distances_epoch' + str(epoch) + '.txt'
+        np.savetxt(savestr, dist_m_all_val, delimiter=',') 
+
     # if epoch==49:
     #     savestr = 'final_val_distances_thresh' + str(thresh) + '.txt'
     #     np.savetxt(savestr, dist_m_all_val, delimiter=',')   # X is an array
@@ -1200,6 +1206,12 @@ def test(test_loader, model, epoch, logger, logger_test_name, test_sample_x, tes
     savestr = 'train_imageid-v-dist_epoch' + str(epoch) + '.png'
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
+
+    if epoch==(args.start_epoch + args.epochs - 1):
+        savestr = 'trainset_imagelabels_epoch' + str(epoch) + '.txt'
+        np.savetxt(savestr, sample_train_set_images, delimiter=',') 
+        savestr = 'trainset_distances_epoch' + str(epoch) + '.txt'
+        np.savetxt(savestr, dist_m_all_val, delimiter=',') 
 
     return test_loss.item(), fpr95
 
