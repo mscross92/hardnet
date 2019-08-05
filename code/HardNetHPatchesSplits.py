@@ -370,6 +370,7 @@ class TotalDatasetsLoader(data.Dataset):
                 for ix in idxs:
                     pos_desc.extend(descrptrs[ix])
                 print(pos_desc)
+                print(descrptrs)
                 # compute distance between all positives
                 x_norm = (pos_desc**2).sum(1).view(-1, 1)
                 y_t = torch.transpose(pos_desc, 0, 1)
