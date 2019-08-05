@@ -431,6 +431,7 @@ class TotalDatasetsLoader(data.Dataset):
 
             # transform images if required
             if self.fliprot:
+                print('transforming!')
                 do_flip = random.random() > 0.5
                 do_rot = random.random() > 0.5
 
