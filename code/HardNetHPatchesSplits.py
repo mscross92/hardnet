@@ -368,12 +368,12 @@ class TotalDatasetsLoader(data.Dataset):
                 idxs = np.argwhere(lll==c1)
                 pos_desc = descrptrs[idxs]
                 # compute distance between all positives
-                distances = []
-                x_norm = (pos_desc**2).sum(1).view(-1, 1)
-                y_t = torch.transpose(pos_desc, 0, 1)
-                y_norm = (pos_desc**2).sum(1).view(1, -1)
-                dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(pos_desc, y_t),0.0,np.inf))
-                distances.extend(dists.data.cpu().numpy())
+                d1_sq = torch.sum(pos_desc * pos_desc, dim=1).unsqueeze(-1)
+                d2_sq = d1_sq
+                eps = 1e-6
+                distances = torch.sqrt((d1_sq.repeat(1, positive.size(0)) + torch.t(d2_sq.repeat(1, anchor.size(0)))
+                                - 2.0 * torch.bmm(anchor.unsqueeze(0), torch.t(positive).unsqueeze(0)).squeeze(0))+eps)
+                distances = distances.numpy()
                 # select hardest positive (largest distance)
                 row_id = np.argwhere(pos_desc==a_desc)
                 distances = distances[:,row_id]
