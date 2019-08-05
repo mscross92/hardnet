@@ -372,7 +372,7 @@ class TotalDatasetsLoader(data.Dataset):
                 p_idx = indices[c1][n2]
             else:
                 n1 = np.random.randint(0, len(indices[c1]))
-                a_desc = descrptrs[indices[c1][n1]]
+                a_desc = descrptrs[indices[c1][n1]].cpu().numpy()
                 # get indices for all possible positives
                 lll = np.array(labels)
                 idxs = np.argwhere(lll==c1).ravel().tolist()
@@ -386,6 +386,7 @@ class TotalDatasetsLoader(data.Dataset):
                 y_norm = (pos_desc**2).sum(1).view(1, -1)
                 dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(pos_desc, y_t),0.0,np.inf))
                 distances = dists.data.cpu().numpy()
+                pos_desc = pos_desc.cpu().numpy()
                 # select hardest positive (largest distance)
                 row_id = np.argwhere(pos_desc==a_desc)
                 distances = distances[:,row_id]
