@@ -363,7 +363,7 @@ class TotalDatasetsLoader(data.Dataset):
             else:
                 n1 = np.random.randint(0, len(indices[c1]))
                 a_desc = descrptrs[indices[c1][n1]]
-                print(a_desc.shape)
+                print(descrptrs.shape)
                 # get indices for all possible positives
                 lll = np.array(labels)
                 idxs = np.argwhere(lll==c1)
