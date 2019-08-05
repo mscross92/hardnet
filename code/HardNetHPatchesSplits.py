@@ -1579,6 +1579,23 @@ def main(train_loader, test_loader, model, logger, file_logger):
     np.savetxt('tp.txt', tp, delimiter=',') 
     np.savetxt('tn.txt', tn, delimiter=',') 
 
+    distances = np.zeros((717,len(inc_list)))
+    # iterate through patches
+    for ii in range(717):
+        d_idx_a = int(label_indices[ii,0]) # reference patch for first image
+        desc_a = desc_xv[d_idx_a].cpu().numpy()
+
+        # iterate through images
+        for jj in range(len(inc_list)):
+            d_idx_b = int(label_indices[ii,jj])
+            desc_b = desc_xv[d_idx_b].cpu().numpy()
+
+            # compute euclidean distance
+            d = cv2.norm(desc_a,desc_b,cv2.NORM_L2)
+            distances[ii,jj] = d
+
+    np.savetxt('positive_dists.txt', distances, delimiter=',') 
+
     torch.cuda.empty_cache()
 
 
