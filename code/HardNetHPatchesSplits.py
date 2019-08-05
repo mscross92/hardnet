@@ -272,7 +272,7 @@ class TotalDatasetsLoader(data.Dataset):
     def get_descriptors_for_dataset(data_a,model):
         with torch.no_grad():
             x = torch.ByteTensor(np.array(data_a, dtype=np.uint8))
-            x = torch.FloatTensor(np.array(xt)).unsqueeze(1)
+            x = torch.FloatTensor(np.array(x)).unsqueeze(1)
 
             if args.cuda:
                 model.cuda()
@@ -280,7 +280,7 @@ class TotalDatasetsLoader(data.Dataset):
                 x = Variable(x)
                 out_a = model(x)
         return out_a
-        
+
         #     # data_a = torch.FloatTensor(np.array(data_a)).unsqueeze_(-1)
         #     descriptors = []
         #     for d in data_a:
