@@ -389,6 +389,8 @@ class TotalDatasetsLoader(data.Dataset):
                 pos_desc = pos_desc.cpu().numpy()
                 # select hardest positive (largest distance)
                 row_id = np.argwhere(pos_desc==a_desc)
+                print(row_id)
+                print(len(pos_desc))
                 distances = distances[:,row_id]
                 p_idx = np.argmax(distances)
                 p_idx = idxs[p_idx]
