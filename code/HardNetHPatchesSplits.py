@@ -396,6 +396,8 @@ class TotalDatasetsLoader(data.Dataset):
             n3 = np.random.randint(0, len(indices[c2]))
             triplets.append([indices[c1][n1], p_idx, indices[c2][n3]])
         # print('TRIPLET SHAPE',np.array(triplets).shape)
+        
+        torch.cuda.empty_cache()
         return torch.LongTensor(np.array(triplets))
 
 
