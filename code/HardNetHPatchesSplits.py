@@ -373,10 +373,10 @@ class TotalDatasetsLoader(data.Dataset):
                 eps = 1e-6
                 distances = torch.sqrt((d1_sq.repeat(1, pos_desc.size(0)) + torch.t(d2_sq.repeat(1, pos_desc.size(0)))
                                 - 2.0 * torch.bmm(pos_desc.unsqueeze(0), torch.t(pos_desc).unsqueeze(0)).squeeze(0))+eps)
-                distances = distances.numpy()
                 # select hardest positive (largest distance)
                 row_id = np.argwhere(pos_desc==a_desc)
                 distances = distances[:,row_id]
+                distances = distances.numpy()
                 p_idx = np.argmax(distances)
                 p_idx = idxs[p_idx]
                 
