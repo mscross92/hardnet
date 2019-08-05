@@ -284,7 +284,7 @@ class TotalDatasetsLoader(data.Dataset):
             
                 dx = Variable(dx)
                 out_a = model(dx)
-                descriptors.extend(out_a.data.cpu().numpy())
+                descriptors.extend(out_a.data.cpu())
         return descriptors
     
 
