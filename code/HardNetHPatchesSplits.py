@@ -365,7 +365,7 @@ class TotalDatasetsLoader(data.Dataset):
                 a_desc = descrptrs[indices[c1][n1]]
                 # get indices for all possible positives
                 lll = np.array(labels)
-                idxs = np.argwhere(lll==c1)
+                idxs = np.argwhere(lll==c1).ravel()
                 print(idxs)
                 pos_desc = descrptrs[idxs]
                 # compute distance between all positives
