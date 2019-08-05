@@ -480,7 +480,7 @@ class HardNet(nn.Module):
             nn.Conv2d(128, 128, kernel_size=3, padding=1, bias=False),
             nn.BatchNorm2d(128, affine=False),
             nn.ReLU(),
-            nn.Dropout(0.5),
+            nn.Dropout(0.3),
             nn.Conv2d(128, 128, kernel_size=8, bias=False),
             nn.BatchNorm2d(128, affine=False),
         )
