@@ -221,9 +221,9 @@ class TotalDatasetsLoader(data.Dataset):
         if self.batch_hard == 0:
             self.triplets = self.generate_triplets(self.labels, self.n_triplets, self.batch_size)
         else:
-            self.descriptors = self.get_descriptors_for_dataset(self.data, self.model)
+            desc = self.get_descriptors_for_dataset(self.data, self.model)
             # #
-            np.save('descriptors.npy', self.descriptors)
+            np.save('descriptors.npy', desc)
             self.descriptors = np.load('descriptors.npy')
 
             self.triplets = self.generate_hard_triplets(self.labels, self.n_triplets, self.descriptors, self.batch_size)
