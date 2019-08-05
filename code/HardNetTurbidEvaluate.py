@@ -1308,7 +1308,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
     def load_patchDataset_allval(patch_dir,incld,n_patches):
         n_imgs = len(incld)
-        idxs = np.zeros((max(n_patches,n_imgs)))
+        idxs = np.zeros((n_patches,n_imgs))
         X = []
         y = []
         y2 = []
