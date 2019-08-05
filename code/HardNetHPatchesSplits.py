@@ -391,7 +391,7 @@ class TotalDatasetsLoader(data.Dataset):
                 row_id = np.argwhere(pos_desc==a_desc)[0][0]
                 distances = distances[:,row_id]
                 p_idx = np.argmax(distances)
-                p_idx = idxs[p_idx]
+                p_idx = int(idxs[p_idx].cpu().numpy())
                 
             n3 = np.random.randint(0, len(indices[c2]))
             triplets.append([indices[c1][n1], p_idx, indices[c2][n3]])
