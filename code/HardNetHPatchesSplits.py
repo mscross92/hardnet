@@ -1430,7 +1430,6 @@ def main(train_loader, test_loader, model, logger, file_logger):
                          transform=transform)
             train_loader = torch.utils.data.DataLoader(trainDatasetWithHardNegatives,
                                                     batch_size=args.batch_size,
-                                                    model=model,
                                                     shuffle=False, **kwargs)
 
 
