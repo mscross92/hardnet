@@ -1446,9 +1446,9 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
         # # visualise 
         # test on deepblue set
-        test_loss_epch, fpr95_epch = test(test_loader, model, epoch, logger,"a_test_log", xt, yt, xv, xv_ref, yv_p, yv_i, xts, xts_ref, yts_p, yts_i)
-        test_losses_arr.append(test_loss_epch)
-        test_fpr95_arr.append(fpr95_epch)
+        # test_loss_epch, fpr95_epch = test(test_loader, model, epoch, logger,"a_test_log", xt, yt, xv, xv_ref, yv_p, yv_i, xts, xts_ref, yts_p, yts_i)
+        # test_losses_arr.append(test_loss_epch)
+        # test_fpr95_arr.append(fpr95_epch)
 
         # if TEST_ON_W1BS:
         #     # print(weights_path)
@@ -1479,31 +1479,76 @@ def main(train_loader, test_loader, model, logger, file_logger):
         #                                  methods=["SNN_ratio"],
         #                                  descs_to_draw=[desc_name])
 
-    # plot losses
-    epchs = range(1, len(test_losses_arr) + 1)
-    plt.figure(figsize=(7,4))
-    plt.plot(epchs, test_fpr95_arr)
-    plt.xlabel('Epochs')
-    plt.ylabel('FPR(95)')
-    savestr = 'frp95_plot.png'
-    plt.savefig(savestr, bbox_inches='tight')
-    plt.close()
+    # # plot losses
+    # epchs = range(1, len(test_losses_arr) + 1)
+    # plt.figure(figsize=(7,4))
+    # plt.plot(epchs, test_fpr95_arr)
+    # plt.xlabel('Epochs')
+    # plt.ylabel('FPR(95)')
+    # savestr = 'frp95_plot.png'
+    # plt.savefig(savestr, bbox_inches='tight')
+    # plt.close()
 
-    plt.figure(figsize=(7,4))
-    plt.plot(epchs, train_losses_arr, label='Milk subset (train)')
-    plt.plot(epchs, test_losses_arr, label='DeepBlue subset (validation)')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.legend()
-    savestr = 'losses_plot.png'
-    plt.savefig(savestr, bbox_inches='tight')
-    plt.close()
+    # plt.figure(figsize=(7,4))
+    # plt.plot(epchs, train_losses_arr, label='Milk subset (train)')
+    # plt.plot(epchs, test_losses_arr, label='DeepBlue subset (validation)')
+    # plt.xlabel('Epochs')
+    # plt.ylabel('Loss')
+    # plt.legend()
+    # savestr = 'losses_plot.png'
+    # plt.savefig(savestr, bbox_inches='tight')
+    # plt.close()
 
-    # save fpr data to file
-    savestr = 'fpr95_test_data.txt'
-    np.savetxt(savestr, test_fpr95_arr, delimiter=',') 
+    # # save fpr data to file
+    # savestr = 'fpr95_test_data.txt'
+    # np.savetxt(savestr, test_fpr95_arr, delimiter=',') 
+
+
+    model.eval()
+    
+    # load all patches
+    inc_list = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
+    patch_fldr = '/content/hardnet/data/sets/turbid/test_data/validation_all'
+    xv, label_indices, yv_p, yv_i = load_patchDataset_allval(patch_fldr,inc_list,717)
+    xv = torch.FloatTensor(np.array(xv)).unsqueeze(1)
+
+    # load comparisons
+    fl = '/content/hardnet/data/sets/turbid/test_data/comparisons.txt'    
+    comparisons = np.loadtxt(fl,delimiter=',').astype('uint8')
+
+    # compute all descriptors
+    if args.cuda:
+        xv = xv.cuda()
+    with torch.no_grad():
+        xv = Variable(xv)
+        desc_xv = model(xv)
+
+    tn, tp, = [], []
+
+    # for each comparison
+    for p in comparisons:
+        pos_flag = p[4]
+        d_idx_a = int(label_indices[p[1],p[0]])
+        desc_a = desc_xv[d_idx_a].cpu().numpy()
+
+        d_idx_b = int(label_indices[p[3],p[2]])
+        desc_b = desc_xv[d_idx_b].cpu().numpy()
+
+        # compute euclidean distance
+        d = cv2.norm(desc_a,desc_b,cv2.NORM_L2)
+
+        if pos_flag == 1:
+            tp.append(d)
+        else:
+            tn.append(d)
+
+    # save to files
+    np.savetxt('tp.txt', tp, delimiter=',') 
+    np.savetxt('tn.txt', tn, delimiter=',') 
 
     torch.cuda.empty_cache()
+
+
 
 if __name__ == '__main__':
     LOG_DIR = args.log_dir
