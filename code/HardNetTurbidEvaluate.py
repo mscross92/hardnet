@@ -1418,8 +1418,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
     # for each comparison
     for p in comparisons:
         pos_flag = p[4]
-        d_idx_a = label_indices[p[1],p[0]]
-        print(d_idx_a)
+        d_idx_a = int(label_indices[p[1],p[0]])
         desc_a = desc_xv[d_idx_a].cpu().numpy()
 
         d_idx_b = label_indices[p[3],p[2]]
