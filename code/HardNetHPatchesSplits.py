@@ -1500,6 +1500,8 @@ def main(train_loader, test_loader, model, logger, file_logger):
     savestr = 'fpr95_test_data.txt'
     np.savetxt(savestr, test_fpr95_arr, delimiter=',') 
 
+    torch.cuda.empty_cache()
+
 if __name__ == '__main__':
     LOG_DIR = args.log_dir
     if not os.path.isdir(LOG_DIR):
