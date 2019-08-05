@@ -366,9 +366,8 @@ class TotalDatasetsLoader(data.Dataset):
                 # get indices for all possible positives
                 lll = np.array(labels)
                 idxs = np.argwhere(lll==c1).ravel().tolist()
-                pos_desc = []
-                for ix in idxs:
-                    pos_desc.extend(descrptrs[ix])
+                idxs = torch.tensor(idxs)
+                pos_desc = torch.index_select(descrptrs, 0, idxs)
                 # compute distance between all positives
                 x_norm = (pos_desc**2).sum(1).view(-1, 1)
                 y_t = torch.transpose(pos_desc, 0, 1)
