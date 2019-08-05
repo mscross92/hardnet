@@ -225,14 +225,8 @@ class TotalDatasetsLoader(data.Dataset):
             # #
             np.save('descriptors.npy', self.descriptors)
             self.descriptors = np.load('descriptors.npy')
-            print(self.descriptors[0])
-            #
-            self.negative_indices = self.get_hard_negatives(self.labels, self.descriptors)
-            np.save('descriptors_min_dist.npy', self.negative_indices)
-            self.negative_indices = np.load('descriptors_min_dist.npy')
-            print(self.negative_indices[0])
 
-            self.triplets = self.generate_hard_triplets(self.labels, self.n_triplets, self.negative_indices,self.descriptors,self.alpha_margin)
+            self.triplets = self.generate_hard_triplets(self.labels, self.n_triplets, self.descriptors, self.batch_size)
 
     @staticmethod
     def generate_triplets(labels, num_triplets, batch_size):
@@ -276,19 +270,21 @@ class TotalDatasetsLoader(data.Dataset):
 
     @staticmethod
     def get_descriptors_for_dataset(data_a,model):
-        # data_a = torch.FloatTensor(np.array(data_a)).unsqueeze_(-1)
-        descriptors = []
-        for d in data_a:
-            dx = torch.FloatTensor(np.array(d)).unsqueeze(0)
-            dx = dx.unsqueeze(0)
+        with torch.no_grad():
 
-            if args.cuda:
-                model.cuda()
-                dx = dx.cuda()
-        
-            dx = Variable(dx)
-            out_a = model(dx)
-            descriptors.extend(out_a.data.cpu().numpy())
+            # data_a = torch.FloatTensor(np.array(data_a)).unsqueeze_(-1)
+            descriptors = []
+            for d in data_a:
+                dx = torch.FloatTensor(np.array(d)).unsqueeze(0)
+                dx = dx.unsqueeze(0)
+
+                if args.cuda:
+                    model.cuda()
+                    dx = dx.cuda()
+            
+                dx = Variable(dx)
+                out_a = model(dx)
+                descriptors.extend(out_a.data.cpu().numpy())
         return descriptors
     
 
@@ -335,7 +331,7 @@ class TotalDatasetsLoader(data.Dataset):
         return descriptors_min_dist
 
     @staticmethod
-    def generate_hard_triplets(labels, num_triplets, descrptrs, negative_indices, alpha_margin=1.0):
+    def generate_hard_triplets(labels, num_triplets, descrptrs, batch_size):
         def create_indices(_labels):
             inds = dict()
             for idx, ind in enumerate(_labels):
@@ -345,56 +341,50 @@ class TotalDatasetsLoader(data.Dataset):
             return inds
 
         triplets = []
-        indices = create_indices(labels)
+        indices = create_indices(labels.numpy())
         unique_labels = np.unique(labels.numpy())
         n_classes = unique_labels.shape[0]
-
         # add only unique indices in batch
         already_idxs = set()
-        count  = 0
+
         for x in tqdm(range(num_triplets)):
-            if len(already_idxs) >= args.batch_size:
+            if len(already_idxs) >= batch_size:
                 already_idxs = set()
-            c1 = np.random.randint(0, n_classes - 1)
+            c1 = np.random.randint(0, n_classes)
             while c1 in already_idxs:
-                c1 = np.random.randint(0, n_classes - 1)
+                c1 = np.random.randint(0, n_classes)
             already_idxs.add(c1)
+            c2 = np.random.randint(0, n_classes)
+            while c1 == c2:
+                c2 = np.random.randint(0, n_classes)
             if len(indices[c1]) == 2:  # hack to speed up process
                 n1, n2 = 0, 1
+                p_idx = indices[c1][n2]
             else:
-                n1 = np.random.randint(0, len(indices[c1]) - 1)
-                n2 = np.random.randint(0, len(indices[c1]) - 1)
-                while n1 == n2:
-                    n2 = np.random.randint(0, len(indices[c1]) - 1)
-            
-            min_dist = torch.dist(descrptrs[indices[c1][n1]],descrptrs[indices[c1][nn]],p=2)
-            # print(min_dist)
-
-            indx = indices[c1][n1]
-            if(len(negative_indices[indx])>0):
-                counter=0
-                negative_indx = random.choice(negative_indices[indx])
-                # get distance between anchor and randomly selected index
-                d = torch.dist(descrptrs[indices[c1][n1]],descrptrs[negative_indx],p=2)
-                while (d<min_dist or d>(min_dist + alpha_margin)) and counter<50:
-                    negative_indx = random.choice(negative_indices[indx])
-                    d = torch.dist(descrptrs[indices[c1][n1]],descrptrs[negative_indx],p=2)
-                    counter = counter + 1
-            else:
-                count+=1
-                c2 = np.random.randint(0, n_classes - 1)
-                while c1 == c2:
-                    c2 = np.random.randint(0, n_classes - 1)
-                n3 = np.random.randint(0, len(indices[c2]) - 1)
-                negative_indx = indices[c2][n3]
-
-            already_idxs.add(c1)
-
-            triplets.append([indices[c1][n1], indices[c1][n2], negative_indx])
-
-        print(count)
-        print('triplets are generated. amount of triplets: {}'.format(len(triplets)))
+                n1 = np.random.randint(0, len(indices[c1]))
+                a_desc = descrptrs[indices[c1][n1]]
+                # get indices for all possible positives
+                lll = np.array(labels)
+                idxs = np.argwhere(lll==c1)
+                pos_desc = descrptrs[idxs]
+                # compute distance between all positives
+                distances = []
+                x_norm = (pos_desc**2).sum(1).view(-1, 1)
+                y_t = torch.transpose(pos_desc, 0, 1)
+                y_norm = (pos_desc**2).sum(1).view(1, -1)
+                dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(pos_desc, y_t),0.0,np.inf))
+                distances.extend(dists.data.cpu().numpy())
+                # select hardest positive (largest distance)
+                row_id = np.argwhere(pos_desc==a_desc)
+                distances = distances[:,row_id]
+                p_idx = np.argmax(distances)
+                p_idx = idxs[p_idx]
+                
+            n3 = np.random.randint(0, len(indices[c2]))
+            triplets.append([indices[c1][n1], p_idx, indices[c2][n3]])
+        # print('TRIPLET SHAPE',np.array(triplets).shape)
         return torch.LongTensor(np.array(triplets))
+
 
     def __getitem__(self, index):
             def transform_img(img):
@@ -1430,7 +1420,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
                                                     model=model,
                                                     shuffle=False, **kwargs)
 
-            print(model)
+
 
         train_loss_epch = train(train_loader, model, optimizer1, epoch, logger)
         train_losses_arr.append(train_loss_epch)
