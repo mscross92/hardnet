@@ -523,19 +523,19 @@ def create_loaders(load_random_triplets=False):
     test_dataset_names = copy.copy(dataset_names)
     test_dataset_names.remove(args.training_set)
     kwargs = {'num_workers': args.num_workers, 'pin_memory': args.pin_memory} if args.cuda else {}
-    np_reshape32 = lambda x: np.reshape(x, (32, 32, 1))
+    np_reshape32 = lambda x: np.reshape(x, (args.imageSize, args.imageSize, 1))
     # np_reshape29 = lambda x: np.reshape(x, (29, 29, 1))
     transform_test = transforms.Compose([
             transforms.Lambda(np_reshape32),
             transforms.ToPILImage(),
-            transforms.Resize(32),
+            transforms.Resize(args.imageSize),
             transforms.ToTensor()])
     transform_train = transforms.Compose([
             transforms.Lambda(np_reshape32),
             transforms.ToPILImage(),
             # transforms.RandomRotation(5,PIL.Image.BILINEAR),
             # transforms.RandomResizedCrop(29, scale = (0.9,1.0),ratio = (0.9,1.1)),
-            transforms.Resize(32),
+            transforms.Resize(args.imageSize),
             transforms.ToTensor()])
     transform = transforms.Compose([
             # transforms.Lambda(cv2_scale),
@@ -547,7 +547,7 @@ def create_loaders(load_random_triplets=False):
             # transforms.RandomRotation(15,PIL.Image.BILINEAR),
             # transforms.RandomHorizontalFlip(p=0.5),
             # transforms.ColorJitter(brightness=0.1, contrast=0, saturation=0, hue=0),
-            transforms.Resize(32),
+            transforms.Resize(args.imageSize),
             transforms.ToTensor()])
     if not args.augmentation:
         transform_train = transform
@@ -1297,7 +1297,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
                         y.append(int(yyy))
                         f = os.path.join(subdir, file)
                         ptch = cv2.imread(f, cv2.IMREAD_GRAYSCALE)
-                        ptch = cv2.resize(ptch, (32, 32))
+                        ptch = cv2.resize(ptch, (args.imageSize, args.imageSize))
                         ptch = np.array(ptch, dtype=np.uint8)
                         X.append(ptch)
                         if not int(yyy) in cl:
@@ -1323,7 +1323,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
                     if int(yy) in incld:
                         f = os.path.join(subdir, file)
                         ptch = cv2.imread(f, cv2.IMREAD_GRAYSCALE)
-                        ptch = cv2.resize(ptch, (32, 32))
+                        ptch = cv2.resize(ptch, (args.imageSize, args.imageSize))
                         ptch = np.array(ptch, dtype=np.uint8)
                         if int(yy)==0:
                             X_ref.append(ptch)
@@ -1365,14 +1365,14 @@ def main(train_loader, test_loader, model, logger, file_logger):
     test_losses_arr, test_fpr95_arr, train_losses_arr = [], [], []
 
     # np_reshape29 = lambda x: np.reshape(x, (29, 29, 1))
-    np_reshape32 = lambda x: np.reshape(x, (32, 32, 1))
+    np_reshape32 = lambda x: np.reshape(x, (args.imageSize, args.imageSize, 1))
     transform = transforms.Compose([
         transforms.Lambda(np_reshape32),
         transforms.ToPILImage(),
         # transforms.RandomRotation(15,PIL.Image.BILINEAR),
         # transforms.RandomHorizontalFlip(p=0.5),
         # transforms.ColorJitter(brightness=0.1, contrast=0, saturation=0, hue=0),
-        transforms.Resize(32),
+        transforms.Resize(args.imageSize),
         transforms.ToTensor()])
 
     # patch_fldr = '/content/hardnet/data/sets/turbid/test_data/patches'
