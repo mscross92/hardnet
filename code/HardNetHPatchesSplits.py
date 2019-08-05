@@ -279,7 +279,7 @@ class TotalDatasetsLoader(data.Dataset):
                 x = x.cuda()
                 x = Variable(x)
                 out_a = model(x)
-        return out_a
+        return out_a.cpu()
 
         #     # data_a = torch.FloatTensor(np.array(data_a)).unsqueeze_(-1)
         #     descriptors = []
@@ -356,7 +356,8 @@ class TotalDatasetsLoader(data.Dataset):
         n_classes = unique_labels.shape[0]
         # add only unique indices in batch
         already_idxs = set()
-
+        if args.cuda:
+            descrptrs = descrptrs.cuda()
         for x in tqdm(range(num_triplets)):
             if len(already_idxs) >= batch_size:
                 already_idxs = set()
