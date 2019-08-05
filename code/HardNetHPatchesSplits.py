@@ -373,7 +373,7 @@ class TotalDatasetsLoader(data.Dataset):
                 y_t = torch.transpose(pos_desc, 0, 1)
                 y_norm = (pos_desc**2).sum(1).view(1, -1)
                 dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(pos_desc, y_t),0.0,np.inf))
-                distances = dists.data.cpu().numpy())
+                distances = dists.data.cpu().numpy()
                 # select hardest positive (largest distance)
                 row_id = np.argwhere(pos_desc==a_desc)
                 distances = distances[:,row_id]
