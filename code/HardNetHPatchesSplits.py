@@ -1306,6 +1306,39 @@ def main(train_loader, test_loader, model, logger, file_logger):
         print(len(y),'patches loaded from',nC,'classes')
         return torch.ByteTensor(np.array(X, dtype=np.uint8)), y
 
+    def load_patchDataset_allval2(patch_dir,incld,n_patches):
+        n_imgs = len(incld)
+        idxs = np.zeros((n_patches,n_imgs))
+        X = []
+        y = []
+        y2 = []
+        cl = []
+        counter = 0
+        for subdir, dirs, files in sortedWalk(patch_dir):
+            yy = subdir.replace(patch_dir+'/','')
+            # print(yy)
+            files = sorted(files)
+            for file in files:
+                if yy != patch_dir:
+                    s = file.replace('.jpg','')
+                    if int(yy) in incld:
+                        f = os.path.join(subdir, file)
+                        ptch = cv2.imread(f, cv2.IMREAD_GRAYSCALE)
+                        ptch = cv2.resize(ptch, (32, 32))
+                        ptch = np.array(ptch, dtype=np.uint8)
+                    
+                        X.append(ptch)
+                        y.append(int(s))
+                        y2.append(int(yy)+1)
+                        idxs[int(s),int(yy)] = counter
+                        if not int(s) in cl:
+                            cl.append(int(s))  
+                        counter =  counter + 1   
+        nC = len(cl)
+        print(len(y),'patches loaded from',nC,'classes')
+
+        return torch.ByteTensor(np.array(X, dtype=np.uint8)), idxs, y, y2
+
     def load_patchDataset_allval(patch_dir,incld):
         X = []
         X_ref = []
@@ -1509,7 +1542,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
     # load all patches
     inc_list = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
     patch_fldr = '/content/hardnet/data/sets/turbid/test_data/validation_all'
-    xv, label_indices, yv_p, yv_i = load_patchDataset_allval(patch_fldr,inc_list,717)
+    xv, label_indices, yv_p, yv_i = load_patchDataset_allval2(patch_fldr,inc_list,717)
     xv = torch.FloatTensor(np.array(xv)).unsqueeze(1)
 
     # load comparisons
