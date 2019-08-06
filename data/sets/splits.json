@@ -1,1 +1,1 @@
-{"a": {"test": ["turbid_deepblue"], "train": ["turbid_milk"], "name": "a"},"b":{"test": ["turbid_deepblue"], "train": ["turbid_mixed"], "name": "b"}}
+{"a": {"test": ["turbid_deepblue"], "train": ["turbid_mixed"], "name": "a"},"b":{"test": ["turbid_deepblue"], "train": ["turbid_mixed"], "name": "b"}}
