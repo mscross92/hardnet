@@ -82,7 +82,7 @@ parser.add_argument('--model-dir', default='data/models/',
                     help='folder to output model checkpoints')
 parser.add_argument('--experiment-name', default='/multiple_datasets_all/',
                     help='experiment path')
-parser.add_argument('--training-set', default='turbid_milk',
+parser.add_argument('--training-set', default='turbid_mixed',
                     help='Other options: notredame, yosemite')
 parser.add_argument('--loss', default='triplet_margin',
                     help='Other options: softmax, contrastive')
@@ -114,7 +114,7 @@ parser.add_argument('--batch-size', type=int, default=512, metavar='BS',
                     help='input batch size for training (default: 1024)')
 parser.add_argument('--test-batch-size', type=int, default=256, metavar='BST',
                     help='input batch size for testing (default: 1024)')
-parser.add_argument('--n-triplets', type=int, default=180000, metavar='N',
+parser.add_argument('--n-triplets', type=int, default=250000, metavar='N',
                     help='how many triplets will generate from the dataset')
 parser.add_argument('--margin', type=float, default=1.0, metavar='MARGIN',
                     help='the margin value for the triplet loss function (default: 1.0')
@@ -476,7 +476,7 @@ class HardNet(nn.Module):
             # nn.MaxPool2d(2),
             nn.BatchNorm2d(64, affine=False),
             nn.ReLU(),
-            nn.Conv2d(64, 128, kernel_size=3, padding=1, bias=False),
+            nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1, bias=False),
             nn.BatchNorm2d(128, affine=False),
             nn.ReLU(),
             nn.Conv2d(128, 128, kernel_size=3, padding=1, bias=False),
@@ -1550,7 +1550,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
     # load comparisons
     fl = '/content/hardnet/data/sets/turbid/test_data/comparisons.txt'    
-    comparisons = np.loadtxt(fl,delimiter=',').astype('uint8')
+    comparisons = np.loadtxt(fl,delimiter=',').astype('uint16')
 
     # compute all descriptors
     if args.cuda:

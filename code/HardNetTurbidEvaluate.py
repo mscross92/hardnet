@@ -1404,7 +1404,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
     # load comparisons
     fl = '/content/hardnet/data/sets/turbid/test_data/comparisons.txt'    
-    comparisons = np.loadtxt(fl,delimiter=',').astype('uint8')
+    comparisons = np.loadtxt(fl,delimiter=',').astype('uint16')
 
     # compute all descriptors
     if args.cuda:
