@@ -1470,8 +1470,8 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
 
 
-        # train_loss_epch = train(train_loader, model, optimizer1, epoch, logger)
-        # train_losses_arr.append(train_loss_epch)
+        train_loss_epch = train(train_loader, model, optimizer1, epoch, logger)
+        train_losses_arr.append(train_loss_epch)
 
         # # iterate over test loaders and test results
         # #train_loader, test_loaders2 = create_loaders(load_random_triplets=triplet_flag)
