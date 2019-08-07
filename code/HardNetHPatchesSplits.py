@@ -1473,8 +1473,8 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
 
 
-        train_loss_epch = train(train_loader, model, optimizer1, epoch, logger)
-        train_losses_arr.append(train_loss_epch)
+        # train_loss_epch = train(train_loader, model, optimizer1, epoch, logger)
+        # train_losses_arr.append(train_loss_epch)
 
         # # iterate over test loaders and test results
         # #train_loader, test_loaders2 = create_loaders(load_random_triplets=triplet_flag)
@@ -1557,7 +1557,13 @@ def main(train_loader, test_loader, model, logger, file_logger):
         xv = xv.cuda()
     with torch.no_grad():
         xv = Variable(xv)
-        desc_xv = model(xv)
+        # desc_xv = model(xv)
+        splts = torch.chunk(xv, args.imageSize)
+        outputs = []
+        for s in splts:
+            desc = model(s)
+            outputs.append(desc)
+        desc_xv = torch.cat(outputs)
 
     tn, tp, = [], []
 
@@ -1614,6 +1620,10 @@ if __name__ == '__main__':
             os.makedirs(DESCS_DIR)
     logger, file_logger = None, None
     model = HardNet()
+    model_weights = '/content/hardnet/pretrained/checkpoint_9.pth'
+    checkpoint = torch.load(model_weights)
+    model.load_state_dict(checkpoint['state_dict'])
+
     if (args.enable_logging):
         from Loggers import Logger, FileLogger
         logger = Logger(LOG_DIR)
