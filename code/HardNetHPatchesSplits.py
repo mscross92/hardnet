@@ -162,7 +162,7 @@ if args.anchorave:
 triplet_flag = (args.batch_reduce == 'random_global') or args.gor
 # triplet_flag = True
 
-dataset_names = ['turbid_milk', 'turbid_deepblue']
+dataset_names = ['turbid_milk', 'turbid_deepblue','turbid_mixed']
 
 TEST_ON_W1BS = False
 # check if path to w1bs dataset testing module exists
