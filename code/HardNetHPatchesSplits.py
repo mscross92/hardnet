@@ -1617,9 +1617,9 @@ if __name__ == '__main__':
             os.makedirs(DESCS_DIR)
     logger, file_logger = None, None
     model = HardNet()
-    model_weights = '/content/hardnet/pretrained/checkpoint_9.pth'
-    checkpoint = torch.load(model_weights)
-    model.load_state_dict(checkpoint['state_dict'])
+    # model_weights = '/content/hardnet/pretrained/checkpoint_9.pth'
+    # checkpoint = torch.load(model_weights)
+    # model.load_state_dict(checkpoint['state_dict'])
 
     if (args.enable_logging):
         from Loggers import Logger, FileLogger
