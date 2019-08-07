@@ -466,10 +466,10 @@ class HardNet(nn.Module):
             nn.BatchNorm2d(32, affine=False),
             nn.ReLU(),
             nn.Conv2d(32, 32, kernel_size=3, padding=1, bias=False),
-            nn.MaxPool2d(2),
+            # nn.MaxPool2d(2),
             nn.BatchNorm2d(32, affine=False),
             nn.ReLU(),
-            nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1, bias=False),
+            nn.Conv2d(32, 64, kernel_size=3, padding=1, bias=False),
             nn.BatchNorm2d(64, affine=False),
             nn.ReLU(),
             nn.Conv2d(64, 64, kernel_size=3, padding=1, bias=False),
@@ -1327,7 +1327,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
                     if int(yy) in incld:
                         f = os.path.join(subdir, file)
                         ptch = cv2.imread(f, cv2.IMREAD_GRAYSCALE)
-                        ptch = cv2.resize(ptch, (32, 32))
+                        ptch = cv2.resize(ptch, (args.imageSize, args.imageSize))
                         ptch = np.array(ptch, dtype=np.uint8)
                     
                         X.append(ptch)
