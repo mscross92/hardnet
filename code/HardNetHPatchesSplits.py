@@ -279,6 +279,7 @@ class TotalDatasetsLoader(data.Dataset):
                 x = x.cuda()
                 x = Variable(x)
                 out_a = model(x)
+                print(out_a.shape)
         return out_a.cpu()
 
         #     # data_a = torch.FloatTensor(np.array(data_a)).unsqueeze_(-1)
@@ -1561,7 +1562,6 @@ def main(train_loader, test_loader, model, logger, file_logger):
             desc = model(s)
             outputs.append(desc)
         desc_xv = torch.cat(outputs)
-        print(desc_xv.shape)
 
     tn, tp, = [], []
 
