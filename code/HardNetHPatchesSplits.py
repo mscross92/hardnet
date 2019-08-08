@@ -278,7 +278,13 @@ class TotalDatasetsLoader(data.Dataset):
                 model.cuda()
                 x = x.cuda()
                 x = Variable(x)
-                out_a = model(x)
+                splts = torch.chunk(x, args.imageSize)
+                outputs = []
+                for s in splts:
+                    desc = model(s)
+                    outputs.append(desc)
+                out_a = torch.cat(outputs)
+                # out_a = model(x)
         return out_a.cpu()
 
         #     # data_a = torch.FloatTensor(np.array(data_a)).unsqueeze_(-1)
