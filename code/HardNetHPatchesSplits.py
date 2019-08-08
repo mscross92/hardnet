@@ -1561,6 +1561,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
             desc = model(s)
             outputs.append(desc)
         desc_xv = torch.cat(outputs)
+        print(desc_xv.shape)
 
     tn, tp, = [], []
 
