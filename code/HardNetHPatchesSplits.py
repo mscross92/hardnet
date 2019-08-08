@@ -477,7 +477,7 @@ class HardNet(nn.Module):
             nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1, bias=False),
             nn.BatchNorm2d(64, affine=False),
             nn.ReLU(),
-            nn.Conv2d(64, 64, kernel_size=3, stride=2, padding=1, bias=False),
+            nn.Conv2d(64, 64, kernel_size=3, padding=1, bias=False),
             # nn.MaxPool2d(2),
             nn.BatchNorm2d(64, affine=False),
             nn.ReLU(),
