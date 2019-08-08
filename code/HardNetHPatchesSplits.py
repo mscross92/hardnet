@@ -281,11 +281,11 @@ class TotalDatasetsLoader(data.Dataset):
                 splts = torch.chunk(x, args.imageSize)
                 outputs = []
                 for s in splts:
-                    desc = model(s)
+                    desc = model(s).cpu()
                     outputs.append(desc)
                 out_a = torch.cat(outputs)
                 # out_a = model(x)
-        return out_a.cpu()
+        return out_a
 
         #     # data_a = torch.FloatTensor(np.array(data_a)).unsqueeze_(-1)
         #     descriptors = []
