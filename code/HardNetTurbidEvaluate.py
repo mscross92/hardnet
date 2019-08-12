@@ -1418,10 +1418,10 @@ def main(train_loader, test_loader, model, logger, file_logger):
     # for each comparison
     for p in comparisons:
         pos_flag = p[4]
-        d_idx_a = int(label_indices[p[1],p[0]])
+        d_idx_a = int(label_indices[p[1],p[0]-2])
         desc_a = desc_xv[d_idx_a].cpu().numpy()
 
-        d_idx_b = int(label_indices[p[3],p[2]])
+        d_idx_b = int(label_indices[p[3],p[2]-2])
         desc_b = desc_xv[d_idx_b].cpu().numpy()
 
         # compute euclidean distance
