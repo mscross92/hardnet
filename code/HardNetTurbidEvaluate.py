@@ -1307,7 +1307,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
         return torch.ByteTensor(np.array(X, dtype=np.uint8)), y
 
     def load_patchDataset_allval(patch_dir,incld,n_patches):
-        n_imgs = len(incld)
+        n_imgs = len(incld)+1
         idxs = np.zeros((n_patches,n_imgs))
         X = []
         y = []
