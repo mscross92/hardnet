@@ -1550,7 +1550,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
     # load all patches
     inc_list = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
     patch_fldr = '/content/hardnet/data/sets/turbid/test_data/validation_all_' + str(args.imageSize)
-    xv, label_indices, yv_p, yv_i = load_patchDataset_allval2(patch_fldr,inc_list,1178)
+    xv, label_indices, yv_p, yv_i = load_patchDataset_allval2(patch_fldr,inc_list,1172)
     xv = torch.FloatTensor(np.array(xv)).unsqueeze(1)
 
     # load comparisons
@@ -1594,22 +1594,22 @@ def main(train_loader, test_loader, model, logger, file_logger):
     np.savetxt('tp.txt', tp, delimiter=',') 
     np.savetxt('tn.txt', tn, delimiter=',') 
 
-    distances = np.zeros((717,len(inc_list)))
-    # iterate through patches
-    for ii in range(717):
-        d_idx_a = int(label_indices[ii,0]) # reference patch for first image
-        desc_a = desc_xv[d_idx_a].cpu().numpy()
+    # distances = np.zeros((717,len(inc_list)))
+    # # iterate through patches
+    # for ii in range(717):
+    #     d_idx_a = int(label_indices[ii,0]) # reference patch for first image
+    #     desc_a = desc_xv[d_idx_a].cpu().numpy()
 
-        # iterate through images
-        for jj in range(len(inc_list)):
-            d_idx_b = int(label_indices[ii,jj])
-            desc_b = desc_xv[d_idx_b].cpu().numpy()
+    #     # iterate through images
+    #     for jj in range(len(inc_list)):
+    #         d_idx_b = int(label_indices[ii,jj])
+    #         desc_b = desc_xv[d_idx_b].cpu().numpy()
 
-            # compute euclidean distance
-            d = cv2.norm(desc_a,desc_b,cv2.NORM_L2)
-            distances[ii,jj] = d
+    #         # compute euclidean distance
+    #         d = cv2.norm(desc_a,desc_b,cv2.NORM_L2)
+    #         distances[ii,jj] = d
 
-    np.savetxt('positive_dists.txt', distances, delimiter=',') 
+    # np.savetxt('positive_dists.txt', distances, delimiter=',') 
 
     torch.cuda.empty_cache()
 
