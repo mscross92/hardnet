@@ -1440,11 +1440,11 @@ def main(train_loader, test_loader, model, logger, file_logger):
     n_tests = 200 # limit to only include milk patches
     distances = np.zeros((n_tests,len(inc_list)))
     for ii in range(n_tests):
-        ref_idx = label_indices[ii,0]
+        ref_idx = int(label_indices[ii,0])
         ref_desc = desc_xv[ref_idx].cpu().numpy()
 
         for jj in range(len(inc_list)):
-            p_idx = label_indices[ii,jj]
+            p_idx = int(label_indices[ii,jj])
             desc = desc_xv[p_idx].cpu().numpy()
             d = cv2.norm(ref_desc,desc,cv2.NORM_L2)
             distances[ii,jj] = d
