@@ -1436,6 +1436,21 @@ def main(train_loader, test_loader, model, logger, file_logger):
     np.savetxt('tp.txt', tp, delimiter=',') 
     np.savetxt('tn.txt', tn, delimiter=',') 
 
+    # compare positives for first 100 patches
+    n_tests = 200 # limit to only include milk patches
+    distances = np.zeros((n_tests,len(inc_list)))
+    for ii in range(n_tests):
+        ref_idx = label_indices[ii,0]
+        ref_desc = desc_xv[ref_idx].cpu().numpy()
+
+        for jj in range(len(inc_list)):
+            p_idx = label_indices[ii,jj]
+            desc = desc_xv[p_idx].cpu().numpy()
+            d = cv2.norm(ref_desc,desc,cv2.NORM_L2)
+            distances[ii,jj] = d
+
+    np.savetxt('positive_dists.txt', distances, delimiter=',')
+
     # distances = np.zeros((717,len(inc_list)))
     # # iterate through patches
     # for ii in range(717):
