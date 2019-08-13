@@ -474,7 +474,7 @@ class HardNet(nn.Module):
             nn.Conv2d(32, 32, kernel_size=3, padding=1, bias=False),
             nn.BatchNorm2d(32, affine=False),
             nn.ReLU(),
-            nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1, bias=False),
+            nn.Conv2d(32, 64, kernel_size=3, padding=1, bias=False),
             nn.BatchNorm2d(64, affine=False),
             nn.ReLU(),
             nn.Conv2d(64, 64, kernel_size=3, padding=1, bias=False),
@@ -1550,7 +1550,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
     # load all patches
     inc_list = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
     patch_fldr = '/content/hardnet/data/sets/turbid/test_data/validation_all_' + str(args.imageSize)
-    xv, label_indices, yv_p, yv_i = load_patchDataset_allval2(patch_fldr,inc_list,1174)
+    xv, label_indices, yv_p, yv_i = load_patchDataset_allval2(patch_fldr,inc_list,330)
     xv = torch.FloatTensor(np.array(xv)).unsqueeze(1)
 
     # load comparisons
