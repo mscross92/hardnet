@@ -114,7 +114,7 @@ parser.add_argument('--batch-size', type=int, default=512, metavar='BS',
                     help='input batch size for training (default: 1024)')
 parser.add_argument('--test-batch-size', type=int, default=256, metavar='BST',
                     help='input batch size for testing (default: 1024)')
-parser.add_argument('--n-triplets', type=int, default=175000, metavar='N',
+parser.add_argument('--n-triplets', type=int, default=250000, metavar='N',
                     help='how many triplets will generate from the dataset')
 parser.add_argument('--margin', type=float, default=1.0, metavar='MARGIN',
                     help='the margin value for the triplet loss function (default: 1.0')
@@ -1593,6 +1593,21 @@ def main(train_loader, test_loader, model, logger, file_logger):
     # save to files
     np.savetxt('tp.txt', tp, delimiter=',') 
     np.savetxt('tn.txt', tn, delimiter=',') 
+
+    # compare positives for first 100 patches
+    n_tests = 200 # limit to only include milk patches
+    distances = np.zeros((n_tests,len(inc_list)))
+    for ii in range(n_tests):
+        ref_idx = int(label_indices[ii,0])
+        ref_desc = desc_xv[ref_idx].cpu().numpy()
+
+        for jj in range(len(inc_list)):
+            p_idx = int(label_indices[ii,jj])
+            desc = desc_xv[p_idx].cpu().numpy()
+            d = cv2.norm(ref_desc,desc,cv2.NORM_L2)
+            distances[ii,jj] = d
+
+    np.savetxt('positive_dists.txt', distances, delimiter=',')
 
     # distances = np.zeros((717,len(inc_list)))
     # # iterate through patches
