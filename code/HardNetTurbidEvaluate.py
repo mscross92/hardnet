@@ -1592,7 +1592,8 @@ if __name__ == '__main__':
             os.makedirs(DESCS_DIR)
     logger, file_logger = None, None
     model = HardNet()
-    model_weights = '/content/hardnet/pretrained/pretrained_all_datasets/HardNet++.pth'
+    # model_weights = '/content/hardnet/pretrained/pretrained_all_datasets/HardNet++.pth'
+    model_weights = '/content/hardnet/pretrained/6Brown/hardnetBr6.pth'
     checkpoint = torch.load(model_weights)
     model.load_state_dict(checkpoint['state_dict'])
     
