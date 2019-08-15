@@ -1469,6 +1469,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
     patch_fldr = '/content/hardnet/data/sets/vids'
     d = get_frame_patches(patch_fldr,0)
+    d = torch.FloatTensor(np.array(d)).unsqueeze(1)
     if args.cuda:
         d = d.cuda()
     with torch.no_grad():
@@ -1484,6 +1485,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
         # extract patches and descriptors for frame
         d = get_frame_patches(patch_fldr,ii)
+        d = torch.FloatTensor(np.array(d)).unsqueeze(1)
         if args.cuda:
             d = d.cuda()
         with torch.no_grad():
