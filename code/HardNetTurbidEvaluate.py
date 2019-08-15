@@ -1306,6 +1306,21 @@ def main(train_loader, test_loader, model, logger, file_logger):
         print(len(y),'patches loaded from',nC,'classes')
         return torch.ByteTensor(np.array(X, dtype=np.uint8)), y
 
+    def get_frame_patches(fldr,n):
+        X = []
+        img_fldr = fldr + '/' + str(n)
+        folder = os.fsencode(img_fldr)
+        fldr = os.listdir(folder)
+        fldr = sorted(fldr)
+        for file in fldr:
+            filepath = img_fldr + "/" + os.fsdecode(file)
+            if filepath.endswith(".jpg"):
+                ptch = cv2.imread(filepath, cv2.IMREAD_GRAYSCALE)
+                ptch = cv2.resize(ptch, (64, 64))
+                ptch = np.array(ptch, dtype=np.uint8)
+                X.append(ptch)
+        return X
+
     def load_patchDataset_allval(patch_dir,incld,n_patches):
         n_imgs = len(incld)+1
         idxs = np.zeros((n_patches,n_imgs))
@@ -1324,7 +1339,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
                     if int(yy) in incld:
                         f = os.path.join(subdir, file)
                         ptch = cv2.imread(f, cv2.IMREAD_GRAYSCALE)
-                        ptch = cv2.resize(ptch, (32, 32))
+                        ptch = cv2.resize(ptch, (64, 64))
                         ptch = np.array(ptch, dtype=np.uint8)
                     
                         X.append(ptch)
@@ -1450,6 +1465,48 @@ def main(train_loader, test_loader, model, logger, file_logger):
             distances[ii,jj] = d
 
     np.savetxt('positive_dists.txt', distances, delimiter=',')
+
+
+    patch_fldr = '/content/hardnet/data/sets/vids'
+    d = get_frame_patches(patch_fldr,0)
+    if args.cuda:
+        d = d.cuda()
+    with torch.no_grad():
+        d = Variable(d)
+        d = model(d)
+        d = d.cpu().numpy()
+        
+    match_thresh = 1.05
+    n_frames = 21
+    for ii in range(n_frames):
+        # store descriptors for last frame
+        last_d = d
+
+        # extract patches and descriptors for frame
+        d = get_frame_patches(patch_fldr,ii)
+        if args.cuda:
+            d = d.cuda()
+        with torch.no_grad():
+            d = Variable(d)
+            d = model(d)
+            d = d.cpu().numpy()
+
+        # compare to previous frame
+        # brute force matching with default params
+        bf = cv2.BFMatcher(cv2.NORM_L2,crossCheck=True)
+        matches = bf.match(d, last_d)
+        print(len(matches),'matches via brute force')
+        
+        # discard matches below threshold
+        good = []
+        for m in matches:
+            if m.distance < match_thresh:
+                good.append(m)
+        print(len(good),'matches below threshold')
+        
+        # Draw matches
+        img3 = cv2.drawMatches(f,k,last_f,last_k,good,None,matchColor=(255,255,153),flags=0)
+        cv2.imwrite(str(ii)+'.png',img3)
 
     # distances = np.zeros((717,len(inc_list)))
     # # iterate through patches
@@ -1593,7 +1650,8 @@ if __name__ == '__main__':
     logger, file_logger = None, None
     model = HardNet()
     # model_weights = '/content/hardnet/pretrained/pretrained_all_datasets/HardNet++.pth'
-    model_weights = '/content/hardnet/pretrained/6Brown/hardnetBr6.pth'
+    # model_weights = '/content/hardnet/pretrained/6Brown/hardnetBr6.pth'
+    model_weights = '/content/hardnet/pretrained/checkpoint_9.pth'
     checkpoint = torch.load(model_weights)
     model.load_state_dict(checkpoint['state_dict'])
     
