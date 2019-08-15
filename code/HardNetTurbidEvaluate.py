@@ -1477,7 +1477,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
         d = model(d)
         d = d.cpu().numpy()
         
-    match_thresh = 1.05
+    match_thresh = 0.9
     n_frames = 21
     f = np.zeros((1080,1920))
     last_f = np.zeros((1080,1920))
@@ -1661,7 +1661,7 @@ if __name__ == '__main__':
     model = HardNet()
     # model_weights = '/content/hardnet/pretrained/pretrained_all_datasets/HardNet++.pth'
     # model_weights = '/content/hardnet/pretrained/6Brown/hardnetBr6.pth'
-    model_weights = '/content/hardnet/pretrained/checkpoint_9.pth'
+    model_weights = '/content/hardnet/pretrained/checkpoint_8.pth'
     checkpoint = torch.load(model_weights)
     model.load_state_dict(checkpoint['state_dict'])
     
