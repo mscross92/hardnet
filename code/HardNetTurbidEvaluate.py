@@ -1502,15 +1502,21 @@ def main(train_loader, test_loader, model, logger, file_logger):
         print(len(matches),'matches via brute force')
         
         # discard matches below threshold
+        fff = open(str(ii) + '_matches.txt', "w")
         good = []
         for m in matches:
             if m.distance < match_thresh:
+                p = str(m.distance) + "," + str(m.trainIdx) + "," + str(m.queryIdx) + "," + str(m.imgIdx) + "\n"
+                fff.write(p)
                 good.append(m)
+        
+        fff.close()
         print(len(good),'matches below threshold')
         
         # Draw matches
-        img3 = cv2.drawMatches(f,k,last_f,last_k,good,None,matchColor=(255,255,153),flags=0)
-        cv2.imwrite(str(ii)+'.png',img3)
+        # img3 = cv2.drawMatches(f,k,last_f,last_k,good,None,matchColor=(255,255,153),flags=0)
+        # cv2.imwrite(str(ii)+'.png',img3)
+        # write matches to file
 
     # distances = np.zeros((717,len(inc_list)))
     # # iterate through patches
