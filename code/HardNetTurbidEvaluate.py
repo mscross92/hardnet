@@ -1479,6 +1479,8 @@ def main(train_loader, test_loader, model, logger, file_logger):
         
     match_thresh = 1.05
     n_frames = 21
+    f = np.zeros((1080),1920)
+    last_f = np.zeros((1080,1920))
     for ii in range(n_frames):
         # store descriptors for last frame
         last_d = d
