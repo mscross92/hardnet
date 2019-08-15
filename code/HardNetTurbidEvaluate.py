@@ -1319,7 +1319,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
                 ptch = cv2.resize(ptch, (64, 64))
                 ptch = np.array(ptch, dtype=np.uint8)
                 X.append(ptch)
-        return X
+        return torch.ByteTensor(np.array(X, dtype=np.uint8))
 
     def load_patchDataset_allval(patch_dir,incld,n_patches):
         n_imgs = len(incld)+1
