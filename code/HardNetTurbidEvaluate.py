@@ -1480,7 +1480,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
         
     print(len(d))
     match_thresh = 0.9
-    n_frames = 269
+    n_frames = 853
     for ii in range(0,n_frames):
         # store descriptors for last frame
         last_d = d
