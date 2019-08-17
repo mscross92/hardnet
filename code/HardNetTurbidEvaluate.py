@@ -1498,14 +1498,24 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
         # compare to previous frame
         # brute force matching with default params
-        bf = cv2.BFMatcher(cv2.NORM_L2,crossCheck=True)
-        matches = bf.match(d, last_d)
-        print(len(matches),'matches via brute force')
+        # bf = cv2.BFMatcher(cv2.NORM_L2,crossCheck=True)
+        # matches = bf.match(d, last_d)
+        # print(len(matches),'matches via brute force')
+        
+
+        bf = cv2.BFMatcher()
+        matches = bf.knnMatch(d,last_d, k=2)
+        # Apply ratio test
+        lws = []
+        for m,n in matches:
+            if m.distance < 0.75*n.distance:
+                lws.append(m)
+                
         
         # discard matches below threshold
         fff = open(str(ii) + '_matches.txt', "w")
         good = []
-        for m in matches:
+        for m in lws:
             if m.distance < match_thresh:
                 p = str(m.distance) + "," + str(m.trainIdx) + "," + str(m.queryIdx) + "," + str(m.imgIdx) + "\n"
                 fff.write(p)
