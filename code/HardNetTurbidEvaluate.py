@@ -1317,6 +1317,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
             filepath = img_fldr + "/" + os.fsdecode(file)
             if filepath.endswith(".jpg"):
                 ptch = cv2.imread(filepath, cv2.IMREAD_GRAYSCALE)
+                ptch = ptch[16:48,16:48]
                 ptch = cv2.resize(ptch, (64, 64))
                 ptch = np.array(ptch, dtype=np.uint8)
                 X.append(ptch)
@@ -1479,8 +1480,8 @@ def main(train_loader, test_loader, model, logger, file_logger):
         d = d.cpu().numpy()
         
     print(len(d))
-    match_thresh = 0.9
-    n_frames = 853
+    match_thresh = 1.04
+    n_frames = 268
     for ii in range(0,n_frames):
         # store descriptors for last frame
         last_d = d
@@ -1661,7 +1662,7 @@ if __name__ == '__main__':
     model = HardNet()
     # model_weights = '/content/hardnet/pretrained/pretrained_all_datasets/HardNet++.pth'
     # model_weights = '/content/hardnet/pretrained/6Brown/hardnetBr6.pth'
-    model_weights = '/content/hardnet/pretrained/checkpoint_8.pth'
+    model_weights = '/content/hardnet/pretrained/checkpoint_9.pth'
     checkpoint = torch.load(model_weights)
     model.load_state_dict(checkpoint['state_dict'])
     
