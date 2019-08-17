@@ -1313,7 +1313,6 @@ def main(train_loader, test_loader, model, logger, file_logger):
         folder = os.fsencode(img_fldr)
         fldr = os.listdir(folder)
         fldr = sorted(fldr)
-        print(len(fldr))
         for file in fldr:
             filepath = img_fldr + "/" + os.fsdecode(file)
             if filepath.endswith(".jpg"):
@@ -1321,7 +1320,6 @@ def main(train_loader, test_loader, model, logger, file_logger):
                 ptch = cv2.resize(ptch, (64, 64))
                 ptch = np.array(ptch, dtype=np.uint8)
                 X.append(ptch)
-        print(len(X))
         return torch.ByteTensor(np.array(X, dtype=np.uint8))
 
     def load_patchDataset_allval(patch_dir,incld,n_patches):
@@ -1497,7 +1495,6 @@ def main(train_loader, test_loader, model, logger, file_logger):
             d = model(d)
             d = d.cpu().numpy()
 
-        print(len(d))
         # compare to previous frame
         # brute force matching with default params
         bf = cv2.BFMatcher(cv2.NORM_L2,crossCheck=True)
