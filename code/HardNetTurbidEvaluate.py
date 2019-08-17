@@ -1317,6 +1317,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
             filepath = img_fldr + "/" + os.fsdecode(file)
             if filepath.endswith(".jpg"):
                 ptch = cv2.imread(filepath, cv2.IMREAD_GRAYSCALE)
+                ptch = ptch[16:48,16:48]
                 ptch = cv2.resize(ptch, (64, 64))
                 ptch = np.array(ptch, dtype=np.uint8)
                 X.append(ptch)
