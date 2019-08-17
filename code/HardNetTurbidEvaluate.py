@@ -1478,7 +1478,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
         d = d.cpu().numpy()
         
     match_thresh = 0.9
-    n_frames = 21
+    n_frames = 2699
     f = np.zeros((1080,1920))
     last_f = np.zeros((1080,1920))
     for ii in range(n_frames):
