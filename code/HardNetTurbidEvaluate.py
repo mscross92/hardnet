@@ -1317,7 +1317,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
         for file in fldr:
             filepath = img_fldr + "/" + os.fsdecode(file)
             if filepath.endswith(".jpg"):
-                ffff = file.replace(".jpg","")
+                ffff = os.fsdecode(file).replace(".jpg","")
                 f_order.append(ffff)
                 ptch = cv2.imread(filepath, cv2.IMREAD_GRAYSCALE)
                 # ptch = ptch[16:48,16:48]
