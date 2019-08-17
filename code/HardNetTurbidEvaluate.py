@@ -1313,14 +1313,18 @@ def main(train_loader, test_loader, model, logger, file_logger):
         folder = os.fsencode(img_fldr)
         fldr = os.listdir(folder)
         fldr = sorted(fldr)
+        f_order = []
         for file in fldr:
             filepath = img_fldr + "/" + os.fsdecode(file)
             if filepath.endswith(".jpg"):
+                ffff = file.replace(".jpg","")
+                f_order.append(ffff)
                 ptch = cv2.imread(filepath, cv2.IMREAD_GRAYSCALE)
                 # ptch = ptch[16:48,16:48]
                 ptch = cv2.resize(ptch, (64, 64))
                 ptch = np.array(ptch, dtype=np.uint8)
                 X.append(ptch)
+        np.savetxt('f_order_' + str(n) + '.txt', f_order, delimiter=',')
         return torch.ByteTensor(np.array(X, dtype=np.uint8))
 
     def load_patchDataset_allval(patch_dir,incld,n_patches):
