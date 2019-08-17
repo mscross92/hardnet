@@ -1476,7 +1476,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
 
     patch_fldr = '/content/hardnet/data/sets/vids'
-    d = get_frame_patches(patch_fldr,800)
+    d = get_frame_patches(patch_fldr,80)
     d = torch.FloatTensor(np.array(d)).unsqueeze(1)
     if args.cuda:
         d = d.cuda()
