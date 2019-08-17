@@ -1476,7 +1476,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
 
     patch_fldr = '/content/hardnet/data/sets/vids'
-    d = get_frame_patches(patch_fldr,80)
+    d = get_frame_patches(patch_fldr,0)
     d = torch.FloatTensor(np.array(d)).unsqueeze(1)
     if args.cuda:
         d = d.cuda()
@@ -1488,7 +1488,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
     print(len(d))
     match_thresh = 1.04
     n_frames = 380
-    for ii in range(80,n_frames):
+    for ii in range(0,n_frames):
         # store descriptors for last frame
         last_d = d
 
