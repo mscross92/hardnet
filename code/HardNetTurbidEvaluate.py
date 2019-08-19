@@ -1474,6 +1474,34 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
     np.savetxt('positive_dists.txt', distances, delimiter=',')
 
+    def pairwise_dstncs(descA):
+        distances = []
+        # euclidean distance
+        x_norm = (descA**2).sum(1).view(-1, 1)
+        y_t = torch.transpose(descA, 0, 1)
+        y_norm = (descA**2).sum(1).view(1, -1)
+        dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(descA, y_t),0.0,np.inf))
+        distances.extend(dists.data.cpu().numpy())        
+        return distances
+
+    patch_fldr = '/content/hardnet/data/sets/turbid/test_data/patches'
+    inc_list = [0,3,6,9,12,15]
+    xt, yt = load_patchDataset_test(patch_fldr,inc_list)
+    xt = torch.FloatTensor(np.array(xt)).unsqueeze(1)
+    
+    if args.cuda:
+        xt = xt.cuda()
+    with torch.no_grad():
+        xt = Variable(xt)
+        des_eg_test = model(xt)
+        dist_m_test = pairwise_dstncs(des_eg_test)
+        # save distance matrix to file
+        np.savetxt('d_matrix.txt', dist_m_test, delimiter=',')
+        visualise_distance_matrix(dist_m_test,0)
+        # save descriptors to file
+        des_eg_test = des_eg_test.cpu().numpy()
+        np.savetxt('eg_descriptors.txt', des_eg_test, delimiter=',')
+
 
     patch_fldr = '/content/hardnet/data/sets/vids'
     d = get_frame_patches(patch_fldr,0)
