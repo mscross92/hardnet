@@ -1439,6 +1439,12 @@ def main(train_loader, test_loader, model, logger, file_logger):
         xv = Variable(xv)
         desc_xv = model(xv)
 
+    # save descriptors to file
+    np.savetxt('val_descriptors.txt', desc_xv.cpu().numpy(), delimiter=',')
+    # save indices map to file
+    np.savetxt('val_label_indices.txt', label_indices, delimiter=',')
+
+
     tn, tp, = [], []
 
     # for each comparison
