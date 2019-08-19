@@ -1292,6 +1292,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
             for file in files:
                 if yy != patch_dir:
                     s = file.replace('.jpg','')
+                    s = s[1:]
                     if int(s) in incld:
                         yyy = yy[1:]
                         y.append(int(yyy))
