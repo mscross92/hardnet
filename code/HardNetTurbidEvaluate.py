@@ -1514,7 +1514,7 @@ def main(train_loader, test_loader, model, logger, file_logger):
         dist_m_test = pairwise_dstncs(des_eg_test)
         # save distance matrix to file
         np.savetxt('d_matrix.txt', dist_m_test, delimiter=',')
-        visualise_distance_matrix(dist_m_test,0)
+        visualise_distance_matrix(dist_m_test,0,1.6021)
         # save descriptors to file
         des_eg_test = des_eg_test.cpu().numpy()
         np.savetxt('eg_descriptors.txt', des_eg_test, delimiter=',')
