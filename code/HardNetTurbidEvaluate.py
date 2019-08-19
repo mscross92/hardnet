@@ -1474,6 +1474,20 @@ def main(train_loader, test_loader, model, logger, file_logger):
 
     np.savetxt('positive_dists.txt', distances, delimiter=',')
 
+    def visualise_distance_matrix(dist_m,epoch,max_d=2.0):
+        # normalise matrix values using specified maximum
+        dist_m = np.array(dist_m)
+        dist_m /= max_d
+        dist_m *= 255
+        dist_m = np.array(dist_m).astype('uint8')
+        savestr = 'distancematrix_epoch' + str(epoch) + '.png'
+        cv2.imwrite(savestr,dist_m)
+        # plt.figure(figsize=(5, 5))
+        # plt.imshow(dist_m,cmap='gray',vmin=0,vmax=max_d)
+        # plt.axis('off')
+        # plt.savefig(savestr, bbox_inches='tight')
+        # plt.close()
+
     def pairwise_dstncs(descA):
         distances = []
         # euclidean distance
@@ -1503,69 +1517,69 @@ def main(train_loader, test_loader, model, logger, file_logger):
         np.savetxt('eg_descriptors.txt', des_eg_test, delimiter=',')
 
 
-    patch_fldr = '/content/hardnet/data/sets/vids'
-    d = get_frame_patches(patch_fldr,0)
-    d = torch.FloatTensor(np.array(d)).unsqueeze(1)
-    if args.cuda:
-        d = d.cuda()
-    with torch.no_grad():
-        d = Variable(d)
-        d = model(d)
-        d = d.cpu().numpy()
+    # patch_fldr = '/content/hardnet/data/sets/vids'
+    # d = get_frame_patches(patch_fldr,0)
+    # d = torch.FloatTensor(np.array(d)).unsqueeze(1)
+    # if args.cuda:
+    #     d = d.cuda()
+    # with torch.no_grad():
+    #     d = Variable(d)
+    #     d = model(d)
+    #     d = d.cpu().numpy()
         
-    print(len(d))
-    match_thresh = 1.04
-    n_frames = 487
-    for ii in range(0,n_frames):
-        # store descriptors for last frame
-        last_d = d
+    # print(len(d))
+    # match_thresh = 1.04
+    # n_frames = 487
+    # for ii in range(0,n_frames):
+    #     # store descriptors for last frame
+    #     last_d = d
 
-        # extract patches and descriptors for frame
-        d = get_frame_patches(patch_fldr,ii)
-        d = torch.FloatTensor(np.array(d)).unsqueeze(1)
-        if args.cuda:
-            d = d.cuda()
-        with torch.no_grad():
-            d = Variable(d)
-            d = model(d)
-            d = d.cpu().numpy()
+    #     # extract patches and descriptors for frame
+    #     d = get_frame_patches(patch_fldr,ii)
+    #     d = torch.FloatTensor(np.array(d)).unsqueeze(1)
+    #     if args.cuda:
+    #         d = d.cuda()
+    #     with torch.no_grad():
+    #         d = Variable(d)
+    #         d = model(d)
+    #         d = d.cpu().numpy()
 
-        # compare to previous frame
-        # brute force matching with default params
-        bf = cv2.BFMatcher(cv2.NORM_L2,crossCheck=True)
-        matches = bf.match(d, last_d)
-        print(len(matches),'matches via brute force')
-        fff = open(str(ii) + '_matches.txt', "w")
-        good = []
-        for m in matches:
-            if m.distance < match_thresh:
-                p = str(m.distance) + "," + str(m.trainIdx) + "," + str(m.queryIdx) + "," + str(m.imgIdx) + "\n"
-                fff.write(p)
-                good.append(m)
+    #     # compare to previous frame
+    #     # brute force matching with default params
+    #     bf = cv2.BFMatcher(cv2.NORM_L2,crossCheck=True)
+    #     matches = bf.match(d, last_d)
+    #     print(len(matches),'matches via brute force')
+    #     fff = open(str(ii) + '_matches.txt', "w")
+    #     good = []
+    #     for m in matches:
+    #         if m.distance < match_thresh:
+    #             p = str(m.distance) + "," + str(m.trainIdx) + "," + str(m.queryIdx) + "," + str(m.imgIdx) + "\n"
+    #             fff.write(p)
+    #             good.append(m)
         
-        fff.close()
-        print(len(good),'matches below threshold')
+    #     fff.close()
+    #     print(len(good),'matches below threshold')
 
-        bf = cv2.BFMatcher()
-        matches = bf.knnMatch(d,last_d, k=2)
-        # Apply ratio test
-        lws = []
-        for m,n in matches:
-            if m.distance < 0.75*n.distance:
-                lws.append(m)
+    #     bf = cv2.BFMatcher()
+    #     matches = bf.knnMatch(d,last_d, k=2)
+    #     # Apply ratio test
+    #     lws = []
+    #     for m,n in matches:
+    #         if m.distance < 0.75*n.distance:
+    #             lws.append(m)
                 
         
-        # discard matches below threshold
-        fff = open('lowes_' + str(ii) + '_matches.txt', "w")
-        good = []
-        for m in lws:
-            if m.distance < match_thresh:
-                p = str(m.distance) + "," + str(m.trainIdx) + "," + str(m.queryIdx) + "," + str(m.imgIdx) + "\n"
-                fff.write(p)
-                good.append(m)
+    #     # discard matches below threshold
+    #     fff = open('lowes_' + str(ii) + '_matches.txt', "w")
+    #     good = []
+    #     for m in lws:
+    #         if m.distance < match_thresh:
+    #             p = str(m.distance) + "," + str(m.trainIdx) + "," + str(m.queryIdx) + "," + str(m.imgIdx) + "\n"
+    #             fff.write(p)
+    #             good.append(m)
         
-        fff.close()
-        print(len(good),'matches below threshold with lowes')
+    #     fff.close()
+    #     print(len(good),'matches below threshold with lowes')
         
         # Draw matches
         # img3 = cv2.drawMatches(f,k,last_f,last_k,good,None,matchColor=(255,255,153),flags=0)
