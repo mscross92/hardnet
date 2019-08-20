@@ -1525,6 +1525,9 @@ def main(train_loader, test_loader, model, logger, file_logger):
         des_eg_test = des_eg_test.cpu().numpy()
         np.savetxt('eg_descriptors.txt', des_eg_test, delimiter=',')
 
+    model.cpu()
+    torch.save({'epoch': 0, 'state_dict': model.state_dict()},
+               '{}{}/hardnet_turbid_cpu{}.pth'.format(args.model_dir, suffix, epoch))
 
     # patch_fldr = '/content/hardnet/data/sets/vids'
     # d = get_frame_patches(patch_fldr,0)
