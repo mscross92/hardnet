@@ -48,7 +48,7 @@ if __name__ == '__main__':
     # need to be specified
     try:
         path_to_imgs_dir = sys.argv[1]
-        output_dir  = sys.argv[3]
+        output_dir  = sys.argv[2]
     except:
         print("Wrong input format. Try python HPatchesDatasetCreator.py path_to_hpatches path_to_splits_json output_dir")
         sys.exit(1)
