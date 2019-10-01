@@ -24,7 +24,7 @@ class TURBID(data.Dataset):
         self.transform = transform
 
     def read_image_file(self, data_dir):
-        """Return a Tensor containing the patches
+        """Return a Tensor containing the images
         """
         imgs = []
         labels = []
