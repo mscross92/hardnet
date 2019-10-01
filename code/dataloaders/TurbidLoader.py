@@ -7,7 +7,7 @@ import sys
 import json
 
 
-types = ['0','1','2','3','4','5','6','7','8','9','10'] # included images
+types = ['2','3','4','5','6','7','8','9','10','11','12'] # included images
 
 def mean_image(patches):
     mean = np.mean(patches)
