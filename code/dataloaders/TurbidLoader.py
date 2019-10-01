@@ -39,7 +39,7 @@ class TURBID(data.Dataset):
             gray = (gray*255).astype('uint8')
             gray = np.array(gray, dtype=np.uint8)
             imgs.append(gray)
-            labels.append(nn)
+            labels.append(nn-2)
             counter += 1
         print(counter,'images loaded')
         return torch.ByteTensor(np.array(imgs, dtype=np.uint8)), torch.LongTensor(labels)
