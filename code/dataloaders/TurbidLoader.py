@@ -31,6 +31,7 @@ class TURBID(data.Dataset):
         counter = 0
         for nn in types:
             sequence_path = os.path.join(data_dir, '/',str(nn),'.jpg')
+            print(sequence_path)
             gray = cv2.imread(sequence_path)
             # convert to grayscale
             lin_img = ((gray/255 + 0.055) / 1.055) ** 2.4
