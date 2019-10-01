@@ -8,8 +8,6 @@ import json
 
 
 types = ['0','1','2','3','4','5','6','7','8','9','10'] # included images
-n_patches = 3408
-
 
 def mean_image(patches):
     mean = np.mean(patches)
@@ -25,30 +23,32 @@ class TURBID(data.Dataset):
         self.train = train
         self.transform = transform
 
-    def read_image_file(self, data_dir,val_set):
+    def read_image_file(self, data_dir):
         """Return a Tensor containing the patches
         """
         imgs = []
         labels = []
         counter = 0
         for nn in types:
-            
-            sequence_path = os.path.join(data_dir, '/',str(nn),'/',str(ii))+'.png'
-            patch = cv2.imread(sequence_path, 0)
-            patch = cv2.resize(patch, (32, 32))
-            patch = np.array(patch, dtype=np.uint8)
-            patches.append(patch)
-            labels.append(ii)
+            sequence_path = os.path.join(data_dir, '/',str(nn),'.jpg')
+            I = cv2.imread(sequence_path)
+            # convert to grayscale
+            lin_img = ((gray/255 + 0.055) / 1.055) ** 2.4
+            gray_lin = 0.212*lin_img[:,:,0] + 0.7152*lin_img[:,:,1] + 0.0722*lin_img[:,:,2]
+            gray = 1.055 * (gray_lin**(1/2.4)) - 0.055
+            gray = (gray*255).astype('uint8')
+            gray = np.array(gray, dtype=np.uint8)
+            imgs.append(gray)
+            labels.append(nn)
             counter += 1
-        print(counter)
-        return torch.ByteTensor(np.array(patches, dtype=np.uint8)), torch.LongTensor(labels)
+        print(counter,'images loaded')
+        return torch.ByteTensor(np.array(imgs, dtype=np.uint8)), torch.LongTensor(labels)
 
 if __name__ == '__main__':
     # need to be specified
     try:
-        path_to_patches_dir = sys.argv[1]
+        path_to_imgs_dir = sys.argv[1]
         output_dir  = sys.argv[3]
-        val_set_idx  = sys.argv[4]
     except:
         print("Wrong input format. Try python HPatchesDatasetCreator.py path_to_hpatches path_to_splits_json output_dir")
         sys.exit(1)
@@ -56,10 +56,9 @@ if __name__ == '__main__':
         os.makedirs(output_dir)
 
     t = "train"
-    hPatches = HPatches()
-    split = 'a'
-    images, labels = hPatches.read_image_file(path_to_patches_dir,val_set_idx)
-    with open(os.path.join(output_dir, 'hpatches_split_' + split +  '_' + t + '.pt'), 'wb') as f:
+    trbd = TURBID()
+    images, labels = trbd.read_image_file(path_to_imgs_dir)
+    with open(os.path.join(output_dir, 'turbid_imgs.pt'), 'wb') as f:
         torch.save((images, labels), f)
-    print(split, t, 'Saved')
+    print(t, 'images saved')
 
