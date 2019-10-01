@@ -138,6 +138,8 @@ parser.add_argument('--optimizer', default='sgd', type=str,
                     metavar='OPT', help='The optimizer to use (default: SGD)')
 parser.add_argument('--batch_hard', type=int, default=0, metavar='HM',
                     help='triplet mining strategy')
+parser.add_argument('--valset', type=int, default=0, metavar='VAL',
+                    help='index of validation set to use')
 # Device options
 parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='enables CUDA training')
@@ -588,21 +590,21 @@ def create_loaders(load_random_triplets=False):
         batch_size=args.batch_size,
         shuffle=False, **kwargs)
 
-    test_loader = torch.utils.data.DataLoader(
-        TotalDatasetsLoader(train=False,
-                         load_random_triplets = False,
-                         batch_size=512,
-                         datasets_path=args.hpatches_split+"hpatches_split_a_test.pt",
-                         fliprot=args.fliprot,
-                         n_triplets=6980,
-                         batch_hard=0,
-                         name="turbid_deepblue",
-                         download=True,
-                         transform=transform_test),
-        batch_size=args.test_batch_size,
-        shuffle=False, **kwargs)
+    # test_loader = torch.utils.data.DataLoader(
+    #     TotalDatasetsLoader(train=False,
+    #                      load_random_triplets = False,
+    #                      batch_size=512,
+    #                      datasets_path=args.hpatches_split+"hpatches_split_a_test.pt",
+    #                      fliprot=args.fliprot,
+    #                      n_triplets=6980,
+    #                      batch_hard=0,
+    #                      name="turbid_deepblue",
+    #                      download=True,
+    #                      transform=transform_test),
+    #     batch_size=args.test_batch_size,
+    #     shuffle=False, **kwargs)
 
-    return train_loader, test_loader
+    return train_loader
 
 
 def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
