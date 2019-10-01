@@ -9,13 +9,13 @@ import json
 
 types = [2,3,4,5,6,7,8,9,10,11,12] # included images
 
-def mean_image(patches):
-    mean = np.mean(patches)
-    return mean
+# def mean_image(patches):
+#     mean = np.mean(patches)
+#     return mean
 
-def std_image(patches):
-    std = np.std(patches)
-    return std
+# def std_image(patches):
+#     std = np.std(patches)
+#     return std
 
 class TURBID(data.Dataset):
 
