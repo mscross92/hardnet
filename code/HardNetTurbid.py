@@ -653,7 +653,7 @@ def create_optimizer(model, new_lr):
     return optimizer
 
 
-def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, train_img_dir):
+def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, train_img_dir, val_set_idx):
     
     # print the experiment configuration
     print('\nparsed options:\n{}\n'.format(vars(args)))
@@ -917,4 +917,4 @@ if __name__ == '__main__':
     train_img_dir = './data/sets/turbid/milk_imgs'
 
     train_loader = create_loaders(load_random_triplets=triplet_flag)
-    main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, train_img_dir)
+    main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, train_img_dir, args.valset)
