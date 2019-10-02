@@ -231,7 +231,7 @@ class TurbidDatasetsLoader(data.Dataset):
             return inds
 
         triplets = []
-        indices = create_indices(labels.numpy(),n_feats,val_feats.numpy())
+        indices = create_indices(labels.numpy(),n_feats,val_feats)
 
         # add only unique indices in batch
         already_idxs = set()
