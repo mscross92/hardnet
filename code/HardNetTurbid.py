@@ -506,46 +506,6 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                                         margin=args.margin,
                                         anchor_swap=args.anchorswap,
                                         loss_type=args.loss)
-            # if batch_idx==0:
-            #     vis_id = np.random.randint(0, data_a.shape[0])
-            #     cv2.imwrite('batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
-            #     cv2.imwrite('batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
-            #     cv2.imwrite('batch' + str(batch_idx) + '_randomsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(data_n[vis_id,0,:,:].cpu())*255).astype('uint8'))
-
-            # if batch_idx==20:
-            # visualise distribution of batch
-            tp, tn = [], []
-            # # get pairwise distances
-            x_norm = (out_a**2).sum(1).view(-1, 1)
-            y_t = torch.transpose(out_p, 0, 1)
-            y_norm = (out_p**2).sum(1).view(1, -1)
-            dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
-            d_p = torch.diag(dists) # 1D tensor of distances for positive samples
-            tp.extend(d_p.data.cpu().numpy()) 
-            y_t = torch.transpose(out_n, 0, 1)
-            y_norm = (out_n**2).sum(1).view(1, -1)
-            dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
-            d_n = torch.diag(dists) # 1D tensor of distances for positive samples
-            tn.extend(d_n.data.cpu().numpy()) 
-            # # # plot positives
-            # tp = np.asarray(tp)
-            # plt.figure(figsize=(8, 5))
-            # sns.distplot(tp, hist=False, label='Positives',
-            #             bins=int(30), color = 'green', 
-            #             hist_kws={'edgecolor':'black'},
-            #             kde_kws={'linewidth': 2})
-            # # # plot negatives
-            # tn = np.asarray(tn)
-            # sns.distplot(tn, hist=False, kde=True, label='Negatives',
-            #             bins=int(30), color = 'darkred', 
-            #             hist_kws={'edgecolor':'black'},
-            #             kde_kws={'linewidth': 2})
-            # # plt.legend()
-            # savestr = 'traindistances_epoch' + str(epoch) + '_batch50.png'
-            # plt.savefig(savestr, bbox_inches='tight')
-            # plt.close()
-            del x_norm, y_t, y_norm, dists, d_p
-            del d_n
        
         elif args.batch_reduce == 'random_sh':
             if batch_idx==0:
@@ -557,53 +517,6 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                             batch_reduce=args.batch_reduce,
                             loss_type=args.loss,
                             visualise_idx=vis_id)
-            
-            if n_type>0:
-                d_n = data_p[n_idx,0,:,:].cpu()
-            else:
-                d_n = data_a[n_idx,0,:,:].cpu()
-
-            # visualise random semi-hard sample
-            # if batch_idx==0:
-                # print(n_idx,vis_id)
-                # cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
-                # cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
-                # cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(d_n)*255).astype('uint8'))
-
-            # if batch_idx==20:
-            # visualise distribution of batch
-            tp, tn = [], []
-            # # get pairwise distances
-            x_norm = (out_a**2).sum(1).view(-1, 1)
-            y_t = torch.transpose(out_p, 0, 1)
-            y_norm = (out_p**2).sum(1).view(1, -1)
-            dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
-            d_p = torch.diag(dists) # 1D tensor of distances for positive samples
-            tp.extend(d_p.data.cpu().numpy()) 
-            y_t = torch.transpose(out_n, 0, 1)
-            y_norm = (out_n**2).sum(1).view(1, -1)
-            dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
-            d_n = torch.diag(dists) # 1D tensor of distances for positive samples
-            tn.extend(d_n.data.cpu().numpy()) 
-            # # # plot positives
-            # tp = np.asarray(tp)
-            # plt.figure(figsize=(8, 5))
-            # sns.distplot(tp, hist=False, 
-            #             bins=int(30), color = 'green', 
-            #             hist_kws={'edgecolor':'black'},
-            #             kde_kws={'linewidth': 2})
-            # # # plot negatives
-            # tn = np.asarray(tn)
-            # sns.distplot(tn, hist=False, kde=True, 
-            #             bins=int(30), color = 'darkred', 
-            #             hist_kws={'edgecolor':'black'},
-            #             kde_kws={'linewidth': 2})
-            # # plt.legend()
-            # savestr = 'traindistances_epoch' + str(epoch) + '_batch100.png'
-            # plt.savefig(savestr, bbox_inches='tight')
-            # plt.close()
-            del x_norm, y_t, y_norm, dists, d_p
-            del d_n
 
         else:
             if batch_idx==0:
@@ -616,51 +529,6 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                                 loss_type=args.loss,
                                 visualise_idx=vis_id)
             
-            if n_type>0:
-                d_n = data_p[n_idx,0,:,:].cpu()
-            else:
-                d_n = data_a[n_idx,0,:,:].cpu()
-
-            # visualise random hard sample
-            # if batch_idx==0:
-                # print(n_idx,vis_id)
-                # cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_a.png',(np.array(data_a[vis_id,0,:,:].cpu())*255).astype('uint8'))
-                # cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_p.png',(np.array(data_p[vis_id,0,:,:].cpu())*255).astype('uint8'))
-                # cv2.imwrite('batch' + str(batch_idx) + '_hardsample_epch' + str(epoch) + '_idx' + str(vis_id) + '_n.png',(np.array(d_n)*255).astype('uint8'))
-
-            # if batch_idx==20:
-            # visualise distribution of batch
-            tp, tn = [], []
-            # # get pairwise distances
-            x_norm = (out_a**2).sum(1).view(-1, 1)
-            y_t = torch.transpose(out_p, 0, 1)
-            y_norm = (out_p**2).sum(1).view(1, -1)
-            dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
-            d_p = torch.diag(dists) # 1D tensor of distances for positive samples
-            tp.extend(d_p.data.cpu().numpy()) 
-            y_t = torch.transpose(out_n, 0, 1)
-            y_norm = (out_n**2).sum(1).view(1, -1)
-            dists = torch.sqrt(torch.clamp(x_norm + y_norm - 2.0 * torch.mm(out_a, y_t),0.0,np.inf))
-            d_n = torch.diag(dists) # 1D tensor of distances for positive samples
-            tn.extend(d_n.data.cpu().numpy()) 
-            # # plot positives
-            # tp = np.asarray(tp)
-            # plt.figure(figsize=(8, 5))
-            # sns.distplot(tp, hist=False, 
-            #             bins=int(30), color = 'green', 
-            #             hist_kws={'edgecolor':'black'},
-            #             kde_kws={'linewidth': 2})
-            # # # plot negatives
-            # tn = np.asarray(tn)
-            # sns.distplot(tn, hist=False, kde=True, 
-            #             bins=int(30), color = 'darkred', 
-            #             hist_kws={'edgecolor':'black'},
-            #             kde_kws={'linewidth': 2})
-            # savestr = 'traindistances_epoch' + str(epoch) + '_batch100.png'
-            # plt.savefig(savestr, bbox_inches='tight')
-            # plt.close()
-            del x_norm, y_t, y_norm, dists, d_p
-            del d_n
 
         if args.decor:
             loss += CorrelationPenaltyLoss()(out_a)
@@ -685,31 +553,6 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
     except:
         os.makedirs('{}{}'.format(args.model_dir, suffix))
 
-    # store data to replot later
-    if epoch==(args.start_epoch + args.epochs - 1):
-        tp = np.asarray(tp)
-        plt.figure(figsize=(8, 5))
-        sns.distplot(tp, hist=False, 
-                    bins=int(30), color = 'green', 
-                    hist_kws={'edgecolor':'black'},
-                    kde_kws={'linewidth': 2})
-        # # plot negatives
-        tn = np.asarray(tn)
-        sns.distplot(tn, hist=False, kde=True, 
-                    bins=int(30), color = 'darkred', 
-                    hist_kws={'edgecolor':'black'},
-                    kde_kws={'linewidth': 2})
-        savestr = 'traindistances_epoch' + str(epoch) + '.png'
-        plt.savefig(savestr, bbox_inches='tight')
-        plt.close()
-        
-        savestr = 'train_tp_epoch' + str(epoch) + '.txt'
-        np.savetxt(savestr, tp, delimiter=',') 
-        savestr = 'train_tn_epoch' + str(epoch) + '.txt'
-        np.savetxt(savestr, tn, delimiter=',')
-
-
-
     torch.save({'epoch': epoch + 1, 'state_dict': model.state_dict()},
                '{}{}/checkpoint_{}.pth'.format(args.model_dir, suffix, epoch))
     
@@ -727,7 +570,6 @@ def test(model, epoch, logger, logger_test_name, val_data_dir, val_setdef_dir, v
         
     # switch to evaluate mode
     model.eval()
-
 
     # load features and pairs
     all_pairs = np.loadtxt(val_setdef_dir + '/validation_pairs_set'+str(val_set_idx)+'.txt',delimiter=' ').astype('uint16')
@@ -811,7 +653,7 @@ def create_optimizer(model, new_lr):
     return optimizer
 
 
-def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir):
+def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, train_img_dir):
     
     # print the experiment configuration
     print('\nparsed options:\n{}\n'.format(vars(args)))
@@ -837,6 +679,21 @@ def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir):
     
     kwargs = {'num_workers': args.num_workers, 'pin_memory': args.pin_memory} if args.cuda else {}
 
+    # get feature points
+    fps_str = train_img_dir + '/features.txt'
+    fps = []
+    lines = [line.strip() for line in open(fps_str)]
+    for line in lines:
+        list = line.split(',')
+        kp = cv2.KeyPoint(x=float(list[0]), y=float(list[1]), _size=float(list[2]), _angle=float(list[3]),
+                        _response=float(list[4]), _octave=int(list[5]), _class_id=int(list[6]))
+        if kp.size<12:
+            kp.size = 12
+        fps.append(kp)
+    del list
+
+    val_idxs = np.loadtext(train_img_dir + '/validation_location_idxs_set'+str(val_set_idx)+'.txt',delimiter=',')
+
     test_fpr95_arr, train_losses_arr = [], []
     start = args.start_epoch
     end = start + args.epochs
@@ -851,7 +708,9 @@ def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir):
                             datasets_path=args.hpatches_split+"turbid_imgs.pt",
                             n_triplets=args.n_triplets,
                             name=args.training_set,
-                            download=True)
+                            download=True,
+                            fps=fps,
+                            val_feat_idxs=val_idxs)
             
             train_loader = torch.utils.data.DataLoader(trainDatasetWithHardNegatives,
                                                     batch_size=args.batch_size,
@@ -866,8 +725,9 @@ def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir):
                          valset_idx=args.valset,
                          n_triplets=args.n_triplets,
                          name=args.training_set,
-                         model=model,
-                         download=True)
+                         download=True,
+                         fps=fps,
+                         val_feat_idxs=val_idxs)
             train_loader = torch.utils.data.DataLoader(trainDatasetWithHardNegatives,
                                                     batch_size=args.batch_size,
                                                     shuffle=False, **kwargs)
@@ -1051,5 +911,9 @@ if __name__ == '__main__':
     # train_loader, test_loader = create_loaders(load_random_triplets=triplet_flag)
     # main(train_loader, test_loader, model, logger, file_logger)
 
+    val_x_dir = './data/sets/turbid/test_set'
+    val_set_def_dir = val_x_dir
+    train_img_dir = './data/sets/turbid/milk_imgs'
+
     train_loader = create_loaders(load_random_triplets=triplet_flag)
-    main(train_loader, model, logger, file_logger)
+    main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, train_img_dir)
