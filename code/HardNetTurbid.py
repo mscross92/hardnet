@@ -760,8 +760,8 @@ def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, t
 
 
 
-        train_loss_epch = train(train_loader, model, optimizer1, epoch, logger)
-        train_losses_arr.append(train_loss_epch)
+        # train_loss_epch = train(train_loader, model, optimizer1, epoch, logger)
+        # train_losses_arr.append(train_loss_epch)
 
         fpr95_epch = test(model, epoch, logger, "a_test_log",val_x_dir, val_set_def_dir,args.valset)
         test_fpr95_arr.append(fpr95_epch)
