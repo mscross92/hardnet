@@ -461,7 +461,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
     # print('\n\n',pbar.shape,'\n\n')
     tp, tn = [], []
     for batch_idx, data in pbar:
-        print(batch_idx)
+        # print(batch_idx)
         if load_triplets:
             data_a, data_p, data_n = data
             
