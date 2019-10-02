@@ -284,10 +284,9 @@ class TurbidDatasetsLoader(data.Dataset):
             a_fps = self.fps[a_idx]
             p_fps = self.fps[p_idx]
             n_fps = self.fps[n_idx]
-            print(a_idx, p_idx, n_idx)
+            print(a_img, p_img, n_img)
 
             a_img = self.data[a_img]
-            # print(a_img.shape)
             p_img = self.data[p_img]
             n_img = self.data[n_img]
 
