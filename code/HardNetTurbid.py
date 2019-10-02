@@ -421,10 +421,10 @@ def create_loaders(load_random_triplets=False):
     #     shuffle=False, **kwargs)
 
     train_loader = torch.utils.data.DataLoader(
-        TotalDatasetsLoader(train=True,
+        TurbidDatasetsLoader(train=True,
                          load_random_triplets=load_random_triplets,
                          batch_size=args.batch_size,
-                         datasets_path=args.hpatches_split+"hpatches_split_a_train.pt",
+                         datasets_path=args.hpatches_split+"turbid_imgs.pt",
                          fliprot=args.fliprot,
                          n_triplets=args.n_triplets,
                          batch_hard=0,
@@ -845,7 +845,7 @@ def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir):
         model.eval()
         
         if  args.batch_hard==0:
-            trainDatasetWithHardNegatives = TotalDatasetsLoader(train=True,
+            trainDatasetWithHardNegatives = TurbidDatasetsLoader(train=True,
                             load_random_triplets=False,
                             batch_size=args.batch_size,
                             datasets_path=args.hpatches_split+"turbid_imgs.pt",
@@ -858,7 +858,7 @@ def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir):
                                                     shuffle=False, **kwargs)
         
         else:
-            trainDatasetWithHardNegatives = TotalDatasetsLoader(train=True,
+            trainDatasetWithHardNegatives = TurbidDatasetsLoader(train=True,
                          load_random_triplets=False,
                          batch_size=args.batch_size,
                          datasets_path=args.hpatches_split+"turbid_imgs.pt",
