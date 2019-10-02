@@ -458,6 +458,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
     pbar = tqdm(enumerate(train_loader))
     tp, tn = [], []
     for batch_idx, data in pbar:
+        print(data[0].shape)
         if load_triplets:
             data_a, data_p, data_n = data
             
