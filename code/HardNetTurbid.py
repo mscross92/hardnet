@@ -373,7 +373,7 @@ def weights_init(m):
     return
 
 
-def create_loaders(load_random_triplets=False, val_x_dir='', val_set_def_dir='', train_img_dir='', val_set_idx=0,fps,val_idxs):
+def create_loaders(load_random_triplets=False, val_x_dir='', val_set_def_dir='', train_img_dir='', val_set_idx=0,fps=None,val_idxs=None):
     test_dataset_names = copy.copy(dataset_names)
     test_dataset_names.remove(args.training_set)
     kwargs = {'num_workers': args.num_workers, 'pin_memory': args.pin_memory} if args.cuda else {}
@@ -933,6 +933,6 @@ if __name__ == '__main__':
     del list
 
     val_idxs = np.loadtext(train_img_dir + '/validation_location_idxs_set'+str(val_set_idx)+'.txt',delimiter=',')
-
-    train_loader = create_loaders(load_random_triplets=triplet_flag, val_x_dir, val_set_def_dir, train_img_dir, args.valset. fps, val_idxs)
+    train_loader = create_loaders(load_random_triplets=False, val_x_dir=val_x_dir, val_set_def_dir=val_set_def_dir, train_img_dir=train_img_dir, val_set_idx=args.valset,fps=fps,val_idxs=val_idxs)
+    # train_loader = create_loaders(load_random_triplets=triplet_flag, val_x_dir, val_set_def_dir, train_img_dir, args.valset. fps, val_idxs)
     main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, train_img_dir, args.valset, fps, val_idxs)
