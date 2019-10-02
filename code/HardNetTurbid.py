@@ -456,6 +456,7 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
     # switch to train mode
     model.train()
     pbar = tqdm(enumerate(train_loader))
+    print('\n\n',pbar.shape,'\n\n')
     tp, tn = [], []
     for batch_idx, data in pbar:
         print(batch_idx)
