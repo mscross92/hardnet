@@ -282,7 +282,7 @@ class TurbidDatasetsLoader(data.Dataset):
                     tr = M.dot(np.array((y,x) + (1,)))
                     x = tr[0]
                     y = tr[1]
-                    plt.imsho(img)
+                    plt.imshow(img)
                     plt.show()
                 img = img[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)] # extract patch
                 plt.imshow(img)
