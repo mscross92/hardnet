@@ -266,9 +266,7 @@ class TurbidDatasetsLoader(data.Dataset):
                 (y,x) = p.pt
                 s = p.size
 
-                # print(x,y,s)
-
-                img = img[int(x-0.5*s):int(x+0.5*s),int(y-0.5*s):int(y+0.5*s)] # extract patch
+                img = img[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)] # extract patch
                 # print(img.shape)
 
                 transform = transforms.Compose([
