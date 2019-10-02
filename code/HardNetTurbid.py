@@ -276,8 +276,8 @@ class TurbidDatasetsLoader(data.Dataset):
                     sin = np.abs(M[0, 1])
                     nW = int((h * sin) + (w * cos))
                     nH = int((h * cos) + (w * sin))
-                    M[0, 2] += (nW / 2) - (0.5*w-y)
-                    M[1, 2] += (nH / 2) - (0.5*h-x)
+                    M[0, 2] += (nW / 2) - (0.5*w+y)
+                    M[1, 2] += (nH / 2) - (0.5*h+x)
                     img = cv2.warpAffine(img, M, (nW, nH))
                     tr = M.dot(np.array((y,x) + (1,)))
                     x = tr[0]
