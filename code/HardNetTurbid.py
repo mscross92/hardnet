@@ -596,7 +596,6 @@ def test(model, epoch, logger, logger_test_name, val_data_dir, val_setdef_dir, v
             img = img.cuda()
         with torch.no_grad():
             img = Variable(img)
-            print(img.shape)
             desc_a = model(img)
             desc_a = desc_a.cpu().numpy()
             
