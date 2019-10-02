@@ -263,14 +263,14 @@ class TurbidDatasetsLoader(data.Dataset):
 
     def __getitem__(self, index):
             def transform_img(img, p):
-                (x,y) = p.pt
+                (y,x) = p.pt
                 s = p.size
 
-                print(x,y,s)
+                # print(x,y,s)
 
                 img = img[int(x-0.5*s):int(x+0.5*s),int(y-0.5*s):int(y+0.5*s)] # extract patch
-                print(img.shape)
-                
+                # print(img.shape)
+
                 transform = transforms.Compose([
                     transforms.ToPILImage(),
                     transforms.Resize(args.imageSize), # resize patch
@@ -287,7 +287,7 @@ class TurbidDatasetsLoader(data.Dataset):
             a_fps = self.fps[a_idx]
             p_fps = self.fps[p_idx]
             n_fps = self.fps[n_idx]
-            print(a_img, p_img, n_img)
+            # print(a_img, p_img, n_img)
 
             a_img = self.data[a_img]
             p_img = self.data[p_img]
