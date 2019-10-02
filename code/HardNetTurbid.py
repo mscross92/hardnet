@@ -265,8 +265,29 @@ class TurbidDatasetsLoader(data.Dataset):
             def transform_img(img, p):
                 (y,x) = p.pt
                 s = p.size
+                (h,w) = img.shape
 
+                # optionally rotate
+                do_rot = random.random() > 0.5
+                if do_rot:
+                    angl = random.randint(-60,60)
+                    M = cv2.getRotationMatrix2D((x,y), angl, 1.0)
+                    cos = np.abs(M[0, 0])
+                    sin = np.abs(M[0, 1])
+                    nW = int((h * sin) + (w * cos))
+                    nH = int((h * cos) + (w * sin))
+                    M[0, 2] += (nW / 2) - x
+                    M[1, 2] += (nH / 2) - y
+                    img = cv2.warpAffine(img, M, (nW, nH))
+                    tr = M.dot(np.array((y,x) + (1,)))
+                    x = tr[0]
+                    y = tr[1]
+                    plt.imsho(img)
+                    plt.show()
                 img = img[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)] # extract patch
+                plt.imshow(img)
+                plt.show()
+
                 # print(img.shape)
 
                 transform = transforms.Compose([
@@ -760,50 +781,11 @@ def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, t
 
 
 
-        # train_loss_epch = train(train_loader, model, optimizer1, epoch, logger)
-        # train_losses_arr.append(train_loss_epch)
+        train_loss_epch = train(train_loader, model, optimizer1, epoch, logger)
+        train_losses_arr.append(train_loss_epch)
 
         fpr95_epch = test(model, epoch, logger, "a_test_log",val_x_dir, val_set_def_dir,args.valset)
         test_fpr95_arr.append(fpr95_epch)
-
-        # # iterate over test loaders and test results
-        # #train_loader, test_loaders2 = create_loaders(load_random_triplets=triplet_flag)
-        # train(train_loader, model, optimizer1, epoch, logger, triplet_flag)
-
-        # # visualise 
-        # test on deepblue set
-        # test_loss_epch, fpr95_epch = test(test_loader, model, epoch, logger,"a_test_log", xt, yt, xv, xv_ref, yv_p, yv_i, xts, xts_ref, yts_p, yts_i)
-        # test_losses_arr.append(test_loss_epch)
-        # test_fpr95_arr.append(fpr95_epch)
-
-        # if TEST_ON_W1BS:
-        #     # print(weights_path)
-        #     patch_images = w1bs.get_list_of_patch_images(
-        #         DATASET_DIR=args.w1bsroot.replace('/code', '/data/W1BS'))
-        #     desc_name = 'curr_desc'  # + str(random.randint(0,100))
-
-        #     DESCS_DIR = LOG_DIR + '/temp_descs/'  # args.w1bsroot.replace('/code', "/data/out_descriptors")
-        #     OUT_DIR = DESCS_DIR.replace('/temp_descs/', "/out_graphs/")
-
-        #     for img_fname in patch_images:
-        #         w1bs_extract_descs_and_save(img_fname, model, desc_name, cuda=args.cuda,
-        #                                     mean_img=args.mean_image,
-        #                                     std_img=args.std_image, out_dir=DESCS_DIR)
-
-        #     force_rewrite_list = [desc_name]
-        #     w1bs.match_descriptors_and_save_results(DESC_DIR=DESCS_DIR, do_rewrite=True,
-        #                                             dist_dict={},
-        #                                             force_rewrite_list=force_rewrite_list)
-        #     if (args.enable_logging):
-        #         w1bs.draw_and_save_plots_with_loggers(DESC_DIR=DESCS_DIR, OUT_DIR=OUT_DIR,
-        #                                               methods=["SNN_ratio"],
-        #                                               descs_to_draw=[desc_name],
-        #                                               logger=file_logger,
-        #                                               tensor_logger=logger)
-        #     else:
-        #         w1bs.draw_and_save_plots(DESC_DIR=DESCS_DIR, OUT_DIR=OUT_DIR,
-        #                                  methods=["SNN_ratio"],
-        #                                  descs_to_draw=[desc_name])
 
     # plot losses
     epchs = range(1, len(test_fpr95_arr) + 1)
@@ -815,101 +797,6 @@ def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, t
     plt.savefig(savestr, bbox_inches='tight')
     plt.close()
 
-    # plt.figure(figsize=(7,4))
-    # plt.plot(epchs, train_losses_arr, label='Milk subset (train)')
-    # plt.plot(epchs, test_losses_arr, label='DeepBlue subset (validation)')
-    # plt.xlabel('Epochs')
-    # plt.ylabel('Loss')
-    # plt.legend()
-    # savestr = 'losses_plot.png'
-    # plt.savefig(savestr, bbox_inches='tight')
-    # plt.close()
-
-    # # save fpr data to file
-    # savestr = 'fpr95_test_data.txt'
-    # np.savetxt(savestr, test_fpr95_arr, delimiter=',') 
-
-
-    # model.eval()
-    
-    # # load all patches
-    # inc_list = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
-    # patch_fldr = '/content/hardnet/data/sets/turbid/test_data/validation_all_' + str(args.imageSize)
-    # xv, label_indices, yv_p, yv_i = load_patchDataset_allval2(patch_fldr,inc_list,330)
-    # xv = torch.FloatTensor(np.array(xv)).unsqueeze(1)
-
-    # # load comparisons
-    # fl = '/content/hardnet/data/sets/turbid/test_data/comparisons.txt'    
-    # comparisons = np.loadtxt(fl,delimiter=',').astype('uint16')
-
-    # # compute all descriptors
-    # if args.cuda:
-    #     xv = xv.cuda()
-    # with torch.no_grad():
-    #     xv = Variable(xv)
-    #     # desc_xv = model(xv)
-    #     splts = torch.chunk(xv, args.imageSize)
-    #     outputs = []
-    #     for s in splts:
-    #         desc = model(s)
-    #         outputs.append(desc)
-    #     desc_xv = torch.cat(outputs)
-    #     print(desc_xv.shape)
-
-    # tn, tp, = [], []
-
-    # # for each comparison
-    # for p in comparisons:
-    #     pos_flag = p[4]
-    #     d_idx_a = int(label_indices[p[1],p[0]-2])
-    #     desc_a = desc_xv[d_idx_a].cpu().numpy()
-
-    #     d_idx_b = int(label_indices[p[3],p[2]-2])
-    #     desc_b = desc_xv[d_idx_b].cpu().numpy()
-
-    #     # compute euclidean distance
-    #     d = cv2.norm(desc_a,desc_b,cv2.NORM_L2)
-
-    #     if pos_flag == 1:
-    #         tp.append(d)
-    #     else:
-    #         tn.append(d)
-
-    # # save to files
-    # np.savetxt('tp.txt', tp, delimiter=',') 
-    # np.savetxt('tn.txt', tn, delimiter=',') 
-
-    # # compare positives for first 100 patches
-    # n_tests = 200 # limit to only include milk patches
-    # distances = np.zeros((n_tests,len(inc_list)))
-    # for ii in range(n_tests):
-    #     ref_idx = int(label_indices[ii,0])
-    #     ref_desc = desc_xv[ref_idx].cpu().numpy()
-
-    #     for jj in range(len(inc_list)):
-    #         p_idx = int(label_indices[ii,jj])
-    #         desc = desc_xv[p_idx].cpu().numpy()
-    #         d = cv2.norm(ref_desc,desc,cv2.NORM_L2)
-    #         distances[ii,jj] = d
-
-    # np.savetxt('positive_dists.txt', distances, delimiter=',')
-
-    # distances = np.zeros((717,len(inc_list)))
-    # # iterate through patches
-    # for ii in range(717):
-    #     d_idx_a = int(label_indices[ii,0]) # reference patch for first image
-    #     desc_a = desc_xv[d_idx_a].cpu().numpy()
-
-    #     # iterate through images
-    #     for jj in range(len(inc_list)):
-    #         d_idx_b = int(label_indices[ii,jj])
-    #         desc_b = desc_xv[d_idx_b].cpu().numpy()
-
-    #         # compute euclidean distance
-    #         d = cv2.norm(desc_a,desc_b,cv2.NORM_L2)
-    #         distances[ii,jj] = d
-
-    # np.savetxt('positive_dists.txt', distances, delimiter=',') 
 
     torch.cuda.empty_cache()
 
