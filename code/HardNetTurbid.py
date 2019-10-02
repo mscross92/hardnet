@@ -373,7 +373,7 @@ def weights_init(m):
     return
 
 
-def create_loaders(load_random_triplets=False):
+def create_loaders(load_random_triplets=False, val_x_dir='', val_set_def_dir='', train_img_dir='', val_set_idx=0,fps,val_idxs):
     test_dataset_names = copy.copy(dataset_names)
     test_dataset_names.remove(args.training_set)
     kwargs = {'num_workers': args.num_workers, 'pin_memory': args.pin_memory} if args.cuda else {}
@@ -425,12 +425,13 @@ def create_loaders(load_random_triplets=False):
                          load_random_triplets=load_random_triplets,
                          batch_size=args.batch_size,
                          datasets_path=args.hpatches_split+"turbid_imgs.pt",
-                         fliprot=args.fliprot,
+                         setdef_path=val_set_def_dir,
+                         valset_idx=args.valset,
                          n_triplets=args.n_triplets,
-                         batch_hard=0,
                          name=args.training_set,
                          download=True,
-                         transform=transform_train),
+                         fps=fps,
+                         val_feat_idxs=val_idxs),
         batch_size=args.batch_size,
         shuffle=False, **kwargs)
 
@@ -653,7 +654,7 @@ def create_optimizer(model, new_lr):
     return optimizer
 
 
-def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, train_img_dir, val_set_idx):
+def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, train_img_dir, val_set_idx, fps, val_idxs):
     
     # print the experiment configuration
     print('\nparsed options:\n{}\n'.format(vars(args)))
@@ -680,20 +681,20 @@ def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, t
     kwargs = {'num_workers': args.num_workers, 'pin_memory': args.pin_memory} if args.cuda else {}
 
     # get feature points
-    fps_str = train_img_dir + '/features.txt'
-    print(fps_str)
-    fps = []
-    lines = [line.strip() for line in open(fps_str)]
-    for line in lines:
-        list = line.split(',')
-        kp = cv2.KeyPoint(x=float(list[0]), y=float(list[1]), _size=float(list[2]), _angle=float(list[3]),
-                        _response=float(list[4]), _octave=int(list[5]), _class_id=int(list[6]))
-        if kp.size<12:
-            kp.size = 12
-        fps.append(kp)
-    del list
+    # fps_str = train_img_dir + '/features.txt'
+    # print(fps_str)
+    # fps = []
+    # lines = [line.strip() for line in open(fps_str)]
+    # for line in lines:
+    #     list = line.split(',')
+    #     kp = cv2.KeyPoint(x=float(list[0]), y=float(list[1]), _size=float(list[2]), _angle=float(list[3]),
+    #                     _response=float(list[4]), _octave=int(list[5]), _class_id=int(list[6]))
+    #     if kp.size<12:
+    #         kp.size = 12
+    #     fps.append(kp)
+    # del list
 
-    val_idxs = np.loadtext(train_img_dir + '/validation_location_idxs_set'+str(val_set_idx)+'.txt',delimiter=',')
+    # val_idxs = np.loadtext(train_img_dir + '/validation_location_idxs_set'+str(val_set_idx)+'.txt',delimiter=',')
 
     test_fpr95_arr, train_losses_arr = [], []
     start = args.start_epoch
@@ -707,6 +708,8 @@ def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, t
                             load_random_triplets=False,
                             batch_size=args.batch_size,
                             datasets_path=args.hpatches_split+"turbid_imgs.pt",
+                            setdef_path=val_set_def_dir,
+                            valset_idx=args.valset,
                             n_triplets=args.n_triplets,
                             name=args.training_set,
                             download=True,
@@ -916,5 +919,20 @@ if __name__ == '__main__':
     val_set_def_dir = val_x_dir
     train_img_dir = './data/sets/turbid/milk_imgs'
 
-    train_loader = create_loaders(load_random_triplets=triplet_flag)
-    main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, train_img_dir, args.valset)
+    fps_str = train_img_dir + '/features.txt'
+    print(fps_str)
+    fps = []
+    lines = [line.strip() for line in open(fps_str)]
+    for line in lines:
+        list = line.split(',')
+        kp = cv2.KeyPoint(x=float(list[0]), y=float(list[1]), _size=float(list[2]), _angle=float(list[3]),
+                        _response=float(list[4]), _octave=int(list[5]), _class_id=int(list[6]))
+        if kp.size<12:
+            kp.size = 12
+        fps.append(kp)
+    del list
+
+    val_idxs = np.loadtext(train_img_dir + '/validation_location_idxs_set'+str(val_set_idx)+'.txt',delimiter=',')
+
+    train_loader = create_loaders(load_random_triplets=triplet_flag, val_x_dir, val_set_def_dir, train_img_dir, args.valset. fps, val_idxs)
+    main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, train_img_dir, args.valset, fps, val_idxs)
