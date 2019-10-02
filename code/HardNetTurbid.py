@@ -681,6 +681,7 @@ def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, t
 
     # get feature points
     fps_str = train_img_dir + '/features.txt'
+    print(fps_str)
     fps = []
     lines = [line.strip() for line in open(fps_str)]
     for line in lines:
