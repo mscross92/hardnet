@@ -274,10 +274,6 @@ class TurbidDatasetsLoader(data.Dataset):
                     M = cv2.getRotationMatrix2D((y,x), angl, 1.0)
                     img = cv2.warpAffine(img, M, (w, h))
                 img = img[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)] # extract patch
-                # if do_rot:
-                cv2.imwrite('p_'+str(x)+str(y)+'.png',img)
-
-                # print(img.shape)
 
                 transform = transforms.Compose([
                     transforms.ToPILImage(),
