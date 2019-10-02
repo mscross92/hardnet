@@ -272,20 +272,10 @@ class TurbidDatasetsLoader(data.Dataset):
                 if do_rot:
                     angl = random.randint(-60,60)
                     M = cv2.getRotationMatrix2D((y,x), angl, 1.0)
-                    cos = np.abs(M[0, 0])
-                    sin = np.abs(M[0, 1])
-                    nW = int((h * sin) + (w * cos))
-                    nH = int((h * cos) + (w * sin))
-                    M[0, 2] += (nW / 2) - (0.5*w+y)
-                    M[1, 2] += (nH / 2) - (0.5*h+x)
-                    img = cv2.warpAffine(img, M, (nW, nH))
-                    tr = M.dot(np.array((y,x) + (1,)))
-                    x = tr[0]
-                    y = tr[1]
-                    cv2.imwrite('rot_'+str(angl)+'.png',img)
+                    img = cv2.warpAffine(img, M, (w, h))
                 img = img[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)] # extract patch
                 # if do_rot:
-                # cv2.imwrite('p_'+str(x)+str(y)+'.png',img)
+                cv2.imwrite('p_'+str(x)+str(y)+'.png',img)
 
                 # print(img.shape)
 
