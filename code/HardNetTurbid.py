@@ -577,8 +577,6 @@ def test(model, epoch, logger, logger_test_name, val_data_dir, val_setdef_dir, v
         ptch = cv2.imread(img_str, 0)
         ptch = cv2.resize(ptch, (patch_size, patch_size))
         ptch = np.array(ptch, dtype=np.uint8)
-        plt.imshow(ptch)
-        plt.show()
         return torch.ByteTensor(np.array(ptch, dtype=np.uint8))
         
     # switch to evaluate mode
@@ -594,6 +592,8 @@ def test(model, epoch, logger, logger_test_name, val_data_dir, val_setdef_dir, v
         # get descriptors
         img = get_ptch(val_data_dir,p[0],p[1],args.imageSize)
         img = torch.FloatTensor(np.array(img)).unsqueeze(0).unsqueeze(0)
+        if args.cuda:
+            img = img.cuda()
         with torch.no_grad():
             img = Variable(img)
             print(img.shape)
@@ -602,6 +602,8 @@ def test(model, epoch, logger, logger_test_name, val_data_dir, val_setdef_dir, v
             
         img = get_ptch(val_data_dir,p[2],p[3],args.imageSize)
         img = torch.FloatTensor(np.array(img)).unsqueeze(0).unsqueeze(0)
+        if args.cuda:
+            img = img.cuda()
         with torch.no_grad():
             desc_b = model(img)
             desc_b = desc_b.cpu().numpy()
