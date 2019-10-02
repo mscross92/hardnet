@@ -932,7 +932,7 @@ if __name__ == '__main__':
         fps.append(kp)
     del list
 
-    val_idxs = np.loadtext(train_img_dir + '/validation_location_idxs_set'+str(val_set_idx)+'.txt',delimiter=',')
+    val_idxs = np.loadtext(train_img_dir + '/validation_location_idxs_set'+str(args.valset)+'.txt',delimiter=',')
     train_loader = create_loaders(load_random_triplets=False, val_x_dir=val_x_dir, val_set_def_dir=val_set_def_dir, train_img_dir=train_img_dir, val_set_idx=args.valset,fps=fps,val_idxs=val_idxs)
     # train_loader = create_loaders(load_random_triplets=triplet_flag, val_x_dir, val_set_def_dir, train_img_dir, args.valset. fps, val_idxs)
     main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, train_img_dir, args.valset, fps, val_idxs)
