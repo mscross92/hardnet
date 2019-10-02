@@ -579,6 +579,14 @@ def test(model, epoch, logger, logger_test_name, val_data_dir, val_setdef_dir, v
         ptch = np.array(ptch, dtype=np.uint8)
         return torch.ByteTensor(np.array(ptch, dtype=np.uint8))
         
+    def err_at95recall(labels, distances):
+        recall_point = 0.95
+        labels = labels[np.argsort(distances)]
+        threshold_index = np.argmax(np.cumsum(labels) >= recall_point * np.sum(labels)) 
+        FP = np.sum(labels[:threshold_index] == 0) # Below threshold (i.e., labelled positive), but should be negative
+        TN = np.sum(labels[threshold_index:] == 0) # Above threshold (i.e., labelled negative), and should be negative
+        return (float(FP) / float(FP + TN)) * 100
+        
     # switch to evaluate mode
     model.eval()
 
@@ -625,7 +633,7 @@ def test(model, epoch, logger, logger_test_name, val_data_dir, val_setdef_dir, v
     d_sift = np.append(tn,tp)
     d_sift = np.asarray(d_sift)
 
-    err = ErrorRateAt95Recall(ll,d_sift)
+    err = err_at95recall(ll,d_sift)
     print('FPR@95 from validation set',val_set_idx,':',err)
 
     savestr = 'val_set' + str(val_set_idx) + '_hist_epoch' + str(epoch) + '.png'
