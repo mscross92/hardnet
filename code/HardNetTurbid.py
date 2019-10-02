@@ -295,6 +295,12 @@ class TurbidDatasetsLoader(data.Dataset):
             ptch_p = transform_img(p_img.numpy(),p_fps)
             ptch_n = transform_img(n_img.numpy(),n_fps)
 
+            # horizontal flip with p=0.5
+            do_flip = random.random() > 0.5
+            if do_flip:
+                ptch_a = torch.from_numpy(deepcopy(ptch_a.numpy()[:,:,::-1]))
+                ptch_p = torch.from_numpy(deepcopy(ptch_p.numpy()[:,:,::-1]))
+
             return ptch_a, ptch_p, ptch_n
 
     def __len__(self):
@@ -588,6 +594,7 @@ def test(model, epoch, logger, logger_test_name, val_data_dir, val_setdef_dir, v
         img = torch.FloatTensor(np.array(img)).unsqueeze(0).unsqueeze(0)
         with torch.no_grad():
             img = Variable(img)
+            print(img.shape)
             desc_a = model(img)
             desc_a = desc_a.cpu().numpy()
             
