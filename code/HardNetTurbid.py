@@ -254,7 +254,7 @@ class TurbidDatasetsLoader(data.Dataset):
                 while n1 == n2:
                     n2 = np.random.randint(0, len(indices[c1]))
             n3 = np.random.randint(0, len(indices[c2]))
-            triplets.append([c1,n1],[c1,n2],[c2,n3])
+            triplets.append([[c1,n1],[c1,n2],[c2,n3]])
             # triplets.append([indices[c1][n1], indices[c1][n2], indices[c2][n3]])
         # print('TRIPLET SHAPE',np.array(triplets).shape)
         return torch.LongTensor(np.array(triplets))
