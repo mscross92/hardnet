@@ -278,9 +278,9 @@ class TurbidDatasetsLoader(data.Dataset):
                 return img
 
             t = self.triplets[index]
-            (a_img, a_idx) = t[0]
-            (p_img, p_idx) = t[1]
-            (n_img, n_idx) = t[2]
+            (a_idx, a_img) = t[0]
+            (p_idx, p_img) = t[1]
+            (n_idx, n_img) = t[2]
             a_fps = self.fps[a_idx]
             p_fps = self.fps[p_idx]
             n_fps = self.fps[n_idx]
