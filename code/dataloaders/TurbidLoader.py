@@ -6,6 +6,7 @@ import cv2
 import sys
 import json
 from scipy.stats import truncnorm
+import random
 
 def get_truncated_normal(mean=0, sd=5, low=-15, upp=15):
     return truncnorm(
@@ -94,16 +95,36 @@ class TURBID(data.Dataset):
                     ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
                     labels.append(ll)
 
-                    # rotated patches
-                    rot_dist = [get_truncated_normal().rvs()] # sample angles from normal distribution
-                    for r in rot_dist:
-                        M = cv2.getRotationMatrix2D((y,x), r, 1.0) # rotate about patch center
-                        rotated = cv2.warpAffine(gray, M, (w, h))
-                        ptch = rotated[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
-                        ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
-                        labels.append(ll)
-
                     # perspective transform patch
+                    pts1 = np.float32([[0,0],[s,0],[0,s],[s,s]])
+                    pts2 = np.float32([[-random.randint(0,20),-random.randint(0,20)],[s+random.randint(0,20),-random.randint(0,20)],[-random.randint(0,20),s+random.randint(0,20)],[s+random.randint(0,20),s+random.randint(0,20)]])
+                    xmin=np.max((pts2[0,0],pts2[2,0]))
+                    xmax=np.min((pts2[1,0],pts2[3,0]))
+                    ymin=np.max((pts2[0,1],pts2[1,1]))
+                    ymax=np.min((pts2[2,1],pts2[3,1]))
+                    x_dif = (xmax-xmin)
+                    y_dif = (ymax-ymin)
+                    sz=np.min((x_dif,y_dif))
+                    transform = transforms.Compose([
+                        transforms.ToPILImage(),
+                        transforms.CenterCrop(sz),
+                        transforms.Resize(s)])
+                    M = cv2.getPerspectiveTransform(pts1,pts2)
+                    M[0, 2] -= xmin
+                    M[1, 2] -= ymin
+                    ptch = cv2.warpPerspective(ptch,M,(x_dif,y_dif))
+                    ptch = np.array(transform(ptch))
+                    ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
+                    labels.append(ll)
+
+                    # rotated patches
+                    r = get_truncated_normal().rvs() # sample angles from normal distribution
+                    M = cv2.getRotationMatrix2D((y,x), r, 1.0) # rotate about patch center
+                    rotated = cv2.warpAffine(gray, M, (w, h))
+                    ptch = rotated[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
+                    ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
+                    labels.append(ll)
+
                     
 
         print(len(ptchs),'patches created from',ll,'locations and',nn,'images')
