@@ -194,7 +194,7 @@ np.random.seed(args.seed)
 
 class TurbidDatasetsLoader(data.Dataset):
 
-    def __init__(self, datasets_path, train = True, transform = None, batch_size = None, n_triplets = 5000000, fps = None, val_feat_idxs = None, alpha_margin = 1.0, fliprot = False, *arg, **kw):
+    def __init__(self, datasets_path, train = True, transform = None, batch_size = None, n_triplets = 5000000, fps = None, val_feat_idxs = None, alpha_margin = 1.0, transform=None, fliprot = False, *arg, **kw):
         super(TurbidDatasetsLoader, self).__init__()
 
         # load turbid images
@@ -214,6 +214,7 @@ class TurbidDatasetsLoader(data.Dataset):
         self.batch_size = batch_size
         self.alpha_margin = alpha_margin
         self.fliprot = fliprot
+        self.transform = transform
 
         self.triplets = self.generate_triplets(self.labels, self.n_triplets, self.batch_size, self.val_feat_idxs, self.n_features)
         
@@ -262,59 +263,98 @@ class TurbidDatasetsLoader(data.Dataset):
 
 
     def __getitem__(self, index):
-            def transform_img(img, p):
-                (y,x) = p.pt
-                s = p.size
-                # (h,w) = img.shape
-
-                transform_a = transforms.Compose([
-                    transforms.ToPILImage(),
-                    transforms.RandomRotation(60, resample=PIL.Image.BICUBIC, center=(y,x))]) # rotate
-
-                # # optionally rotate
-                # do_rot = random.random() > 0.5
-                # if do_rot:
-                #     angl = random.randint(-60,60)
-                #     M = cv2.getRotationMatrix2D((y,x), angl, 1.0)
-                #     img = cv2.warpAffine(img, M, (w, h))
-                
-                # img = transform_a(img)
-                img = np.array(img)
-                img = img[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)] # extract patch
-
-                transform_b = transforms.Compose([
-                    transforms.ToPILImage(),
-                    transforms.Resize(args.imageSize), # resize patch
-                    transforms.ToTensor()])
-                
-                img = transform_b(img)
-
+            def transform_img(img):
+                if self.transform is not None:
+                    img = self.transform(img.numpy())
                 return img
 
             t = self.triplets[index]
-            (a_idx, a_img) = t[0]
-            (p_idx, p_img) = t[1]
-            (n_idx, n_img) = t[2]
-            a_fps = self.fps[a_idx]
-            p_fps = self.fps[p_idx]
-            n_fps = self.fps[n_idx]
-            # print(a_img, p_img, n_img)
+            a, p, n = self.data[t[0]], self.data[t[1]], self.data[t[2]]
+            # a, p, n = self.data[t[0]].float(), self.data[t[1]].float(), self.data[t[2]].float()
+            
+            # normalise range [0,1]
+            # a = a / 255
+            # p = p / 255
+            # n = n / 255
 
-            a_img = self.data[a_img]
-            p_img = self.data[p_img]
-            n_img = self.data[n_img]
+            # # subtract mean
+            # # print(torch.min(a),torch.mean(a))
+            # a = a - torch.mean(a)
+            # p = p - torch.mean(p)
+            # n = n - torch.mean(n)
 
-            ptch_a = transform_img(a_img.numpy(),a_fps)
-            ptch_p = transform_img(p_img.numpy(),p_fps)
-            ptch_n = transform_img(n_img.numpy(),n_fps)
+            img_a = transform_img(a)
+            img_p = transform_img(p)
+            img_n = transform_img(n)
 
-            # horizontal flip with p=0.5
-            do_flip = random.random() > 0.5
-            if do_flip:
-                ptch_a = torch.from_numpy(deepcopy(ptch_a.numpy()[:,:,::-1]))
-                ptch_p = torch.from_numpy(deepcopy(ptch_p.numpy()[:,:,::-1]))
+            # print(torch.min(a),torch.min(img_a),'\n')
 
-            return ptch_a, ptch_p, ptch_n
+            # transform images if required
+            if self.fliprot:
+                do_flip = random.random() > 0.5
+                do_rot = random.random() > 0.5
+
+                if do_rot:
+                    img_a = img_a.permute(0,2,1)
+                    img_p = img_p.permute(0,2,1)
+
+                if do_flip:
+                    img_a = torch.from_numpy(deepcopy(img_a.numpy()[:,:,::-1]))
+                    img_p = torch.from_numpy(deepcopy(img_p.numpy()[:,:,::-1]))
+            return img_a, img_p, img_n
+            # def transform_img(img, p):
+            #     (y,x) = p.pt
+            #     s = p.size
+            #     # (h,w) = img.shape
+
+            #     transform_a = transforms.Compose([
+            #         transforms.ToPILImage(),
+            #         transforms.RandomRotation(60, resample=PIL.Image.BICUBIC, center=(y,x))]) # rotate
+
+            #     # # optionally rotate
+            #     # do_rot = random.random() > 0.5
+            #     # if do_rot:
+            #     #     angl = random.randint(-60,60)
+            #     #     M = cv2.getRotationMatrix2D((y,x), angl, 1.0)
+            #     #     img = cv2.warpAffine(img, M, (w, h))
+                
+            #     # img = transform_a(img)
+            #     img = np.array(img)
+            #     img = img[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)] # extract patch
+
+            #     transform_b = transforms.Compose([
+            #         transforms.ToPILImage(),
+            #         transforms.Resize(args.imageSize), # resize patch
+            #         transforms.ToTensor()])
+                
+            #     img = transform_b(img)
+
+            #     return img
+
+            # t = self.triplets[index]
+            # (a_idx, a_img) = t[0]
+            # (p_idx, p_img) = t[1]
+            # (n_idx, n_img) = t[2]
+            # a_fps = self.fps[a_idx]
+            # p_fps = self.fps[p_idx]
+            # n_fps = self.fps[n_idx]
+            # # print(a_img, p_img, n_img)
+
+            # a_img = self.data[a_img]
+            # p_img = self.data[p_img]
+            # n_img = self.data[n_img]
+
+            # ptch_a = transform_img(a_img.numpy(),a_fps)
+            # ptch_p = transform_img(p_img.numpy(),p_fps)
+            # ptch_n = transform_img(n_img.numpy(),n_fps)
+
+            # # horizontal flip with p=0.5
+            # do_flip = random.random() > 0.5
+            # if do_flip:
+            #     ptch_a = torch.from_numpy(deepcopy(ptch_a.numpy()[:,:,::-1]))
+            #     ptch_p = torch.from_numpy(deepcopy(ptch_p.numpy()[:,:,::-1]))
+
+            # return ptch_a, ptch_p, ptch_n
 
     def __len__(self):
             # if self.train:
@@ -474,6 +514,7 @@ def create_loaders(load_random_triplets=False, val_x_dir='', val_set_def_dir='',
                          n_triplets=args.n_triplets,
                          name=args.training_set,
                          download=True,
+                         transform=transform_train,
                          fps=fps,
                          val_feat_idxs=val_idxs),
         batch_size=args.batch_size,
@@ -753,7 +794,19 @@ def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, t
     # del list
 
     # val_idxs = np.loadtext(train_img_dir + '/validation_location_idxs_set'+str(val_set_idx)+'.txt',delimiter=',')
-
+    transform = transforms.Compose([
+        # transforms.Lambda(cv2_scale),
+        # transforms.Lambda(np_reshape),
+        # transforms.ToTensor(),
+        # transforms.Normalize((args.mean_image,), (args.std_image,))])
+        transforms.Lambda(np_reshape32),
+        transforms.ToPILImage(),
+        # transforms.RandomRotation(15,PIL.Image.BILINEAR),
+        # transforms.RandomHorizontalFlip(p=0.5),
+        # transforms.ColorJitter(brightness=0.1, contrast=0, saturation=0, hue=0),
+        transforms.Resize(args.imageSize),
+        transforms.ToTensor()])
+        
     test_fpr95_arr, train_losses_arr = [], []
     start = args.start_epoch
     end = start + args.epochs
@@ -771,6 +824,7 @@ def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, t
                             n_triplets=args.n_triplets,
                             name=args.training_set,
                             download=True,
+                            transform=transform,
                             fps=fps,
                             val_feat_idxs=val_idxs)
             
@@ -787,6 +841,7 @@ def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, t
                          valset_idx=args.valset,
                          n_triplets=args.n_triplets,
                          name=args.training_set,
+                         transform=transform,
                          download=True,
                          fps=fps,
                          val_feat_idxs=val_idxs)
@@ -827,8 +882,8 @@ if __name__ == '__main__':
         if not os.path.isdir(DESCS_DIR):
             os.makedirs(DESCS_DIR)
     logger, file_logger = None, None
-    model = TNet()
-    # model = HardNet()
+    # model = TNet()
+    model = HardNet()
     # model_weights = '/content/hardnet/pretrained/checkpoint_9.pth'
     # checkpoint = torch.load(model_weights)
     # model.load_state_dict(checkpoint['state_dict'])
@@ -845,7 +900,7 @@ if __name__ == '__main__':
     train_img_dir = './data/sets/turbid/milk_imgs'
 
     fps_str = train_img_dir + '/features.txt'
-    print(fps_str)
+    # print(fps_str)
     fps = []
     lines = [line.strip() for line in open(fps_str)]
     for line in lines:
