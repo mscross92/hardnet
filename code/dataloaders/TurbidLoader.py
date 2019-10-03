@@ -93,7 +93,8 @@ class TURBID(data.Dataset):
 
                     # original patch
                     ptch = gray[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
-                    ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
+                    ptchs.append(ptch)
+                    # ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
                     labels.append(ll)
 
                     # perspective transform patch
@@ -115,7 +116,8 @@ class TURBID(data.Dataset):
                     M[1, 2] -= ymin
                     ptch = cv2.warpPerspective(ptch,M,(x_dif,y_dif))
                     ptch = np.array(transform(ptch))
-                    ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
+                    ptchs.append(ptch)
+                    # ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
                     labels.append(ll)
 
                     # rotated patches
@@ -123,12 +125,14 @@ class TURBID(data.Dataset):
                     M = cv2.getRotationMatrix2D((y,x), r, 1.0) # rotate about patch center
                     rotated = cv2.warpAffine(gray, M, (w, h))
                     ptch = rotated[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
-                    ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
+                    ptchs.append(ptch)
+                    # ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
                     labels.append(ll)
 
                     
 
         print(len(ptchs),'patches created from',ll,'locations and',nn,'images')
+
         return torch.ByteTensor(np.array(ptchs, dtype=np.uint8)), torch.LongTensor(labels)
 
 
