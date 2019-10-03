@@ -92,7 +92,7 @@ class TURBID(data.Dataset):
 
                     # original patch
                     ptch = gray[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
-                    ptchs.append(ptch.cuda())
+                    ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
                     labels.append(ll)
 
                     # rotated patches
@@ -101,7 +101,7 @@ class TURBID(data.Dataset):
                         M = cv2.getRotationMatrix2D((y,x), r, 1.0) # rotate about patch center
                         rotated = cv2.warpAffine(gray, M, (w, h))
                         ptch = rotated[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
-                        ptchs.append(ptch.cuda())
+                        ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
                         labels.append(ll)
 
                     # perspective transform patch
