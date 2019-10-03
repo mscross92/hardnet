@@ -72,6 +72,7 @@ class TURBID(data.Dataset):
         for nn in types: # iterate through every image
             # load image
             pth = data_dir + '/' + str(nn) +'.jpg'
+            print(pth)
             gray = cv2.imread(pth)
             # convert to grayscale
             lin_img = ((gray/255 + 0.055) / 1.055) ** 2.4
@@ -104,7 +105,7 @@ class TURBID(data.Dataset):
                         labels.append(ll)
 
                     # perspective transform patch
-        
+                    
 
         print(len(ptchs),'patches created from',ll,'locations and',nn,'images')
         return torch.ByteTensor(np.array(ptchs, dtype=np.uint8)), torch.LongTensor(labels)
