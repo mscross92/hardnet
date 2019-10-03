@@ -6,6 +6,7 @@ import cv2
 import sys
 import json
 from scipy.stats import truncnorm
+import torchvision.transforms as transforms
 import random
 
 def get_truncated_normal(mean=0, sd=5, low=-15, upp=15):
