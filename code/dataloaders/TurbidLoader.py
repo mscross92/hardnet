@@ -109,7 +109,7 @@ class TURBID(data.Dataset):
                     transform = transforms.Compose([
                         transforms.ToPILImage(),
                         transforms.CenterCrop(sz),
-                        transforms.Resize(s)])
+                        transforms.Resize(int(s))])
                     M = cv2.getPerspectiveTransform(pts1,pts2)
                     M[0, 2] -= xmin
                     M[1, 2] -= ymin
