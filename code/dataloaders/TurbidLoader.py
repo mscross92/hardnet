@@ -92,17 +92,16 @@ class TURBID(data.Dataset):
 
                     # original patch
                     ptch = gray[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
-                    ptchs.append(ptch)
+                    ptchs.append(ptch.cuda())
                     labels.append(ll)
 
                     # rotated patches
                     rot_dist = get_truncated_normal().rvs(25) # sample angles from normal distribution
-                    print(rot_dist)
                     for r in rot_dist:
                         M = cv2.getRotationMatrix2D((y,x), r, 1.0) # rotate about patch center
                         rotated = cv2.warpAffine(gray, M, (w, h))
                         ptch = rotated[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
-                        ptchs.append(ptch)
+                        ptchs.append(ptch.cuda())
                         labels.append(ll)
 
                     # perspective transform patch
