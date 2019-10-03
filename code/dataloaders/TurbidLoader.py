@@ -12,7 +12,6 @@ def get_truncated_normal(mean=0, sd=5, low=-15, upp=15):
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
 types = [2,3,4,5,6,7,8,9,10,11,12] # included images
-rot_dists = get_truncated_normal().rvs(25)
 
 # def mean_image(patches):
 #     mean = np.mean(patches)
@@ -96,7 +95,7 @@ class TURBID(data.Dataset):
                     labels.append(ll)
 
                     # rotated patches
-                    rot_dist = get_truncated_normal().rvs(4) # sample angles from normal distribution
+                    rot_dist = [get_truncated_normal().rvs()] # sample angles from normal distribution
                     for r in rot_dist:
                         M = cv2.getRotationMatrix2D((y,x), r, 1.0) # rotate about patch center
                         rotated = cv2.warpAffine(gray, M, (w, h))
