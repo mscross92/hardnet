@@ -7,7 +7,7 @@ import sys
 import json
 from scipy.stats import truncnorm
 
-def get_truncated_normal(mean=0, sd=25, low=-50, upp=50):
+def get_truncated_normal(mean=0, sd=5, low=-15, upp=15):
     return truncnorm(
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
@@ -96,7 +96,7 @@ class TURBID(data.Dataset):
                     labels.append(ll)
 
                     # rotated patches
-                    rot_dist = get_truncated_normal().rvs(25) # sample angles from normal distribution
+                    rot_dist = get_truncated_normal().rvs(5) # sample angles from normal distribution
                     for r in rot_dist:
                         M = cv2.getRotationMatrix2D((y,x), r, 1.0) # rotate about patch center
                         rotated = cv2.warpAffine(gray, M, (w, h))
