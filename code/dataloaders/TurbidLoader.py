@@ -96,7 +96,7 @@ class TURBID(data.Dataset):
                     labels.append(ll)
 
                     # rotated patches
-                    rot_dist = get_truncated_normal().rvs(5) # sample angles from normal distribution
+                    rot_dist = get_truncated_normal().rvs(4) # sample angles from normal distribution
                     for r in rot_dist:
                         M = cv2.getRotationMatrix2D((y,x), r, 1.0) # rotate about patch center
                         rotated = cv2.warpAffine(gray, M, (w, h))
