@@ -265,22 +265,29 @@ class TurbidDatasetsLoader(data.Dataset):
             def transform_img(img, p):
                 (y,x) = p.pt
                 s = p.size
-                (h,w) = img.shape
+                # (h,w) = img.shape
 
-                # optionally rotate
-                do_rot = random.random() > 0.5
-                if do_rot:
-                    angl = random.randint(-60,60)
-                    M = cv2.getRotationMatrix2D((y,x), angl, 1.0)
-                    img = cv2.warpAffine(img, M, (w, h))
+                transform_a = transforms.Compose([
+                    transforms.ToPILImage(),
+                    transforms.RandomRotation(60, resample=PIL.Image.BICUBIC, center=(y,x))]) # rotate
+
+                # # optionally rotate
+                # do_rot = random.random() > 0.5
+                # if do_rot:
+                #     angl = random.randint(-60,60)
+                #     M = cv2.getRotationMatrix2D((y,x), angl, 1.0)
+                #     img = cv2.warpAffine(img, M, (w, h))
+                
+                img = transform_a(img)
+                img = np.array(img)
                 img = img[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)] # extract patch
 
-                transform = transforms.Compose([
+                transform_b = transforms.Compose([
                     transforms.ToPILImage(),
                     transforms.Resize(args.imageSize), # resize patch
                     transforms.ToTensor()])
                 
-                img = transform(img)
+                img = transform_b(img)
 
                 return img
 
