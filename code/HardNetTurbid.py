@@ -194,7 +194,7 @@ np.random.seed(args.seed)
 
 class TurbidDatasetsLoader(data.Dataset):
 
-    def __init__(self, datasets_path, train = True, transform = None, batch_size = None, n_triplets = 5000000, fps = None, val_feat_idxs = None, alpha_margin = 1.0, transform=None, fliprot = False, *arg, **kw):
+    def __init__(self, datasets_path, train = True, batch_size = None, n_triplets = 5000000, fps = None, val_feat_idxs = None, alpha_margin = 1.0, transform=None, fliprot = False, *arg, **kw):
         super(TurbidDatasetsLoader, self).__init__()
 
         # load turbid images
