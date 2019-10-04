@@ -68,7 +68,7 @@ class TURBID(data.Dataset):
         # get validation set
         val_idxs = np.loadtxt(data_dir + '/validation_location_idxs_set'+str(val_set_idx)+'.txt',delimiter=',')
                     
-        ptchs = []
+        ptchs = None
         labels = []
         counter = 0
         for nn in types: # iterate through every image
@@ -86,6 +86,9 @@ class TURBID(data.Dataset):
 
             for ll,p in enumerate(fps): # iterate through every point
                 if ll not in val_idxs: # check to be included in train set
+
+                    ps = []
+
                     # extract feature details
                     (y,x) = p.pt
                     s = p.size
@@ -95,8 +98,8 @@ class TURBID(data.Dataset):
                     # original patch
                     ptch = gray[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
                     ptch_1 = cv2.resize(ptch, (32, 32))
-                    # ptchs.append(ptch)
-                    ptchs.append(torch.ByteTensor(np.array(ptch_1, dtype=np.uint8)).cuda())
+                    ps.append(ptch)
+                    # ptchs.append(torch.ByteTensor(np.array(ptch_1, dtype=np.uint8)).cuda())
                     labels.append(ll)
 
                     # perspective transform patch
@@ -118,8 +121,8 @@ class TURBID(data.Dataset):
                     M[1, 2] -= ymin
                     ptch = cv2.warpPerspective(ptch,M,(x_dif,y_dif))
                     ptch = np.array(transform(ptch))
-                    # ptchs.append(ptch)
-                    ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
+                    ps.append(ptch)
+                    # ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
                     labels.append(ll)
 
                     # rotated patches
@@ -128,9 +131,17 @@ class TURBID(data.Dataset):
                     rotated = cv2.warpAffine(gray, M, (w, h))
                     ptch = rotated[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
                     ptch = cv2.resize(ptch, (32, 32))
-                    # ptchs.append(ptch)
-                    ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
+                    ps.append(ptch)
+                    # ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
                     labels.append(ll)
+
+                    ps = torch.ByteTensor(np.array(ps, dtype=np.uint8)).cuda()
+
+                    if ptchs == None:
+                        ptchs = ps
+                    else:
+                        ptchs = torch.cat([ptchs,ps], dim=0)
+
                     
         print(len(ptchs),'patches created from',ll,'locations and',nn,'images')
         ptchs = torch.cat(ptchs, dim=2) # concat list of tensors
