@@ -221,32 +221,69 @@ class TurbidDatasetsLoader(data.Dataset):
         
     @staticmethod
     def generate_triplets(labels, num_triplets, batch_size, val_feats, n_feats):
-        def create_indices(_labels,_n_feats,_val_feats):
+        # def create_indices(_labels,_n_feats,_val_feats):
+        #     inds = dict()
+        #     for ind in range(_n_feats):
+        #         if ind not in _val_feats:
+        #             if ind not in inds:
+        #                 inds[ind] = []
+        #             for idx in range(max(_labels)+1):
+        #                 inds[ind].append(idx)
+        #     return inds
+
+        # triplets = []
+        # indices = create_indices(labels.numpy(),n_feats,val_feats)
+
+        # # add only unique indices in batch
+        # already_idxs = set()
+
+        # for x in tqdm(range(num_triplets)):
+        #     if len(already_idxs) >= batch_size:
+        #         already_idxs = set()
+        #     c1 = np.random.randint(0, n_feats)
+        #     while c1 in already_idxs or c1 in val_feats:
+        #         c1 = np.random.randint(0, n_feats)
+        #     already_idxs.add(c1)
+        #     c2 = np.random.randint(0, n_feats)
+        #     while c1 == c2  or c2 in val_feats:
+        #         c2 = np.random.randint(0, n_feats)
+        #     if len(indices[c1]) == 2:  # hack to speed up process
+        #         n1, n2 = 0, 1
+        #     else:
+        #         n1 = np.random.randint(0, len(indices[c1]))
+        #         n2 = np.random.randint(0, len(indices[c1]))
+        #         while n1 == n2:
+        #             n2 = np.random.randint(0, len(indices[c1]))
+        #     n3 = np.random.randint(0, len(indices[c2]))
+        #     triplets.append([[c1,n1],[c1,n2],[c2,n3]])
+        #     # triplets.append([indices[c1][n1], indices[c1][n2], indices[c2][n3]])
+        # # print('TRIPLET SHAPE',np.array(triplets).shape)
+        # return torch.LongTensor(np.array(triplets))
+        def create_indices(_labels):
             inds = dict()
-            for ind in range(_n_feats):
-                if ind not in _val_feats:
-                    if ind not in inds:
-                        inds[ind] = []
-                    for idx in range(max(_labels)+1):
-                        inds[ind].append(idx)
+            for idx, ind in enumerate(_labels):
+                if ind not in inds:
+                    inds[ind] = []
+                inds[ind].append(idx)
             return inds
 
         triplets = []
-        indices = create_indices(labels.numpy(),n_feats,val_feats)
-
+        indices = create_indices(labels.numpy())
+        unique_labels = np.unique(labels.numpy())
+        n_classes = unique_labels.shape[0]
         # add only unique indices in batch
         already_idxs = set()
 
         for x in tqdm(range(num_triplets)):
             if len(already_idxs) >= batch_size:
                 already_idxs = set()
-            c1 = np.random.randint(0, n_feats)
-            while c1 in already_idxs or c1 in val_feats:
-                c1 = np.random.randint(0, n_feats)
+            c1 = np.random.randint(0, n_classes)
+            while c1 in already_idxs:
+                c1 = np.random.randint(0, n_classes)
             already_idxs.add(c1)
-            c2 = np.random.randint(0, n_feats)
-            while c1 == c2  or c2 in val_feats:
-                c2 = np.random.randint(0, n_feats)
+            c2 = np.random.randint(0, n_classes)
+            while c1 == c2:
+                c2 = np.random.randint(0, n_classes)
             if len(indices[c1]) == 2:  # hack to speed up process
                 n1, n2 = 0, 1
             else:
@@ -255,8 +292,7 @@ class TurbidDatasetsLoader(data.Dataset):
                 while n1 == n2:
                     n2 = np.random.randint(0, len(indices[c1]))
             n3 = np.random.randint(0, len(indices[c2]))
-            triplets.append([[c1,n1],[c1,n2],[c2,n3]])
-            # triplets.append([indices[c1][n1], indices[c1][n2], indices[c2][n3]])
+            triplets.append([indices[c1][n1], indices[c1][n2], indices[c2][n3]])
         # print('TRIPLET SHAPE',np.array(triplets).shape)
         return torch.LongTensor(np.array(triplets))
 
