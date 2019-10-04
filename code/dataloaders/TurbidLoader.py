@@ -133,8 +133,8 @@ class TURBID(data.Dataset):
                     labels.append(ll)
                     
         print(len(ptchs),'patches created from',ll,'locations and',nn,'images')
-        ptchs = torch.cat(ptchs, dim=1) # concat list of tensors
-
+        ptchs = torch.cat(ptchs, dim=2) # concat list of tensors
+        
         return ptchs, torch.LongTensor(labels)
 
 
