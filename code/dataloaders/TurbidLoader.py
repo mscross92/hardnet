@@ -135,12 +135,12 @@ class TURBID(data.Dataset):
                     # ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
                     labels.append(ll)
 
-                    ps = torch.ByteTensor(np.array(ps, dtype=np.uint8)).cuda()
+                    pss = torch.ByteTensor(np.array(ps, dtype=np.uint8)).cuda()
 
                     if ptchs == None:
-                        ptchs = ps
+                        ptchs = pss
                     else:
-                        ptchs = torch.cat([ptchs,ps], dim=0)
+                        ptchs = torch.cat([ptchs,pss], dim=0)
 
                     
         print(len(ptchs),'patches created from',ll,'locations and',nn,'images')
