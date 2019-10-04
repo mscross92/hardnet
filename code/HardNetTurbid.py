@@ -831,6 +831,7 @@ def main(train_loader, model, logger, file_logger, val_x_dir, val_set_def_dir, t
     # del list
 
     # val_idxs = np.loadtext(train_img_dir + '/validation_location_idxs_set'+str(val_set_idx)+'.txt',delimiter=',')
+    np_reshape32 = lambda x: np.reshape(x, (args.imageSize, args.imageSize, 1))
     transform = transforms.Compose([
         # transforms.Lambda(cv2_scale),
         # transforms.Lambda(np_reshape),
