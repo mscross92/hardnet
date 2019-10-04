@@ -303,7 +303,7 @@ class TurbidDatasetsLoader(data.Dataset):
     def __getitem__(self, index):
             def transform_img(img):
                 if self.transform is not None:
-                    img = self.transform(img.numpy())
+                    img = self.transform(img.cpu().numpy())
                 return img
 
             t = self.triplets[index]
