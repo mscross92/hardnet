@@ -203,6 +203,7 @@ class TurbidDatasetsLoader(data.Dataset):
         del datasets
         
         self.data, self.labels = data, labels
+        print(self.data[0].shape)
 
         self.fps = fps
         self.n_features = len(fps)
