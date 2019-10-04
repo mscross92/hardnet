@@ -13,8 +13,8 @@ def get_truncated_normal(mean=0, sd=5, low=-15, upp=15):
     return truncnorm(
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
-# types = [2,3,4,5,6,7,8,9,10,11,12] # included images
-types = [2,3] # included images
+types = [2,3,4,5,6,7,8,9,10,11,12] # included images
+# types = [2,3] # included images
 
 # def mean_image(patches):
 #     mean = np.mean(patches)
