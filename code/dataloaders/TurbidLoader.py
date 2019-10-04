@@ -98,7 +98,8 @@ class TURBID(data.Dataset):
                     # original patch
                     ptch = gray[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
                     ptch_1 = cv2.resize(ptch, (32, 32))
-                    ps.append(ptch)
+                    ptch_1 = np.array(ptch_1, dtype=np.uint8)
+                    ps.append(ptch_1)
                     # ptchs.append(torch.ByteTensor(np.array(ptch_1, dtype=np.uint8)).cuda())
                     labels.append(ll)
 
@@ -120,7 +121,7 @@ class TURBID(data.Dataset):
                     M[0, 2] -= xmin
                     M[1, 2] -= ymin
                     ptch = cv2.warpPerspective(ptch,M,(x_dif,y_dif))
-                    ptch = np.array(transform(ptch))
+                    ptch = np.array(transform(ptch), dtype=np.uint8)
                     ps.append(ptch)
                     # ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
                     labels.append(ll)
@@ -131,16 +132,21 @@ class TURBID(data.Dataset):
                     rotated = cv2.warpAffine(gray, M, (w, h))
                     ptch = rotated[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
                     ptch = cv2.resize(ptch, (32, 32))
+                    ptch = np.array(ptch, dtype=np.uint8)
                     ps.append(ptch)
                     # ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
                     labels.append(ll)
 
-                    pss = torch.ByteTensor(np.array(ps, dtype=np.uint8)).cuda()
+                    ps = np.array(ps)
+                    ps = ps.astype('uint8')
 
-                    if ptchs == None:
-                        ptchs = pss
+                    
+                    ps = torch.ByteTensor(ps).cuda()
+
+                    if type(ptchs) == type(None):
+                        ptchs = ps
                     else:
-                        ptchs = torch.cat([ptchs,pss], dim=0)
+                        ptchs = torch.cat([ptchs,ps], dim=0)
 
                     
         print(len(ptchs),'patches created from',ll,'locations and',nn,'images')
