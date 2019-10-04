@@ -146,11 +146,11 @@ class TURBID(data.Dataset):
                     if type(ptchs) == type(None):
                         ptchs = ps
                     else:
-                        ptchs = torch.cat([ptchs,ps], dim=0)
+                        ptchs = torch.cat([ptchs,ps], dim=0) # concat list of tensors
 
                     
         print(len(ptchs),'patches created from',ll,'locations and',nn,'images')
-        ptchs = torch.cat(ptchs, dim=2) # concat list of tensors
+        # ptchs = torch.cat(ptchs, dim=2) # concat list of tensors
         
         return ptchs, torch.LongTensor(labels)
 
