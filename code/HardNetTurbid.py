@@ -203,7 +203,6 @@ class TurbidDatasetsLoader(data.Dataset):
         del datasets
         
         self.data, self.labels = data, labels
-        print(self.data[0].shape)
 
         self.fps = fps
         self.n_features = len(fps)
@@ -578,13 +577,14 @@ def create_loaders(load_random_triplets=False, val_x_dir='', val_set_def_dir='',
 def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
     # switch to train mode
     model.train()
-    pbar = tqdm(enumerate(train_loader))
+    # pbar = tqdm(enumerate(train_loader))
     # print('\n\n',pbar.shape,'\n\n')
     tp, tn = [], []
-    for batch_idx, data in pbar:
+    for batch_idx, (data_a, data_p, data_n) in tqdm(enumerate(train_loader)):
+    # for batch_idx, data in pbar:
         # print(batch_idx)
-        if load_triplets:
-            data_a, data_p, data_n = data
+        # if load_triplets:
+        #     data_a, data_p, data_n = data
             
             # visualise random triplet for the first batch - TODO: randomly select batch
             # index = np.random.randint(0, data_a.shape[0])
@@ -609,19 +609,19 @@ def train(train_loader, model, optimizer, epoch, logger, load_triplets=True):
                 # savestr = 'epch' + str(epoch) + '_idx' + str(index) + '.png'
                 # plt.savefig(savestr, bbox_inches='tight')
                 # plt.close()
-        else:
-            data_a, data_p = data
+        # else:
+        #     data_a, data_p = data
 
-        if args.cuda:
-            data_a, data_p = data_a.cuda(), data_p.cuda()
-            data_a, data_p = Variable(data_a), Variable(data_p)
-            out_a = model(data_a)
-            out_p = model(data_p)
+        # if args.cuda:
+        #     data_a, data_p = data_a.cuda(), data_p.cuda()
+        data_a, data_p = Variable(data_a), Variable(data_p)
+        out_a = model(data_a)
+        out_p = model(data_p)
 
-        if load_triplets:
-            data_n = data_n.cuda()
-            data_n = Variable(data_n)
-            out_n = model(data_n)
+        # if load_triplets:
+            # data_n = data_n.cuda()
+        data_n = Variable(data_n)
+        out_n = model(data_n)
 
         vis_id = 99999
         if args.batch_reduce == 'L2Net':
