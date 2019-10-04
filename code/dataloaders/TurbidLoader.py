@@ -131,7 +131,6 @@ class TURBID(data.Dataset):
                     # ptchs.append(ptch)
                     ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
                     labels.append(ll)
-
                     
         print(len(ptchs),'patches created from',ll,'locations and',nn,'images')
         ptchs = torch.cat(ptchs, dim=1) # concat list of tensors
