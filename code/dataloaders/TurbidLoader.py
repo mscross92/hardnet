@@ -94,9 +94,9 @@ class TURBID(data.Dataset):
 
                     # original patch
                     ptch = gray[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
-                    ptch = cv2.resize(ptch, (32, 32))
+                    ptch_1 = cv2.resize(ptch, (32, 32))
                     # ptchs.append(ptch)
-                    ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
+                    ptchs.append(torch.ByteTensor(np.array(ptch_1, dtype=np.uint8)).cuda())
                     labels.append(ll)
 
                     # perspective transform patch
