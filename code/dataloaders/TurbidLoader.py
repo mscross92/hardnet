@@ -136,7 +136,7 @@ class TURBID(data.Dataset):
         print(len(ptchs),'patches created from',ll,'locations and',nn,'images')
         ptchs = torch.cat(ptchs, dim=1) # concat list of tensors
 
-        return torch.ByteTensor(np.array(ptchs, dtype=np.uint8)), torch.LongTensor(labels)
+        return ptchs, torch.LongTensor(labels)
 
 
 if __name__ == '__main__':
