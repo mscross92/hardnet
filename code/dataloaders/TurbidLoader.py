@@ -66,7 +66,7 @@ class TURBID(data.Dataset):
 
         # get validation set
         val_idxs = np.loadtxt(data_dir + '/validation_location_idxs_set'+str(val_set_idx)+'.txt',delimiter=',')
-        
+                    
         ptchs = []
         labels = []
         counter = 0
@@ -93,13 +93,14 @@ class TURBID(data.Dataset):
 
                     # original patch
                     ptch = gray[int(x-0.5*s):int(x-0.5*s)+int(s),int(y-0.5*s):int(y-0.5*s)+int(s)]
+                    ptch = cv2.resize(ptch, (32, 32))
                     # ptchs.append(ptch)
                     ptchs.append(torch.ByteTensor(np.array(ptch, dtype=np.uint8)).cuda())
                     labels.append(ll)
 
                     # perspective transform patch
                     pts1 = np.float32([[0,0],[s,0],[0,s],[s,s]])
-                    pts2 = np.float32([[-random.randint(0,20),-random.randint(0,20)],[s+random.randint(0,20),-random.randint(0,20)],[-random.randint(0,20),s+random.randint(0,20)],[s+random.randint(0,20),s+random.randint(0,20)]])
+                    pts2 = np.float32([[-random.randint(0,15),-random.randint(0,15)],[s+random.randint(0,15),-random.randint(0,15)],[-random.randint(0,15),s+random.randint(0,15)],[s+random.randint(0,15),s+random.randint(0,15)]])
                     xmin=np.max((pts2[0,0],pts2[2,0]))
                     xmax=np.min((pts2[1,0],pts2[3,0]))
                     ymin=np.max((pts2[0,1],pts2[1,1]))
@@ -110,7 +111,7 @@ class TURBID(data.Dataset):
                     transform = transforms.Compose([
                         transforms.ToPILImage(),
                         transforms.CenterCrop(sz),
-                        transforms.Resize(int(s))])
+                        transforms.Resize(32)])
                     M = cv2.getPerspectiveTransform(pts1,pts2)
                     M[0, 2] -= xmin
                     M[1, 2] -= ymin
