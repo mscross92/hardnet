@@ -9,7 +9,7 @@ from scipy.stats import truncnorm
 import torchvision.transforms as transforms
 import random
 
-def get_truncated_normal(mean=0, sd=35, low=-50, upp=50):
+def get_truncated_normal(mean=0, sd=35, low=-70, upp=70):
     return truncnorm(
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
