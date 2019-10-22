@@ -288,12 +288,12 @@ class TurbidDatasetsLoader(data.Dataset):
             if len(indices[unique_labels[c1]]) == 2:  # hack to speed up process
                 n1, n2 = 0, 1
             else:
-                # n1 = np.random.randint(0, len(indices[unique_labels[c1]]))
-                # n2 = np.random.randint(0, len(indices[unique_labels[c1]]))
-                # while n1 == n2:
-                #     n2 = np.random.randint(0, len(indices[unique_labels[c1]]))
-                n1 = 0 # always use the original patch when training with augmented data
-                n2 = np.random.randint(1, len(indices[unique_labels[c1]]))
+                n1 = np.random.randint(0, len(indices[unique_labels[c1]]))
+                n2 = np.random.randint(0, len(indices[unique_labels[c1]]))
+                while n1 == n2:
+                    n2 = np.random.randint(0, len(indices[unique_labels[c1]]))
+                # n1 = 0 # always use the original patch when training with augmented data
+                # n2 = np.random.randint(1, len(indices[unique_labels[c1]]))
             n3 = np.random.randint(0, len(indices[unique_labels[c2]]))
             triplets.append([indices[unique_labels[c1]][n1], indices[unique_labels[c1]][n2], indices[unique_labels[c2]][n3]])
         # print('TRIPLET SHAPE',np.array(triplets).shape)
