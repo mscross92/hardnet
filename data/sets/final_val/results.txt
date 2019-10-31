@@ -1,0 +1,180 @@
+1805 (250 samples)
+
+HardNet-Air
+248 matches via brute force
+248 matches below threshold
+248 / 250 matches, with 0 incorrect.
+Precision 1.0
+Recall 0.992
+F1 0.9959839357429718 
+
+HardNet-TURBID+aug (set0, 256bs, e100, sd35)
+248 matches via brute force
+248 matches below threshold
+248 / 250 matches, with 0 incorrect.
+Precision 1.0
+Recall 0.992
+F1 0.9959839357429718 
+
+HardNet-UW+aug (256bs, e10, sd25, n250000)
+247 matches via brute force
+247 matches below threshold
+247 / 250 matches, with 0 incorrect.
+Precision 1.0
+Recall 0.988
+F1 0.993963782696177 
+
+HardNet-TURBID (MSc)
+246 matches via brute force
+246 matches below threshold
+246 / 250 matches, with 0 incorrect.
+Precision 1.0
+Recall 0.984
+F1 0.9919354838709677
+
+SIFT
+241 matches via brute force
+241 matches below threshold
+241 / 250 matches, with 0 incorrect.
+Precision 1.0
+Recall 0.964
+F1 0.9816700610997963 
+
+SURF
+210 matches via brute force
+210 matches below threshold
+210 / 250 matches, with 11 incorrect.
+Precision 0.9476190476190476
+Recall 0.8326359832635983
+F1 0.8864142538975501 
+
+ORB
+174 matches via brute force
+174 matches below threshold
+174 / 250 matches, with 137 incorrect.
+Precision 0.21264367816091953
+Recall 0.3274336283185841
+F1 0.2578397212543554
+
+
+
+1934 (200 samples)
+
+HardNet-Air
+195 matches via brute force
+195 matches below threshold
+195 / 200 matches, with 0 incorrect.
+Precision 1.0
+Recall 0.975
+F1 0.9873417721518987 
+
+HardNet-TURBID+aug (set0, 256bs, e100, sd35)
+193 matches via brute force
+193 matches below threshold
+193 / 200 matches, with 0 incorrect.
+Precision 1.0
+Recall 0.965
+F1 0.9821882951653944 
+
+HardNet-UW+aug (256bs, e10, sd25, n250000)
+191 matches via brute force
+191 matches below threshold
+False positives: 0.9231457710266113
+191 / 200 matches, with 1 incorrect.
+Precision 0.9947643979057592
+Recall 0.9547738693467337
+F1 0.9743589743589743 
+
+HardNet-TURBID (MSc)
+186 matches via brute force
+186 matches below threshold
+186 / 200 matches, with 1 incorrect.
+Precision 0.9946236559139785
+Recall 0.9296482412060302
+F1 0.9610389610389611
+
+SIFT
+179 matches via brute force
+179 matches below threshold
+False positives: 99.40824890136719
+179 / 200 matches, with 2 incorrect.
+Precision 0.9888268156424581
+Recall 0.8939393939393939
+F1 0.9389920424403183 
+
+SURF
+155 matches via brute force
+155 matches below threshold
+155 / 200 matches, with 20 incorrect.
+Precision 0.8709677419354839
+Recall 0.75
+F1 0.8059701492537312
+
+ORB
+110 matches via brute force
+110 matches below threshold
+110 / 200 matches, with 101 incorrect.
+Precision 0.08181818181818182
+Recall 0.09090909090909091
+F1 0.0861244019138756 
+
+
+
+
+5847 (200 samples)
+
+HardNet-Air
+182 matches via brute force
+182 matches below threshold
+182 / 200 matches, with 0 incorrect.
+Precision 1.0
+Recall 0.91
+F1 0.9528795811518325
+
+HardNet-TURBID (set0, 256bs, e100, sd35)
+171 matches via brute force
+171 matches below threshold
+171 / 200 matches, with 3 incorrect.
+Precision 0.9824561403508771
+Recall 0.8527918781725888
+F1 0.9130434782608695 
+
+HardNet-UW (256bs, e10, sd25, n250000)
+166 matches via brute force
+166 matches below threshold
+166 / 200 matches, with 10 incorrect.
+Precision 0.9397590361445783
+Recall 0.8210526315789474
+F1 0.8764044943820224
+
+HardNet-TURBID (MSc)
+156 matches via brute force
+156 matches below threshold
+156 / 200 matches, with 20 incorrect.
+Precision 0.8717948717948718
+Recall 0.7555555555555555
+F1 0.8095238095238095
+
+SIFT
+164 matches via brute force
+164 matches below threshold
+164 / 200 matches, with 9 incorrect.
+Precision 0.9451219512195121
+Recall 0.8115183246073299
+F1 0.8732394366197183 
+
+SURF
+134 matches via brute force
+134 matches below threshold
+134 / 200 matches, with 29 incorrect.
+Precision 0.7835820895522388
+Recall 0.6140350877192983
+F1 0.6885245901639344
+
+ORB
+94 matches via brute force
+94 matches below threshold
+94 / 200 matches, with 88 incorrect.
+Precision 0.06382978723404255
+Recall 0.05357142857142857
+F1 0.05825242718446602 
